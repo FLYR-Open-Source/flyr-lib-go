@@ -1,0 +1,113 @@
+name:  Test Coverage
+
+on:
+  workflow_call:
+    inputs:
+      working-directory:
+        required: true
+        type: string
+      datadog-service:
+        required: true
+        type: string
+      sonarcloud-project-key:
+        required: true
+        type: string
+
+jobs:
+  tests-and-coverage:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+    # Utility binaries. Download the latest version only once a week.
+      - name: "Install Cloud SDK"
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          install_components: 'beta,pubsub-emulator'
+      - name: 'Start Pub/Sub emulator'
+        run: |
+          gcloud beta emulators pubsub start --project=testproject --host-port=0.0.0.0:8085 &
+      - name: Get date for weekly cache
+        id: get-date
+        run: |
+          echo "date=$(/bin/date -u "+%Y%m%U")" >> $GITHUB_OUTPUT
+        shell: bash
+
+      - name: Set env vars
+        run: |
+          echo "CGO_ENABLED=1" >> $GITHUB_ENV
+          echo "GOPATH=$HOME/go" >> "$GITHUB_ENV"
+          echo "$HOME/go/bin" >> "$GITHUB_PATH"
+      
+      - name: "Cache gotestsum"
+        id: cache-gotestsum
+        uses: actions/cache@v4
+        with:
+          path: ~/go/bin/gotestsum
+          key:  ${{ runner.os }}-gotestsum-${{ steps.get-date.outputs.date }}
+          restore-keys: ${{ runner.os }}-gotestsum
+      - name: "Install gotestsum"
+        if: steps.cache-gotestsum.outputs.cache-hit != 'true'
+        run: |
+            go install gotest.tools/gotestsum@latest
+            echo "$HOME/go/bin" >> $GITHUB_PATH
+
+      - name: "Cache datadog-ci"
+        id: cache-datadog-ci
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/bin/datadog-ci
+          key: ${{ runner.os }}-datadog-ci-${{ steps.get-date.outputs.date }}
+          restore-keys: ${{ runner.os }}-datadog-ci
+      - name: "Install datadog-ci"
+        if: steps.cache-datadog-ci.outputs.cache-hit != 'true'
+        run: curl -L --fail "https://github.com/DataDog/datadog-ci/releases/latest/download/datadog-ci_linux-x64" --output "/usr/local/bin/datadog-ci" && chmod +x /usr/local/bin/datadog-ci
+
+      - name: "[Branch: HEAD] Checking out"
+        # Now that we have created the coverage map for the base, we jump to
+        # PR's branch and do the same thing (get test coverage)
+        uses: actions/checkout@v4
+        with:
+          clean: yes
+      - name: Setup Golang
+        uses: actions/setup-go@v5
+        with:
+          cache: true
+          check-latest: false
+          go-version-file: ' ${{inputs.working-directory }}/go.mod'
+          cache-dependency-path: ' ${{inputs.working-directory }}/go.sum'
+      - name: "[Branch: HEAD] Generate source hash from source files"
+        id: hash-head
+        run: echo "value=${{ hashFiles('**/*.go') }}" >>"$GITHUB_OUTPUT"
+
+      - name: "[Branch: HEAD] Generate test coverage and junit report"
+        working-directory:  ${{inputs.working-directory }}
+        if: steps.cache-head.outputs.cache-hit != 'true' && steps.hash-base.outputs.value != steps.hash-head.outputs.value
+        run: gotestsum --junitfile  ${RUNNER_TEMP}/report.xml -f testname -- -race -coverprofile=${{ steps.hash-head.outputs.value }}.cover ./... 
+
+      - name: SonarCloud Scan
+        uses: sonarsource/sonarcloud-github-action@v2.3.0 # Ex: v2.1.0, See the latest version at https://github.com/marketplace/actions/sonarcloud-scan
+        with:
+            args: >
+                -Dsonar.organization=flyrinc
+                -Dsonar.projectKey=${{inputs.sonarcloud-project-key}}
+                -Dsonar.sources=${{inputs.working-directory }}
+                -Dsonar.host.url=https://sonarcloud.io 
+                -Dsonar.verbose=true
+                -Dsonar.go.coverage.reportPaths=${{ steps.hash-head.outputs.value }}.cover  
+        env:
+           SONAR_TOKEN: ${{ secrets.SONARCLOUD_TOKEN }}
+
+      - name: Print coverage
+        run: |
+              cat ${{ steps.hash-head.outputs.value }}.cover 
+
+      - name: "Upload test results to Datadog"
+        if: always()
+        run: |
+            total_coverage=$(go tool cover -func=${{ steps.hash-head.outputs.value }}.cover | grep "total:" | awk '{print $3}' | sed 's/%//')
+            echo "Coverage: $total_coverage%"
+            datadog-ci junit upload --service ${{ inputs.datadog-service }} --env gha  ${RUNNER_TEMP}/report.xml --tags service:${{ inputs.datadog-service }} --report-measures=test.code_coverage.lines_pct:$total_coverage
+        working-directory: ${{inputs.working-directory }}
+        env:
+          DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}

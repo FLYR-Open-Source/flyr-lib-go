@@ -1,0 +1,52 @@
+name: 'CI'
+concurrency:
+  cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.ref }}
+
+on:
+  pull_request:
+    branches:
+      - main
+    types: [opened, reopened, synchronize]
+  push:
+    branches:
+      - main
+      
+permissions:
+  actions: read
+  checks: read
+  contents: read
+  deployments: read
+  issues: read
+  discussions: read
+  packages: read
+  pages: read
+  pull-requests: write
+  repository-projects: read
+  security-events: read
+  statuses: read
+
+jobs:
+  lint:
+    uses: FlyrInc/terraform-github-actions/.github/workflows/golang_lint.yaml@v1.1.0
+    secrets: inherit
+    with:
+      working-directory: "."
+  security:
+    uses: FlyrInc/terraform-github-actions/.github/workflows/golang_security.yaml@v1.1.0
+    secrets: inherit
+    with:
+      working-directory: "."
+  unit_test:
+    uses: FlyrInc/terraform-github-actions/.github/workflows/golang_unit_test.yaml@v1.1.0
+    secrets: inherit
+    with:
+      working-directory: "."
+      datadog-service: ${{ github.repository }}
+  sonarcloud:
+    uses:  ./.github/workflows/golang_unit_test_sonarcloud.yaml
+    with:
+      working-directory: .
+      datadog-service: flyr-lib-go
+      sonarcloud-project-key: FlyrInc_flyr-lib-go
+    secrets: inherit

@@ -1,0 +1,49 @@
+{
+    "branches": "main",
+    "repositoryUrl": "https://github.com/FlyrInc/flyr-lib-go",
+    "debug": "false",
+    "tagFormat":"v${version}",
+    "plugins": [
+        [
+            "@semantic-release/commit-analyzer",
+            {
+                "preset": "conventionalcommits",
+                "releaseRules": [
+                    { "breaking": true, "release": "major" },
+                    { "type": "revert", "release": "patch" },
+                    { "type": "feat", "release": "minor" },
+                    { "type": "enhancement", "release": "patch"},
+                    { "type": "fix", "release": "patch" },
+                    { "type": "perf", "release": "patch" },
+                    { "type": "refactor", "release": "patch" },
+                    { "type": "docs", "release": false },
+                    { "type": "chore", "release": false },
+                    { "type": "style", "release": false },
+                    { "type": "test", "release": false },
+                    { "type": "release", "release": false}
+                ]
+            }
+        ],
+        [
+            "@semantic-release/release-notes-generator",
+            {
+                "preset": "conventionalcommits",
+                "presetConfig": {
+                    "types": [
+                        {"type": "feat", "section": "Features", "hidden": false},
+                        {"type": "enhancement", "section": "Feature Enhancements", "hidden": false},
+                        {"type": "fix", "section": "Bug Fixes", "hidden": false},
+                        {"type": "perf", "section": "Performance Improvements", "hidden": false},
+                        {"type": "docs", "section": "Documentation", "hidden": false},
+                        {"type": "refactor", "section": "Refactors", "hidden": false},
+                        {"type": "chore", "section": "chores", "hidden": true },
+                        {"type": "style", "section": "Styles", "hidden": true },
+                        {"type": "test", "section": "Tests", "hidden": true },
+                        {"type": "release", "section": "Releases", "hidden": true}
+                    ]
+                }
+            }
+        ],
+        "@semantic-release/github"
+    ]
+}
