@@ -13,9 +13,15 @@ func InitTracer(serviceName string) trace.Tracer {
 	return tp
 }
 
-// Start a new trace span
-func StartSpan(ctx context.Context, tracer trace.Tracer, spanName string) (context.Context, trace.Span) {
+// Extract trace from HTTP headers
+func StartSpanFromHTTPRequest(ctx context.Context, tracer trace.Tracer, spanName string, req *http.Request) (context.Context, trace.Span) {
+	// Use the request headers as the carrier to extract trace information
+	propagator := otel.GetTextMapPropagator()
+	ctx = propagator.Extract(ctx, propagation.HeaderCarrier(req.Header))
+
+	// Start a new span (continuing the trace if exists)
 	ctx, span := tracer.Start(ctx, spanName)
+
 	return ctx, span
 }
 
