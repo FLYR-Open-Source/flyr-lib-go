@@ -15,7 +15,7 @@ func InitMetrics(serviceName string) metric.Meter {
 	meterProvider := otel.GetMeterProvider()
 
 	// If no meter provider is configured, use a no-op provider
-	if meterProvider == noop.NewMeterProvider() {
+	if meterProvider == nil  {
 		meterProvider = noop.NewMeterProvider() // No-op meter for testing or when no metrics provider is set
 	}
 
