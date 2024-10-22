@@ -19,7 +19,6 @@ type LogEntry struct {
 	Error     string `json:"error,omitempty"`
 	TraceID   string `json:"dd.trace_id,omitempty"`
 	SpanID    string `json:"dd.span_id,omitempty"`
-	UserID    string `json:"userId,omitempty"`
 	RequestID string `json:"requestId,omitempty"`
 }
 
@@ -41,7 +40,6 @@ func Log(level string, message string, caller string, err error, traceID string,
 		Caller:    caller,
 		TraceID:   traceID,
 		SpanID:    spanID,
-		UserID:    obfuscateUserID(userID), // Obfuscate sensitive data
 		RequestID: requestID,
 		Error:     fmt.Sprintf("%v", err),
 	}
@@ -56,11 +54,3 @@ func Log(level string, message string, caller string, err error, traceID string,
 	log.Println(string(jsonEntry))
 }
 
-// Utility function to obfuscate sensitive User IDs
-func obfuscateUserID(userID string) string {
-	if len(userID) > 0 {
-		// Return a masked version of the user ID, e.g., hash or partial obfuscation
-		return "obfuscated-user-id"
-	}
-	return ""
-}
