@@ -1,9 +1,10 @@
-# Centrally managed file, do not modify directly https://github.com/FlyrInc/terraform-tfe-cloud/tree/main/terraform-github/repository-files/files
+# Centrally managed file, do not modify this directly. Source: https://github.com/FlyrInc/terraform-tfe-cloud/tree/main/terraform-github/repository-files/files
+# PR's created from this workflow won't trigger PR workflows due to https://github.com/orgs/community/discussions/65321#discussioncomment-8003574
 
 name: Generate dependabot.yaml file
 on:
   schedule:
-    - cron: "0 15 22 * *"
+    - cron: "0 15 15 * *"
   workflow_dispatch:
 jobs:
   generate:
@@ -81,7 +82,7 @@ jobs:
       - name: Set pull-request variables
         id: pr-vars
         run: |
-          echo pr_body="Github Action run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" >> $GITHUB_OUTPUT
+          echo pr_body="Due to https://github.com/orgs/community/discussions/65321 one needs to close then open PR to trigger worflows" >> $GITHUB_OUTPUT
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7
         with:
