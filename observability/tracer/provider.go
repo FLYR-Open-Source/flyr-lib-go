@@ -144,6 +144,6 @@ func StartCustomTracer(ctx context.Context, cfg config.MonitoringConfig, name st
 }
 
 // StopTracer gracefully shuts down the provided OpenTelemetry TracerProvider.
-func StopTracer(ctx context.Context, tc *sdktrace.TracerProvider) {
-	tc.Shutdown(ctx)
+func StopTracer(ctx context.Context, tc *sdktrace.TracerProvider) error {
+	return tc.Shutdown(ctx)
 }
