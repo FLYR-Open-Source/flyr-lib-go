@@ -8,10 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
-	"go.opentelemetry.io/otel"
-	sdktrace "go.opentelemetry.io/otel/sdk/trace"
-	sdktracetest "go.opentelemetry.io/otel/sdk/trace/tracetest"
-	oteltrace "go.opentelemetry.io/otel/trace"
+	"github.com/FlyrInc/flyr-lib-go/internal/testhelpers"
 )
 
 // MockSpanExtractor simulates extracting trace and span IDs from the context
@@ -49,17 +46,6 @@ func (h *MockHandler) Handler() slog.Handler {
 	return h
 }
 
-func getMockSpan(ctx context.Context) (context.Context, oteltrace.Span) {
-	tc := sdktrace.NewTracerProvider(
-		sdktrace.WithBatcher(sdktracetest.NewInMemoryExporter()),
-	)
-	otel.SetTracerProvider(tc)
-	defer tc.Shutdown(context.Background())
-	spanCtx, span := tc.Tracer("test-tracer").Start(ctx, "test-span")
-
-	return spanCtx, span
-}
-
 func TestTracingHandler_Enabled(t *testing.T) {
 	handler := NewTracingHandler(&MockHandler{}, "info")
 	assert.True(t, handler.Enabled(context.Background(), slog.LevelInfo))
@@ -71,7 +57,7 @@ func TestTracingHandler_Handle_AddsTraceIDs(t *testing.T) {
 	mockHanlder := MockHandler{}
 	record := slog.Record{}
 
-	spanCtx, span := getMockSpan(ctx)
+	spanCtx, span := testhelpers.GetMockSpan(ctx)
 	defer span.End()
 
 	err := NewTracingHandler(&mockHanlder, "info").Handle(spanCtx, record)
