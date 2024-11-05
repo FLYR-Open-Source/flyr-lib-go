@@ -5,19 +5,6 @@ import (
 	"time"
 
 	"github.com/FlyrInc/flyr-lib-go/config"
-	"github.com/FlyrInc/flyr-lib-go/internal/utils"
-)
-
-const (
-	MESSAGE_KEY  = "message"
-	CALLER_KEY   = "caller"
-	ERROR_KEY    = "error"
-	METADATA_KEY = "metadata"
-)
-
-const (
-	// The depth of the caller in the stack trace
-	callerDepth = 9
 )
 
 // InjectRootAttrs adds root attributes to a slog handler.
@@ -49,12 +36,7 @@ func replaceAttributes(groups []string, a slog.Attr) slog.Attr {
 	}
 
 	if a.Key == "msg" {
-		a.Key = MESSAGE_KEY
-	}
-
-	if a.Key == "source" {
-		a.Key = CALLER_KEY
-		a.Value = slog.StringValue(utils.GetCallerName(callerDepth).String())
+		a.Key = config.LOG_MESSAGE_KEY
 	}
 
 	return a

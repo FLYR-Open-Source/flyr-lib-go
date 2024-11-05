@@ -3,9 +3,11 @@ package tracer
 import (
 	"context"
 
-	"github.com/FlyrInc/flyr-lib-go/internal/utils"
 	"go.opentelemetry.io/otel/attribute"
 	oteltrace "go.opentelemetry.io/otel/trace"
+
+	"github.com/FlyrInc/flyr-lib-go/config"
+	internalUtils "github.com/FlyrInc/flyr-lib-go/internal/utils"
 )
 
 const (
@@ -39,7 +41,12 @@ func (t *Tracer) StartSpan(ctx context.Context, name string, kind SpanKind) (con
 
 	ctx, span := t.tracer.Start(ctx, name, oteltrace.WithSpanKind(kind))
 	// Add the caller to the span attributes
-	span.SetAttributes(attribute.String("caller", utils.GetCallerName(callerDepth).String()))
+	caller := internalUtils.GetCallerName(callerDepth)
+	codeFilePath := attribute.String(config.CODE_PATH, caller.FilePath)
+	codeLineNumber := attribute.Int(config.CODE_LINE, caller.LineNumber)
+	codeFunctionName := attribute.String(config.CODE_FUNC, caller.FunctionName)
+	codeNamespace := attribute.String(config.CODE_NS, caller.Namespace)
+	span.SetAttributes(codeFilePath, codeLineNumber, codeFunctionName, codeNamespace)
 
 	return ctx, Span{span}
 }

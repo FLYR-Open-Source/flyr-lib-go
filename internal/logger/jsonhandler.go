@@ -11,15 +11,14 @@ import (
 // NewJSONLogHandler creates a new JSON log handler with custom configurations.
 //
 // This function initializes a slog.Handler that outputs logs in JSON format
-// to standard output. The handler options include adding the source of log
-// entries, setting the log level according to the provided configuration,
+// to standard output. The handler is setting the log level according to the provided configuration,
 // and replacing certain attributes using the replaceAttributes function for
 // custom formatting.
 func NewJSONLogHandler(cfg config.LoggerConfig) slog.Handler {
 	return slog.NewJSONHandler(
 		os.Stdout,
 		&slog.HandlerOptions{
-			AddSource:   true,
+			AddSource:   false,
 			Level:       parseLogLevel(cfg.LogLevel()),
 			ReplaceAttr: replaceAttributes,
 		})
