@@ -12,7 +12,7 @@ import (
 // InitLogger initializes the logger with the given configuration.
 //
 // The logger is then selected as the default logger for the application.
-func InitLogger(cfg config.Logger) {
+func InitLogger(cfg config.LoggerConfig) {
 	jsonHanlder := internalLogger.NewJSONLogHandler(cfg)
 	tracingHanlder := internalLogger.NewTracingHandler(jsonHanlder, cfg.LogLevel())
 
@@ -22,7 +22,8 @@ func InitLogger(cfg config.Logger) {
 
 // Debug logs a message at the debug level.
 //
-// Any attributes passed as arguments are added to the log message in the group "metadata".
+// Any attributes passed as arguments are added to the log message in the group "metadata",
+// and in the span that is retrieved from the given context.
 func Debug(ctx context.Context, message string, args ...interface{}) {
 	metadata := slog.Group(internalLogger.METADATA_KEY, args...)
 	slog.DebugContext(ctx, message, metadata)
@@ -30,7 +31,8 @@ func Debug(ctx context.Context, message string, args ...interface{}) {
 
 // Info logs a message at the info level.
 //
-// Any attributes passed as arguments are added to the log message in the group "metadata".
+// Any attributes passed as arguments are added to the log message in the group "metadata",
+// and in the span that is retrieved from the given context.
 func Info(ctx context.Context, message string, args ...interface{}) {
 	metadata := slog.Group(internalLogger.METADATA_KEY, args...)
 
@@ -40,7 +42,8 @@ func Info(ctx context.Context, message string, args ...interface{}) {
 
 // Warn logs a message at the warn level.
 //
-// Any attributes passed as arguments are added to the log message in the group "metadata".
+// Any attributes passed as arguments are added to the log message in the group "metadata",
+// and in the span that is retrieved from the given context.
 func Warn(ctx context.Context, message string, args ...interface{}) {
 	metadata := slog.Group(internalLogger.METADATA_KEY, args...)
 	slog.WarnContext(ctx, message, metadata)
@@ -48,7 +51,8 @@ func Warn(ctx context.Context, message string, args ...interface{}) {
 
 // Error logs a message at the error level.
 //
-// Any attributes passed as arguments are added to the log message in the group "metadata".
+// Any attributes passed as arguments are added to the log message in the group "metadata",
+// and in the span that is retrieved from the given context.
 // Furthermore, if an error is passed as an argument, it is added to the log message in the attribute "error",
 // and also sets the span as errored (if the a span cna be retrieved from the given context).
 func Error(ctx context.Context, message string, err error, args ...interface{}) {

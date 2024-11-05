@@ -15,7 +15,7 @@ import (
 // entries, setting the log level according to the provided configuration,
 // and replacing certain attributes using the replaceAttributes function for
 // custom formatting.
-func NewJSONLogHandler(cfg config.Logger) slog.Handler {
+func NewJSONLogHandler(cfg config.LoggerConfig) slog.Handler {
 	return slog.NewJSONHandler(
 		os.Stdout,
 		&slog.HandlerOptions{

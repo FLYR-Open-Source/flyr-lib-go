@@ -35,8 +35,10 @@ func injectAttrsToSpan(ctx context.Context, attr slog.Attr) {
 
 	value, err := valueToJSONString(attr.Value)
 	if err != nil {
-		span.SetAttributes(attribute.String(attr.Key, value))
+		return // if it's null just ignore it and swallow the error
 	}
+
+	span.SetAttributes(attribute.String(attr.Key, value))
 }
 
 // valueToJSONString converts a slog.Value to its JSON string representation.
