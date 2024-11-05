@@ -22,7 +22,7 @@ func NewLoggerConfig(opts ...Option) Logger {
 }
 
 // LogLevel returns the minimum log level for the logger.
-// Possible values could be panic, fatal, error, warn, info, debug, trace
+// Possible values could be error, warn, info, debug
 func (l Logger) LogLevel() string {
 	return l.LogLevelCfg
 }
@@ -33,7 +33,7 @@ func (l Logger) Service() string {
 }
 
 // Env returns the environment name for application tagging.
-// Possible values could be local, dev, stg, int, prd, etc...
+// Possible values could be local, dev, int, qa, testing, traning, prd etc...
 func (l Logger) Env() string {
 	return l.EnvCfg
 }
