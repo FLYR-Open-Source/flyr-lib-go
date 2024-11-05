@@ -15,7 +15,7 @@ const (
 
 // Tracer is a wrapper around the OpenTelemetry Tracer
 type Tracer struct {
-	oteltrace.Tracer
+	tracer oteltrace.Tracer
 }
 
 // defaultTracer is the default tracer used by the application.
@@ -33,11 +33,11 @@ var defaultTracer *Tracer
 //
 // It returns the new context and the Span.
 func (t *Tracer) StartSpan(ctx context.Context, name string, kind SpanKind) (context.Context, Span) {
-	if t == nil {
+	if t.tracer == nil {
 		return ctx, Span{}
 	}
 
-	ctx, span := t.Start(ctx, name, oteltrace.WithSpanKind(kind))
+	ctx, span := t.tracer.Start(ctx, name, oteltrace.WithSpanKind(kind))
 	// Add the caller to the span attributes
 	span.SetAttributes(attribute.String("caller", utils.GetCallerName(callerDepth).String()))
 

@@ -98,12 +98,12 @@ func StartDefaultTracer(ctx context.Context, cfg config.MonitoringConfig) (*sdkt
 		return nil, ErrServiceNameNotSet
 	}
 
-	t := tc.Tracer(
-		cfg.Service(),
-		oteltrace.WithInstrumentationVersion("1"),
-	)
-
-	defaultTracer = t.(*Tracer)
+	defaultTracer = &Tracer{
+		tracer: tc.Tracer(
+			cfg.Service(),
+			oteltrace.WithInstrumentationVersion("1"),
+		),
+	}
 
 	return tc, nil
 }
@@ -133,12 +133,14 @@ func StartCustomTracer(ctx context.Context, cfg config.MonitoringConfig, name st
 		return nil, nil, err
 	}
 
-	t := tc.Tracer(
-		name,
-		oteltrace.WithInstrumentationVersion("1"),
-	)
+	t := &Tracer{
+		tracer: tc.Tracer(
+			name,
+			oteltrace.WithInstrumentationVersion("1"),
+		),
+	}
 
-	return tc, t.(*Tracer), nil
+	return tc, t, nil
 }
 
 // StopTracer gracefully shuts down the provided OpenTelemetry TracerProvider.
