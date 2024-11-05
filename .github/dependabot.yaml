@@ -1,0 +1,21 @@
+version: 2
+registries:
+  terraform-cloud:
+    type: "terraform-registry"
+    url: "https://app.terraform.io"
+    token: ${{ secrets.TERRAFORM_CLOUD }}
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    registries: "*" # Does not make sense, but at least one update must reference each registry
+    schedule:
+      interval: "monthly"
+  - directory: "."
+    package-ecosystem: "gomod"
+    schedule:
+      interval: "monthly"
+    rebase-strategy: "disabled"
+    groups:
+      minor:
+        patterns: ["*"]
+        update-types: [ "minor", "patch" ]
