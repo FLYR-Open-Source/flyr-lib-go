@@ -13,7 +13,7 @@ func TestMonitoringConfig(t *testing.T) {
 	assert.Equalf(t, "", cfg.Env(), "default Env() return value is not correct")
 	assert.Equalf(t, "", cfg.Version(), "default Version() return value is not correct")
 	assert.Equalf(t, "", cfg.Tenant(), "default Tenant() return value is not correct")
-	assert.Equalf(t, false, cfg.TracerEnabled(), "default TracerEnabled() return value is not correct")
+	assert.Falsef(t, cfg.TracerEnabled(), "default TracerEnabled() return value is not correct")
 }
 
 func TestMonitoringConfigWithEnvVars(t *testing.T) {
@@ -32,7 +32,7 @@ func TestMonitoringConfigWithEnvVars(t *testing.T) {
 	assert.Equalf(t, "test-env", cfg.Env(), "environment override Env() return value is not correct")
 	assert.Equalf(t, "test-version", cfg.Version(), "environment override Version() return value is not correct")
 	assert.Equalf(t, "test-tenant", cfg.Tenant(), "environment override Tenant() return value is not correct")
-	assert.Equalf(t, true, cfg.TracerEnabled(), "environment override TracerEnabled() return value is not correct")
+	assert.Truef(t, cfg.TracerEnabled(), "environment override TracerEnabled() return value is not correct")
 	assert.Equalf(t, "http://localhost:4317", cfg.ExporterEndpoint(), "environment override ExporterEndpoint() return value is not correct")
 }
 
