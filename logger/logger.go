@@ -2,53 +2,62 @@ package logger
 
 import (
 	"context"
-	"os"
-	"time"
 
 	"github.com/FlyrInc/flyr-lib-go/config"
-	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/pkgerrors"
+	internalLogger "github.com/FlyrInc/flyr-lib-go/internal/logger"
+
+	"log/slog"
 )
 
-type Logger struct {
-	zerolog.Logger
+// InitLogger initializes the logger with the given configuration.
+//
+// The logger is then selected as the default logger for the application.
+func InitLogger(cfg config.Logger) {
+	jsonHanlder := internalLogger.NewJSONLogHandler(cfg)
+	tracingHanlder := internalLogger.NewTracingHandler(jsonHanlder, cfg.LogLevel())
+
+	l := slog.New(internalLogger.InjectRootAttrs(tracingHanlder, cfg))
+	slog.SetDefault(l)
 }
 
-// WithContext returns a copy of ctx with the logger attached.
-func (l Logger) WithContext(ctx context.Context) context.Context {
-	return l.Logger.WithContext(ctx)
+// Debug logs a message at the debug level.
+//
+// Any attributes passed as arguments are added to the log message in the group "metadata".
+func Debug(ctx context.Context, message string, args ...interface{}) {
+	metadata := slog.Group(internalLogger.METADATA_KEY, args...)
+	slog.DebugContext(ctx, message, metadata)
 }
 
-// New creates a logger with passed options and default settings to allow for contextual logging
-func New(cfg config.Logger) Logger {
-	zerolog.TimestampFunc = func() time.Time {
-		return time.Now().UTC()
+// Info logs a message at the info level.
+//
+// Any attributes passed as arguments are added to the log message in the group "metadata".
+func Info(ctx context.Context, message string, args ...interface{}) {
+	metadata := slog.Group(internalLogger.METADATA_KEY, args...)
+
+	injectAttrsToSpan(ctx, metadata)
+	slog.InfoContext(ctx, message, metadata)
+}
+
+// Warn logs a message at the warn level.
+//
+// Any attributes passed as arguments are added to the log message in the group "metadata".
+func Warn(ctx context.Context, message string, args ...interface{}) {
+	metadata := slog.Group(internalLogger.METADATA_KEY, args...)
+	slog.WarnContext(ctx, message, metadata)
+}
+
+// Error logs a message at the error level.
+//
+// Any attributes passed as arguments are added to the log message in the group "metadata".
+// Furthermore, if an error is passed as an argument, it is added to the log message in the attribute "error",
+// and also sets the span as errored (if the a span cna be retrieved from the given context).
+func Error(ctx context.Context, message string, err error, args ...interface{}) {
+	var errorMessage slog.Attr
+	if err != nil {
+		errorMessage = slog.String(internalLogger.ERROR_KEY, err.Error())
+		setErroredSpan(ctx, err) // Set spans as errored
 	}
-	zerolog.ErrorStackMarshaler = pkgerrors.MarshalStack // Error Logging with Stacktrace
-	level := zerolog.InfoLevel                           // default to info
-	if lvl, err := zerolog.ParseLevel(cfg.LogLevel()); err == nil && lvl != zerolog.NoLevel {
-		level = lvl
-	}
-	zerolog.SetGlobalLevel(level)
-	logger := zerolog.New(os.Stdout).
-		Level(level).
-		With().   // Add contextual fields to the global logger
-		Caller(). // Add file and line number to log
-		Timestamp().
-		Str(config.ENV_NAME, cfg.Env()).
-		Str(config.VERSION_NAME, cfg.Version()).
-		Str(config.SERVICE_NAME, cfg.Service()).
-		Str(config.TENANT_NAME, cfg.Tenant()).
-		Logger().
-		Hook(TracingHook{}) // hook trace and span IDs to the logs
 
-	zerolog.DefaultContextLogger = &logger
-	return Logger{logger}
-}
-
-// Ctx returns the logger associated with given ctx if available
-// If ctx does not have logger, return zerolog.DefaultContextLogger
-// Otherwise falls back to zerolog.disabledLogger
-func Ctx(ctx context.Context) *zerolog.Logger {
-	return zerolog.Ctx(ctx)
+	metadata := slog.Group(internalLogger.METADATA_KEY, args...)
+	slog.ErrorContext(ctx, message, errorMessage, metadata)
 }
