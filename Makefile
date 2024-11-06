@@ -7,4 +7,4 @@ lint:
 
 .PHONY: test
 test:
-	go test ./... -v
+	gotestsum -- -short -coverprofile=cover.out ./...

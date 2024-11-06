@@ -1,0 +1,52 @@
+name: Test Coverage
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  tests-and-coverage:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      # Utility binaries. Download the latest version only once a week.
+      - name: Get date for weekly cache
+        id: get-date
+        run: |
+          echo "date=$(/bin/date -u "+%Y%m%U")" >> $GITHUB_OUTPUT
+        shell: bash
+
+      - name: Set env vars
+        run: |
+          echo "CGO_ENABLED=1" >> $GITHUB_ENV
+          echo "GOPATH=$HOME/go" >> "$GITHUB_ENV"
+          echo "$HOME/go/bin" >> "$GITHUB_PATH"
+
+      - name: "Cache gotestsum"
+        id: cache-gotestsum
+        uses: actions/cache@v4
+        with:
+          path: ~/go/bin/gotestsum
+          key: ${{ runner.os }}-gotestsum-${{ steps.get-date.outputs.date }}
+          restore-keys: ${{ runner.os }}-gotestsum
+
+      - name: "Install gotestsum"
+        if: steps.cache-gotestsum.outputs.cache-hit != 'true'
+        run: |
+          go install gotest.tools/gotestsum@latest
+          echo "$HOME/go/bin" >> $GITHUB_PATH
+
+      - name: "Generate source hash from source files"
+        id: hash-head
+        run: echo "value=${{ hashFiles('**/*.go') }}" >>"$GITHUB_OUTPUT"
+
+      - name: "Generate test coverage and junit report"
+        working-directory: ${{inputs.working-directory}}
+        if: steps.cache-head.outputs.cache-hit != 'true' && steps.hash-base.outputs.value != steps.hash-head.outputs.value
+        run: gotestsum -- -short -race -coverprofile=${{ steps.hash-head.outputs.value }}.cover ./...
