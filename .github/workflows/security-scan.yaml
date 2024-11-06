@@ -1,4 +1,4 @@
-name: run-gosec
+name: Security Scan
 on:
   push:
     branches:
