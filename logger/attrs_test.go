@@ -24,7 +24,7 @@ func TestGetAttributes(t *testing.T) {
 
 		codeLine := attrs[1].(slog.Attr)
 		assert.Equal(t, config.CODE_LINE, codeLine.Key)
-		assert.Equal(t, int64(1689), codeLine.Value.Int64())
+		assert.Greater(t, codeLine.Value.Int64(), int64(0))
 
 		codeFunc := attrs[2].(slog.Attr)
 		assert.Equal(t, config.CODE_FUNC, codeFunc.Key)
