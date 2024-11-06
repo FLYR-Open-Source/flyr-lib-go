@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/FlyrInc/flyr-lib-go/internal/testhelpers"
+	"github.com/FlyrInc/flyr-lib-go/pkg/testhelpers"
 	"github.com/stretchr/testify/assert"
 )
 

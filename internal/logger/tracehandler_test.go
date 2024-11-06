@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
-	"github.com/FlyrInc/flyr-lib-go/internal/testhelpers"
+	"github.com/FlyrInc/flyr-lib-go/pkg/testhelpers"
 )
 
 // MockSpanExtractor simulates extracting trace and span IDs from the context
