@@ -14,8 +14,8 @@ import (
 // tracing operations where span context is required.
 //
 // Returns the current oteltrace.Span.
-func GetSpanFromContext(ctx context.Context) oteltrace.Span {
-	return oteltrace.SpanFromContext(ctx)
+func GetSpanFromContext(ctx context.Context) Span {
+	return Span{oteltrace.SpanFromContext(ctx)}
 }
 
 // ExtractTrace extracts the trace and span IDs from the current span in the context.

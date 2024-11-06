@@ -10,7 +10,7 @@ import (
 
 func TestGetSpanFromContext(t *testing.T) {
 	t.Run("Span exists in the context", func(t *testing.T) {
-		ctx, _ := testhelpers.GetMockSpan(context.Background())
+		ctx, _ := testhelpers.GetFakeSpan(context.Background())
 		span := GetSpanFromContext(ctx)
 		defer span.End()
 		assert.NotNil(t, span)
@@ -30,7 +30,7 @@ func TestGetSpanFromContext(t *testing.T) {
 
 func TestExtractTrace(t *testing.T) {
 	t.Run("Span exists in the context with valid trace and span IDs", func(t *testing.T) {
-		ctx, span := testhelpers.GetMockSpan(context.Background())
+		ctx, span := testhelpers.GetFakeSpan(context.Background())
 		traceID, spanID, found := ExtractTrace(ctx)
 		defer span.End()
 
@@ -48,7 +48,7 @@ func TestExtractTrace(t *testing.T) {
 	})
 
 	t.Run("Span exists but it is not recording", func(t *testing.T) {
-		ctx, span := testhelpers.GetMockSpan(context.Background())
+		ctx, span := testhelpers.GetFakeSpan(context.Background())
 		span.End()
 		traceID, spanID, found := ExtractTrace(ctx)
 

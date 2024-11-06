@@ -58,7 +58,7 @@ func TestTracingHandler_Handle_AddsTraceIDs(t *testing.T) {
 	mockHanlder := MockHandler{}
 	record := slog.Record{}
 
-	spanCtx, span := testhelpers.GetMockSpan(ctx)
+	spanCtx, span := testhelpers.GetFakeSpan(ctx)
 	defer span.End()
 
 	err := NewTracingHandler(&mockHanlder, "info").Handle(spanCtx, record)

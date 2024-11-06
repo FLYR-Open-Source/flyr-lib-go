@@ -7,6 +7,7 @@ import (
 	oteltrace "go.opentelemetry.io/otel/trace"
 
 	"github.com/FlyrInc/flyr-lib-go/config"
+	internalSpan "github.com/FlyrInc/flyr-lib-go/internal/span"
 	internalUtils "github.com/FlyrInc/flyr-lib-go/internal/utils"
 )
 
@@ -34,9 +35,9 @@ var defaultTracer *Tracer
 // and a Span object that wraps the created span.
 //
 // It returns the new context and the Span.
-func (t *Tracer) StartSpan(ctx context.Context, name string, kind SpanKind) (context.Context, Span) {
+func (t *Tracer) StartSpan(ctx context.Context, name string, kind SpanKind) (context.Context, internalSpan.Span) {
 	if t.tracer == nil {
-		return ctx, Span{}
+		return ctx, internalSpan.Span{}
 	}
 
 	ctx, span := t.tracer.Start(ctx, name, oteltrace.WithSpanKind(kind))
@@ -48,5 +49,5 @@ func (t *Tracer) StartSpan(ctx context.Context, name string, kind SpanKind) (con
 	codeNamespace := attribute.String(config.CODE_NS, caller.Namespace)
 	span.SetAttributes(codeFilePath, codeLineNumber, codeFunctionName, codeNamespace)
 
-	return ctx, Span{span}
+	return ctx, internalSpan.Span{Span: span}
 }

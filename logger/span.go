@@ -94,6 +94,7 @@ func valueToJSONString(value slog.Value) (string, error) {
 		return valueToJSONString(value.LogValuer().LogValue())
 
 	default:
+		// Return an error for unsupported kinds
 		return "", fmt.Errorf("unsupported slog.Value kind: %v", value.Kind())
 	}
 

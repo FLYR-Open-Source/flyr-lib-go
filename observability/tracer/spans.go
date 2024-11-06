@@ -10,13 +10,6 @@ import (
 	"github.com/FlyrInc/flyr-lib-go/internal/span"
 )
 
-// Span is a wrapper around oteltrace.Span
-//
-// It is used to provide a more convenient API with extra functionality
-type Span struct {
-	oteltrace.Span
-}
-
 type SpanKind = oteltrace.SpanKind
 type Code = codes.Code
 type KeyValue = attribute.KeyValue
@@ -27,27 +20,12 @@ type KeyValue = attribute.KeyValue
 // tracer.StartDefaultTracer(...) should be called.
 //
 // It returns the new context and the new span
-func StartSpan(ctx context.Context, name string, kind SpanKind) (context.Context, Span) {
+func StartSpan(ctx context.Context, name string, kind SpanKind) (context.Context, span.Span) {
 	if defaultTracer == nil {
-		return ctx, Span{}
+		return ctx, span.Span{}
 	}
 
 	return defaultTracer.StartSpan(ctx, name, kind)
-}
-
-// EndWithError ends the span by updating the status to Error and recording the error
-func (s Span) EndWithError(err error) {
-	if err != nil {
-		s.SetStatus(codes.Error, err.Error())
-		s.RecordError(err)
-	}
-	s.End()
-}
-
-// EndSuccessfully ends the span by updating the status to Ok
-func (s Span) EndSuccessfully() {
-	s.SetStatus(codes.Ok, "")
-	s.End()
 }
 
 // GetSpanFromContext retrieves the current Span from the context.
@@ -58,6 +36,6 @@ func (s Span) EndSuccessfully() {
 // tracing operations where span context is required.
 //
 // Returns the current Span.
-func GetSpanFromContext(ctx context.Context) Span {
-	return span.GetSpanFromContext(ctx).(Span)
+func GetSpanFromContext(ctx context.Context) span.Span {
+	return span.Span{Span: span.GetSpanFromContext(ctx)}
 }
