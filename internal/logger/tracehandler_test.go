@@ -7,6 +7,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
 
 	"github.com/FlyrInc/flyr-lib-go/internal/testhelpers"
 )
@@ -61,10 +62,10 @@ func TestTracingHandler_Handle_AddsTraceIDs(t *testing.T) {
 	defer span.End()
 
 	err := NewTracingHandler(&mockHanlder, "info").Handle(spanCtx, record)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	// Check that the trace and span IDs were added to the log record
-	assert.Equal(t, mockHanlder.r.NumAttrs(), 2)
+	assert.Equal(t, 2, mockHanlder.r.NumAttrs())
 
 	// Check that the trace and span IDs match the span's trace and span IDs
 	mockHanlder.r.Attrs(func(a slog.Attr) bool {
@@ -86,10 +87,10 @@ func TestTracingHandler_Handle_NoTraceIDs(t *testing.T) {
 	record := slog.Record{}
 
 	err := NewTracingHandler(&mockHanlder, "info").Handle(ctx, record)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	// Check that the trace and span IDs were added to the log record
-	assert.Equal(t, mockHanlder.r.NumAttrs(), 0)
+	assert.Equal(t, 0, mockHanlder.r.NumAttrs())
 }
 
 func TestTracingHandler_WithAttrs(t *testing.T) {
