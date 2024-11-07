@@ -8,7 +8,7 @@ import (
 
 	"github.com/FlyrInc/flyr-lib-go/config"
 	"github.com/FlyrInc/flyr-lib-go/logger"
-	"github.com/FlyrInc/flyr-lib-go/observability/tracer"
+	"github.com/FlyrInc/flyr-lib-go/monitoring/tracer"
 	"go.opentelemetry.io/otel/trace"
 )
 
