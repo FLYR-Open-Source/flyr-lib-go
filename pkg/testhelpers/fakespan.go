@@ -65,3 +65,11 @@ func (fs *FakeSpan) SetAttributes(kv ...attribute.KeyValue) {
 	fs.FakeAttributes = append(fs.FakeAttributes, kv...)
 	fs.Span.SetAttributes(kv...)
 }
+
+func (fs *FakeSpan) End(options ...oteltrace.SpanEndOption) {
+	fs.Span.End(options...)
+}
+
+func (fs *FakeSpan) IsRecording() bool {
+	return fs.Span.IsRecording()
+}

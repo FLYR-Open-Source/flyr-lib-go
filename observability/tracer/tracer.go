@@ -26,15 +26,6 @@ type Tracer struct {
 // The default tracer is initialized by the tracer.StartDefaultTracer(...) function.
 var defaultTracer *Tracer
 
-func includeCallerAttributes(span oteltrace.Span) {
-	caller := internalUtils.GetCallerName(callerDepth)
-	codeFilePath := attribute.String(config.CODE_PATH, caller.FilePath)
-	codeLineNumber := attribute.Int(config.CODE_LINE, caller.LineNumber)
-	codeFunctionName := attribute.String(config.CODE_FUNC, caller.FunctionName)
-	codeNamespace := attribute.String(config.CODE_NS, caller.Namespace)
-	span.SetAttributes(codeFilePath, codeLineNumber, codeFunctionName, codeNamespace)
-}
-
 // StartSpan begins a new span for tracing with the specified name and kind.
 //
 // This method takes a context, a span name, and a span kind as arguments. It checks
@@ -50,8 +41,14 @@ func (t *Tracer) StartSpan(ctx context.Context, name string, kind SpanKind) (con
 	}
 
 	ctx, span := t.tracer.Start(ctx, name, oteltrace.WithSpanKind(kind))
+
 	// Add the caller to the span attributes
-	includeCallerAttributes(span)
+	caller := internalUtils.GetCallerName(callerDepth)
+	codeFilePath := attribute.String(config.CODE_PATH, caller.FilePath)
+	codeLineNumber := attribute.Int(config.CODE_LINE, caller.LineNumber)
+	codeFunctionName := attribute.String(config.CODE_FUNC, caller.FunctionName)
+	codeNamespace := attribute.String(config.CODE_NS, caller.Namespace)
+	span.SetAttributes(codeFilePath, codeLineNumber, codeFunctionName, codeNamespace)
 
 	return ctx, internalSpan.Span{Span: span}
 }
