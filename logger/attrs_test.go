@@ -24,11 +24,11 @@ func TestGetAttributes(t *testing.T) {
 
 		codeLine := attrs[1].(slog.Attr)
 		assert.Equal(t, config.CODE_LINE, codeLine.Key)
-		assert.Greater(t, codeLine.Value.Int64(), int64(0))
+		assert.Positive(t, codeLine.Value.Int64())
 
 		codeFunc := attrs[2].(slog.Attr)
 		assert.Equal(t, config.CODE_FUNC, codeFunc.Key)
-		assert.Contains(t, "tRunner", codeFunc.Value.String())
+		assert.Contains(t, codeFunc.Value.String(), "tRunner")
 
 		codeNs := attrs[3].(slog.Attr)
 		assert.Equal(t, config.CODE_NS, codeNs.Key)
@@ -65,5 +65,4 @@ func TestGetAttributes(t *testing.T) {
 		assert.Equal(t, config.LOG_METADATA_KEY, metadata.Key)
 		assert.Equal(t, "[]", metadata.Value.String())
 	})
-
 }

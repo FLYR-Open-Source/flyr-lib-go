@@ -13,7 +13,7 @@ import (
 // which is a placeholder that performs no operations. This is useful for
 // tracing operations where span context is required.
 //
-// Returns the current oteltrace.Span.
+// Returns the custom Span type.
 func GetSpanFromContext(ctx context.Context) Span {
 	return Span{oteltrace.SpanFromContext(ctx)}
 }

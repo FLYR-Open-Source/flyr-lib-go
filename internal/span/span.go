@@ -13,7 +13,7 @@ type Span struct {
 }
 
 // EndWithError ends the span by updating the status to Error and recording the error
-func (s Span) EndWithError(err error) {
+func (s *Span) EndWithError(err error) {
 	if err != nil {
 		s.SetStatus(otelcodes.Error, err.Error())
 		s.RecordError(err)
@@ -22,7 +22,7 @@ func (s Span) EndWithError(err error) {
 }
 
 // EndSuccessfully ends the span by updating the status to Ok
-func (s Span) EndSuccessfully() {
+func (s *Span) EndSuccessfully() {
 	s.SetStatus(otelcodes.Ok, "")
 	s.End()
 }

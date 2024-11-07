@@ -37,5 +37,5 @@ func StartSpan(ctx context.Context, name string, kind SpanKind) (context.Context
 //
 // Returns the current Span.
 func GetSpanFromContext(ctx context.Context) span.Span {
-	return span.Span{Span: span.GetSpanFromContext(ctx)}
+	return span.GetSpanFromContext(ctx)
 }

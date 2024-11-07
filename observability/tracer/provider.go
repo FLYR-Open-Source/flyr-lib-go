@@ -35,7 +35,7 @@ func getOtelCollectorExporter(ctx context.Context, cfg config.MonitoringConfig) 
 // propagation, which is essential for distributed tracing.
 //
 // It returns the initialized TracerProvider and an error if any occurred.
-func newTraceProvider(ctx context.Context, cfg config.MonitoringConfig, exporter *otlptrace.Exporter, defaultProvider bool) (*sdktrace.TracerProvider, error) {
+func newTraceProvider(ctx context.Context, cfg config.MonitoringConfig, exporter *otlptrace.Exporter, defaultProvider bool) (*sdktrace.TracerProvider, *resource.Resource, error) {
 	res, err := resource.New(
 		ctx,
 		resource.WithAttributes(
@@ -50,7 +50,7 @@ func newTraceProvider(ctx context.Context, cfg config.MonitoringConfig, exporter
 		resource.WithHost(),
 	)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	tc := sdktrace.NewTracerProvider(
@@ -64,7 +64,7 @@ func newTraceProvider(ctx context.Context, cfg config.MonitoringConfig, exporter
 
 	otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{}))
 
-	return tc, nil
+	return tc, res, nil
 }
 
 // StartDefaultTracer initializes and starts the default OpenTelemetry TracerProvider.
@@ -89,7 +89,7 @@ func StartDefaultTracer(ctx context.Context, cfg config.MonitoringConfig) (*sdkt
 		return nil, err
 	}
 
-	tc, err := newTraceProvider(ctx, cfg, exporter, true)
+	tc, _, err := newTraceProvider(ctx, cfg, exporter, true)
 	if err != nil {
 		return nil, err
 	}
@@ -128,7 +128,7 @@ func StartCustomTracer(ctx context.Context, cfg config.MonitoringConfig, name st
 		return nil, nil, err
 	}
 
-	tc, err := newTraceProvider(ctx, cfg, exporter, false)
+	tc, _, err := newTraceProvider(ctx, cfg, exporter, false)
 	if err != nil {
 		return nil, nil, err
 	}
