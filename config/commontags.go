@@ -18,8 +18,12 @@ const (
 )
 
 const (
+	// The file path of the code that generated the log or the span
 	CODE_PATH = "code.filepath"
+	// The line number of the code that generated the log or the span
 	CODE_LINE = "code.lineno"
+	// The function name of the code that generated the log or the span
 	CODE_FUNC = "code.function"
-	CODE_NS   = "code.namespace"
+	// The namespace of the code that generated the log or the span
+	CODE_NS = "code.namespace"
 )

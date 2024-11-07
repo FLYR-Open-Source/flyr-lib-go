@@ -1,5 +1,11 @@
+.PHONY: tidy
 tidy:
 	go mod tidy
+
+.PHONY: docs
+docs:
+	$(GOBIN)/godoc -http=:6060
+	# Visit: http://localhost:6060/pkg/github.com/FlyrInc/flyr-lib-go/
 
 .PHONY: lint
 lint:

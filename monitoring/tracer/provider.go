@@ -101,7 +101,7 @@ func StartDefaultTracer(ctx context.Context, cfg config.MonitoringConfig) (*sdkt
 	defaultTracer = &Tracer{
 		tracer: tc.Tracer(
 			cfg.Service(),
-			oteltrace.WithInstrumentationVersion("1"),
+			oteltrace.WithInstrumentationVersion("v0.0.1"), // TODO: Update instrumentation version
 		),
 	}
 

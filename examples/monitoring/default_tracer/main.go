@@ -18,15 +18,21 @@ type MyStruct struct {
 }
 
 const (
+	// You can pass the `OBSERVABILITY_SERVICE` environment variable to set the service name
 	serviceName = "some-service"
-	env         = "dev"
-	flyrTenant  = "fl"
-	version     = "v1.0.0"
+	// You can pass the `OBSERVABILITY_ENV` environment variable to set the environment
+	env = "dev"
+	// You can pass the `OBSERVABILITY_FLYR_TENANT` environment variable to set the tenant
+	flyrTenant = "fl"
+	// You can pass the `OBSERVABILITY_VERSION` environment variable to set the version
+	version = "v1.0.0"
+	// You can pass the `OBSERVABILITY_TRACER_ENABLED` environment variable to enable the tracer
+	enableTracer = true
 )
 
 func getMonitoringConfig() config.MonitoringConfig {
 	cfg := config.NewMonitoringConfig()
-	cfg.EnableTracer = true
+	cfg.EnableTracer = enableTracer
 	cfg.ServiceCfg = serviceName
 	cfg.EnvCfg = env
 	cfg.FlyrTenantCfg = flyrTenant
