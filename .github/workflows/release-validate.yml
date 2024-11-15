@@ -31,7 +31,7 @@ jobs:
           fetch-depth: 0
           ref: ${{ github.event.pull_request.base.ref }}
       - name: setup node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 20
       - name: install semantic release
