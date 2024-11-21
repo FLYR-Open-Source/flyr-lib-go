@@ -23,9 +23,12 @@ type TracingHandler struct {
 	level slog.Level
 }
 
-// Enabled returns true if the log level is greater than or equal to the handler's level
+// Enabled returns true if the log level is greater than Debug Level
+// That means the correlation between Debug logs and spans won't work.
+// This is intentionally since Debug logs can slow down the performance of the Spans
+// in the monitoring Tool (e.g. Datadog, Grafana etc)
 func (h *TracingHandler) Enabled(ctx context.Context, level slog.Level) bool {
-	return level >= h.level
+	return level > slog.LevelDebug
 }
 
 // Handle adds the trace and span ids to the log record and passes it to the next handler

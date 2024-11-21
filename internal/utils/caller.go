@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/FlyrInc/flyr-lib-go/config"
+	otel_attribute "go.opentelemetry.io/otel/attribute"
 )
 
 type Caller struct {
@@ -87,4 +88,13 @@ func (c Caller) LogAttributes() []slog.Attr {
 	codeNamespace := slog.String(config.FUNCTION_PACKAGE_NAME, c.Namespace)
 
 	return []slog.Attr{codeFilePath, codeLineNumber, codeFunctionName, codeNamespace}
+}
+
+func (c Caller) SpanAttributes() []otel_attribute.KeyValue {
+	codeFilePath := otel_attribute.String(config.FILE_PATH, c.FilePath)
+	codeLineNumber := otel_attribute.Int(config.LINE_NUMBER, c.LineNumber)
+	codeFunctionName := otel_attribute.String(config.FUNCTION_NAME, c.FunctionName)
+	codeNamespace := otel_attribute.String(config.FUNCTION_PACKAGE_NAME, c.Namespace)
+
+	return []otel_attribute.KeyValue{codeFilePath, codeLineNumber, codeFunctionName, codeNamespace}
 }

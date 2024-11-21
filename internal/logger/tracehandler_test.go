@@ -50,6 +50,8 @@ func (h *MockHandler) Handler() slog.Handler {
 func TestTracingHandler_Enabled(t *testing.T) {
 	handler := NewTracingHandler(&MockHandler{}, "info")
 	assert.True(t, handler.Enabled(context.Background(), slog.LevelInfo))
+	assert.True(t, handler.Enabled(context.Background(), slog.LevelWarn))
+	assert.True(t, handler.Enabled(context.Background(), slog.LevelError))
 	assert.False(t, handler.Enabled(context.Background(), slog.LevelDebug))
 }
 
