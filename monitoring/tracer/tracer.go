@@ -50,7 +50,10 @@ func StartDefaultTracer(ctx context.Context, cfg config.MonitoringConfig) error 
 		return ErrTracerNameNotSet
 	}
 
-	internaltracer.InitializeTracerProvider(ctx, cfg)
+	err := internaltracer.InitializeTracerProvider(ctx, cfg)
+	if err != nil {
+		return err
+	}
 
 	tc := otel.GetTracerProvider()
 	tracer := &Tracer{

@@ -8,6 +8,7 @@ import (
 
 	"github.com/FlyrInc/flyr-lib-go/config"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/otel/attribute"
 )
 
@@ -56,11 +57,11 @@ func TestCallerMarshalJSON(t *testing.T) {
 	}
 
 	data, err := caller.MarshalJSON()
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	var result map[string]interface{}
 	err = json.Unmarshal(data, &result)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	assert.Equal(t, expectedJSON, result)
 }
