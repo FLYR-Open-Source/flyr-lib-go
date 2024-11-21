@@ -3,6 +3,7 @@ package logger
 import (
 	"context"
 	"errors"
+
 	"testing"
 
 	"github.com/FlyrInc/flyr-lib-go/config"
@@ -16,7 +17,9 @@ func TestGetAttributes(t *testing.T) {
 	// if that test fails, it means the depth of the caller is different,
 	// therefore the caller information is not being retrieved correctly
 	t.Run("With correct code details", func(t *testing.T) {
-		attrs := getAttributes(context.Background(), nil, args...)
+		attrs := NewAttribute(context.Background()).
+			WithMetadata(args...).
+			Get()
 
 		assert.GreaterOrEqual(t, len(attrs), 4)
 
@@ -38,7 +41,9 @@ func TestGetAttributes(t *testing.T) {
 	})
 
 	t.Run("With metadata", func(t *testing.T) {
-		attrs := getAttributes(context.Background(), nil, args...)
+		attrs := NewAttribute(context.Background()).
+			WithMetadata(args...).
+			Get()
 
 		assert.Len(t, attrs, 5)
 
@@ -49,7 +54,10 @@ func TestGetAttributes(t *testing.T) {
 
 	t.Run("With an error", func(t *testing.T) {
 		err := errors.New("test error")
-		attrs := getAttributes(context.Background(), err, args...)
+		attrs := NewAttribute(context.Background()).
+			WithMetadata(args...).
+			WithError(err).
+			Get()
 
 		assert.Len(t, attrs, 6)
 
@@ -59,7 +67,7 @@ func TestGetAttributes(t *testing.T) {
 	})
 
 	t.Run("Without extra metadata", func(t *testing.T) {
-		attrs := getAttributes(context.Background(), nil)
+		attrs := NewAttribute(context.Background()).Get()
 
 		assert.Len(t, attrs, 5)
 

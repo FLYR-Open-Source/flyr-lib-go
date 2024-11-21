@@ -5,11 +5,10 @@ import (
 	"log/slog"
 	"testing"
 
+	"github.com/FlyrInc/flyr-lib-go/pkg/testhelpers"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
-
-	"github.com/FlyrInc/flyr-lib-go/pkg/testhelpers"
 )
 
 // MockSpanExtractor simulates extracting trace and span IDs from the context
@@ -48,22 +47,25 @@ func (h *MockHandler) Handler() slog.Handler {
 }
 
 func TestTracingHandler_Enabled(t *testing.T) {
-	handler := NewTracingHandler(&MockHandler{}, "info")
+	handler := NewTracingHandler(slog.LevelInfo)(&MockHandler{})
+	assert.False(t, handler.Enabled(context.Background(), slog.LevelDebug))
 	assert.True(t, handler.Enabled(context.Background(), slog.LevelInfo))
 	assert.True(t, handler.Enabled(context.Background(), slog.LevelWarn))
 	assert.True(t, handler.Enabled(context.Background(), slog.LevelError))
-	assert.False(t, handler.Enabled(context.Background(), slog.LevelDebug))
 }
 
 func TestTracingHandler_Handle_AddsTraceIDs(t *testing.T) {
 	ctx := context.Background()
-	mockHanlder := MockHandler{}
-	record := slog.Record{}
+	mockHanlder := &MockHandler{}
+	record := slog.Record{
+		Level: slog.LevelInfo,
+	}
 
 	spanCtx, span := testhelpers.GetFakeSpan(ctx)
 	defer span.End()
 
-	err := NewTracingHandler(&mockHanlder, "info").Handle(spanCtx, record)
+	handler := NewTracingHandler(slog.LevelInfo)(mockHanlder)
+	err := handler.Handle(spanCtx, record)
 	require.NoError(t, err)
 
 	// Check that the trace and span IDs were added to the log record
@@ -84,15 +86,38 @@ func TestTracingHandler_Handle_AddsTraceIDs(t *testing.T) {
 }
 
 func TestTracingHandler_Handle_NoTraceIDs(t *testing.T) {
-	ctx := context.Background()
-	mockHanlder := MockHandler{}
-	record := slog.Record{}
+	t.Run("No trace IDs when ctx does not contain the span details", func(t *testing.T) {
+		ctx := context.Background()
+		mockHanlder := &MockHandler{}
+		record := slog.Record{
+			Level: slog.LevelInfo,
+		}
 
-	err := NewTracingHandler(&mockHanlder, "info").Handle(ctx, record)
-	require.NoError(t, err)
+		handler := NewTracingHandler(slog.LevelInfo)(mockHanlder)
+		err := handler.Handle(ctx, record)
+		require.NoError(t, err)
 
-	// Check that the trace and span IDs were added to the log record
-	assert.Equal(t, 0, mockHanlder.r.NumAttrs())
+		// Check that the trace and span IDs were added to the log record
+		assert.Equal(t, 0, mockHanlder.r.NumAttrs())
+	})
+
+	t.Run("No trace IDs when log level is debug", func(t *testing.T) {
+		ctx := context.Background()
+		mockHanlder := &MockHandler{}
+		record := slog.Record{
+			Level: slog.LevelDebug,
+		}
+
+		spanCtx, span := testhelpers.GetFakeSpan(ctx)
+		defer span.End()
+
+		handler := NewTracingHandler(slog.LevelDebug)(mockHanlder)
+		err := handler.Handle(spanCtx, record)
+		require.NoError(t, err)
+
+		// Check that the trace and span IDs were added to the log record
+		assert.Equal(t, 0, mockHanlder.r.NumAttrs())
+	})
 }
 
 func TestTracingHandler_WithAttrs(t *testing.T) {
@@ -117,17 +142,9 @@ func TestTracingHandler_WithGroup(t *testing.T) {
 
 func TestNewTracingHandler(t *testing.T) {
 	mockNext := &MockHandler{}
-	handler := NewTracingHandler(mockNext, "info")
+	handler := NewTracingHandler(slog.LevelInfo)(mockNext)
 
 	assert.NotNil(t, handler)
-	assert.Equal(t, slog.LevelInfo, handler.level)
-	assert.Equal(t, mockNext, handler.next)
-}
-
-func TestNewTracingHandler_WithExistingTracingHandler(t *testing.T) {
-	existingHandler := NewTracingHandler(&TracingHandler{next: &MockHandler{}}, "info")
-	handler := NewTracingHandler(existingHandler, "info")
-
-	assert.NotNil(t, handler)
-	assert.Equal(t, slog.LevelInfo, handler.level) // should retain the level of the existing handler
+	assert.Equal(t, slog.LevelInfo, handler.(*TracingHandler).level)
+	assert.Equal(t, mockNext, handler.(*TracingHandler).next)
 }

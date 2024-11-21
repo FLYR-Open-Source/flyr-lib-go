@@ -5,6 +5,7 @@ import (
 
 	"github.com/FlyrInc/flyr-lib-go/config"
 	internalLogger "github.com/FlyrInc/flyr-lib-go/internal/logger"
+	slogmulti "github.com/samber/slog-multi"
 
 	"log/slog"
 )
@@ -13,10 +14,18 @@ import (
 //
 // The logger is then selected as the default logger for the application.
 func InitLogger(cfg config.LoggerConfig) {
-	jsonHanlder := internalLogger.NewJSONLogHandler(cfg)
-	tracingHanlder := internalLogger.NewTracingHandler(jsonHanlder, cfg.LogLevel())
+	loggerLevel := internalLogger.ParseLogLevel(cfg.LogLevel())
 
-	l := slog.New(internalLogger.InjectRootAttrs(tracingHanlder, cfg))
+	jsonHanlder := internalLogger.NewJSONLogHandler(loggerLevel)
+	tracingHanlder := internalLogger.NewTracingHandler(loggerLevel)
+	sink := internalLogger.InjectRootAttrs(jsonHanlder, cfg)
+
+	l := slog.New(
+		slogmulti.
+			Pipe(tracingHanlder).
+			Handler(sink),
+	)
+
 	slog.SetDefault(l)
 }
 
@@ -26,7 +35,10 @@ func InitLogger(cfg config.LoggerConfig) {
 // and in the span that is retrieved from the given context.
 func Debug(ctx context.Context, message string, args ...interface{}) {
 	l := slog.Default()
-	attrs := getAttributes(ctx, nil, args...)
+	attrs := NewAttribute(ctx).
+		WithOutInjectingAttrsToSpan().
+		WithMetadata(args...).
+		Get()
 	l.LogAttrs(ctx, slog.LevelDebug, message, attrs...)
 }
 
@@ -36,7 +48,9 @@ func Debug(ctx context.Context, message string, args ...interface{}) {
 // and in the span that is retrieved from the given context.
 func Info(ctx context.Context, message string, args ...interface{}) {
 	l := slog.Default()
-	attrs := getAttributes(ctx, nil, args...)
+	attrs := NewAttribute(ctx).
+		WithMetadata(args...).
+		Get()
 	l.LogAttrs(ctx, slog.LevelInfo, message, attrs...)
 }
 
@@ -46,7 +60,9 @@ func Info(ctx context.Context, message string, args ...interface{}) {
 // and in the span that is retrieved from the given context.
 func Warn(ctx context.Context, message string, args ...interface{}) {
 	l := slog.Default()
-	attrs := getAttributes(ctx, nil, args...)
+	attrs := NewAttribute(ctx).
+		WithMetadata(args...).
+		Get()
 	l.LogAttrs(ctx, slog.LevelWarn, message, attrs...)
 }
 
@@ -58,6 +74,9 @@ func Warn(ctx context.Context, message string, args ...interface{}) {
 // and also sets the span as errored (if the a span cna be retrieved from the given context).
 func Error(ctx context.Context, message string, err error, args ...interface{}) {
 	l := slog.Default()
-	attrs := getAttributes(ctx, err, args...)
+	attrs := NewAttribute(ctx).
+		WithMetadata(args...).
+		WithError(err).
+		Get()
 	l.LogAttrs(ctx, slog.LevelError, message, attrs...)
 }

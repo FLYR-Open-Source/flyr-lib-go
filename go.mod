@@ -7,6 +7,7 @@ toolchain go1.22.2
 require (
 	github.com/caarlos0/env/v10 v10.0.0
 	github.com/gin-gonic/gin v1.9.1
+	github.com/samber/slog-multi v1.2.4
 	github.com/stretchr/testify v1.9.0
 	go.opentelemetry.io/otel v1.31.0
 	go.opentelemetry.io/otel/sdk v1.31.0
@@ -37,6 +38,7 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.9 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
+	github.com/samber/lo v1.47.0 // indirect
 	github.com/stretchr/objx v0.5.2 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.11 // indirect

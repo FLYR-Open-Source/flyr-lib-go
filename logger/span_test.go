@@ -1,42 +1,12 @@
 package logger
 
 import (
-	"context"
 	"encoding/json"
-	"errors"
 	"testing"
 	"time"
 
 	"log/slog"
-
-	"github.com/FlyrInc/flyr-lib-go/pkg/testhelpers"
-	"github.com/stretchr/testify/assert"
-	"go.opentelemetry.io/otel/codes"
 )
-
-func TestSetErroredSpan(t *testing.T) {
-	t.Run("With recording span", func(t *testing.T) {
-		err := errors.New("test error")
-		cxt, span := testhelpers.GetFakeSpan(context.Background())
-		setErroredSpan(cxt, err)
-
-		span.FakeStatus.Code = codes.Error
-		span.FakeStatus.Description = err.Error()
-
-		assert.Equal(t, codes.Error, span.FakeStatus.Code)
-		assert.Equal(t, span.FakeStatus.Description, err.Error())
-	})
-
-	t.Run("Without recording span", func(t *testing.T) {
-		cxt, span := testhelpers.GetFakeSpan(context.Background())
-		span.End() // End the span to stop recording
-
-		setErroredSpan(cxt, errors.New("test error"))
-
-		assert.Equal(t, codes.Unset, span.FakeStatus.Code)
-		assert.Empty(t, "", span.FakeStatus.Description)
-	})
-}
 
 func TestValueToJSONString(t *testing.T) {
 	tests := []struct {

@@ -4,9 +4,9 @@ import (
 	"context"
 	"errors"
 	"log/slog"
-	"strings"
 
 	"github.com/FlyrInc/flyr-lib-go/internal/span"
+	slogmulti "github.com/samber/slog-multi"
 )
 
 const (
@@ -23,18 +23,20 @@ type TracingHandler struct {
 	level slog.Level
 }
 
-// Enabled returns true if the log level is greater than Debug Level
-// That means the correlation between Debug logs and spans won't work.
-// This is intentionally since Debug logs can slow down the performance of the Spans
-// in the monitoring Tool (e.g. Datadog, Grafana etc)
+// Enabled returns true if the log level is greater than or equal to the handler's level
 func (h *TracingHandler) Enabled(ctx context.Context, level slog.Level) bool {
-	return level > slog.LevelDebug
+	return level >= h.level
 }
 
 // Handle adds the trace and span ids to the log record and passes it to the next handler
 func (h *TracingHandler) Handle(ctx context.Context, record slog.Record) error {
 	if h.next == nil {
 		return errors.New("handler is missing")
+	}
+
+	// Do not add trace and span ids to debug logs
+	if record.Level <= slog.LevelDebug {
+		return h.next.Handle(ctx, record)
 	}
 
 	traceId, spanId, found := span.ExtractTrace(ctx)
@@ -49,12 +51,18 @@ func (h *TracingHandler) Handle(ctx context.Context, record slog.Record) error {
 
 // WithAttrs returns a new handler with the given attributes added to the log record
 func (h *TracingHandler) WithAttrs(attrs []slog.Attr) slog.Handler {
-	return NewTracingHandler(h.next.WithAttrs(attrs), strings.ToLower(h.level.String()))
+	return &TracingHandler{
+		next:  h.next.WithAttrs(attrs),
+		level: h.level,
+	}
 }
 
 // WithGroup returns a new handler with the given group name added to the log record
 func (h *TracingHandler) WithGroup(name string) slog.Handler {
-	return NewTracingHandler(h.next.WithGroup(name), strings.ToLower(h.level.String()))
+	return &TracingHandler{
+		next:  h.next.WithGroup(name),
+		level: h.level,
+	}
 }
 
 // WithLevel returns a new handler with the given log level
@@ -62,6 +70,7 @@ func (h *TracingHandler) Handler() slog.Handler {
 	return h.next
 }
 
+// TODO: update doc
 // NewTracingHandler creates a new TracingHandler with the specified log level.
 //
 // This function wraps a given slog.Handler with a TracingHandler, which
@@ -70,11 +79,12 @@ func (h *TracingHandler) Handler() slog.Handler {
 // to avoid redundant wrapping. The log level is parsed and set to control
 // the tracing output level.
 //
-// Returns a pointer to the new TracingHandler.
-func NewTracingHandler(next slog.Handler, level string) *TracingHandler {
-	if th, ok := next.(*TracingHandler); ok {
-		next = th.Handler()
+// Returns an slogmulti.Middleware
+func NewTracingHandler(level slog.Level) slogmulti.Middleware {
+	return func(next slog.Handler) slog.Handler {
+		return &TracingHandler{
+			next:  next,
+			level: level,
+		}
 	}
-
-	return &TracingHandler{next: next, level: parseLogLevel(level)}
 }

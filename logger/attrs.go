@@ -13,9 +13,33 @@ const (
 	callerDepth = 3
 )
 
-func getAttributes(ctx context.Context, err error, args ...interface{}) []slog.Attr {
-	metadata := slog.Group(config.LOG_METADATA_KEY, args...)
-	injectAttrsToSpan(ctx, metadata)
+type Attribute struct {
+	ctx               context.Context
+	err               error
+	metadata          []interface{}
+	injectAttrsToSpan bool
+}
+
+func (a *Attribute) WithError(err error) *Attribute {
+	a.err = err
+	return a
+}
+
+func (a *Attribute) WithMetadata(args ...interface{}) *Attribute {
+	a.metadata = args
+	return a
+}
+
+func (a *Attribute) WithOutInjectingAttrsToSpan() *Attribute {
+	a.injectAttrsToSpan = false
+	return a
+}
+
+func (a *Attribute) Get() []slog.Attr {
+	metadata := slog.Group(config.LOG_METADATA_KEY, a.metadata...)
+	if a.injectAttrsToSpan {
+		injectAttrsToSpan(a.ctx, metadata)
+	}
 
 	caller := internalUtils.GetCallerName(callerDepth)
 	callerAttrs := caller.LogAttributes()
@@ -23,11 +47,15 @@ func getAttributes(ctx context.Context, err error, args ...interface{}) []slog.A
 	attrs := append(callerAttrs, metadata)
 
 	var errorMessage slog.Attr
-	if err != nil {
-		errorMessage = slog.String(config.LOG_ERROR_KEY, err.Error())
-		setErroredSpan(ctx, err) // Set spans as errored
+	if a.err != nil {
+		errorMessage = slog.String(config.LOG_ERROR_KEY, a.err.Error())
+		setErroredSpan(a.ctx, a.err) // Set spans as errored
 		attrs = append(attrs, errorMessage)
 	}
 
 	return attrs
+}
+
+func NewAttribute(ctx context.Context) *Attribute {
+	return &Attribute{ctx: ctx, injectAttrsToSpan: true}
 }

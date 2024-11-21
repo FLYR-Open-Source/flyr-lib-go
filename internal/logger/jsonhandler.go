@@ -4,8 +4,6 @@ import (
 	"log/slog"
 	"os"
 	"strings"
-
-	"github.com/FlyrInc/flyr-lib-go/config"
 )
 
 // NewJSONLogHandler creates a new JSON log handler with custom configurations.
@@ -14,12 +12,12 @@ import (
 // to standard output. The handler is setting the log level according to the provided configuration,
 // and replacing certain attributes using the replaceAttributes function for
 // custom formatting.
-func NewJSONLogHandler(cfg config.LoggerConfig) slog.Handler {
+func NewJSONLogHandler(level slog.Level) slog.Handler {
 	return slog.NewJSONHandler(
 		os.Stdout,
 		&slog.HandlerOptions{
 			AddSource:   false,
-			Level:       parseLogLevel(cfg.LogLevel()),
+			Level:       level,
 			ReplaceAttr: replaceAttributes,
 		})
 }
@@ -27,7 +25,7 @@ func NewJSONLogHandler(cfg config.LoggerConfig) slog.Handler {
 // parseLogLevel converts a string to a slog.Level.
 //
 // If the string is not a valid log level, it defaults to info.
-func parseLogLevel(level string) slog.Level {
+func ParseLogLevel(level string) slog.Level {
 	switch strings.ToLower(level) {
 	case "debug":
 		return slog.LevelDebug
