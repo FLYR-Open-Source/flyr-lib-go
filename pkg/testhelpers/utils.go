@@ -1,4 +1,4 @@
-package testhelpers
+package testhelpers // import "github.com/FlyrInc/flyr-lib-go/pkg/testhelpers"
 
 import (
 	"context"

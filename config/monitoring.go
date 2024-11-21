@@ -1,4 +1,4 @@
-package config
+package config // import "github.com/FlyrInc/flyr-lib-go/config"
 
 type MonitoringConfig interface {
 	Service() string

@@ -1,4 +1,4 @@
-package config
+package config // import "github.com/FlyrInc/flyr-lib-go/config"
 
 import (
 	semconv "go.opentelemetry.io/otel/semconv/v1.17.0"
