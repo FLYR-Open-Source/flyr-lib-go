@@ -112,14 +112,6 @@ The default way to use the library, is by using the default Tracer. A Tracer has
 
 You can see examples of how to use the default Tracer in [examples/monitoring/default_tracer/main.go](./examples/monitoring/default_tracer/main.go).
 
-##### Use your own Tracers
-
-A more advance usage is to create your own Tracers. As mentioned above, the default Tracer's name is the service name (which is the `operation_name` in Datadog). You can group your operations by creating custom Tracers with custom names.
-
-For example, you can have a Tracer per layer. That means a Tracer for your Service (Domain) layer, another one for your Repository layer and so on.
-
-You can see examples of how to use custom Tracers in [examples/monitoring/custom_tracers/main.go](./examples/monitoring/custom_tracers/main.go).
-
 #### Spans
 
 A **Span** represents a unit of work or operation. Spans are the building blocks of Trace. In OpenTelemetry, they include the following information:
@@ -152,9 +144,12 @@ In order for the library to give a better experience when working with Traces, S
 
 When you create a new Span, it returns back a new `context.Context` value. This new context contains the Span information.
 
-When logging inside a block of code that is wrapped in a Span, it is recommended to pass to the Logger the new context that was includes the Span. That won't only inluce the Trace and Span IDs into the log, but also will automatically include into the Spans the attributes that are being passed to the Logger.
+When logging inside a block of code that is wrapped in a Span, it is recommended to pass to the Logger the new context that includes the Span information. That won't only inluce the Trace and Span IDs into the log, but also will automatically include into the Spans the attributes that are being passed to the Logger.
 
 That ensures useful information for debugging will be present at the same time in both the logs and the spans.
+
+> [!IMPORTANT]
+> Debug logs do not contain the Trace and Span ID and also do not attach any given metadata to the Span. That is useful because including the debug logs to the spans can flood them with unnecessary information, making them harder to interpret.
 
 #### Distributed Tracing
 TBD
