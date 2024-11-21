@@ -15,8 +15,11 @@ import (
 
 // ErrServiceNameNotSet is returned when the service name is not set in the configuration
 var ErrServiceNameNotSet = errors.New("service name not set")
-var ErrTracerNameNotSet = errors.New("tracer name not set")
+
+// ErrTracerProviderNotInitialized is returned when the tracer provider is not initialized
 var ErrTracerProviderNotInitialized = errors.New("tracer provider not initialized")
+
+// ErrTracerProviderAlreadyInitialized is returned when the tracer provider is already initialized
 var ErrTracerProviderAlreadyInitialized = errors.New("tracer provider already initialized")
 
 var (

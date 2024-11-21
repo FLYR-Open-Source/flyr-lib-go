@@ -11,6 +11,7 @@ import (
 	otel_attribute "go.opentelemetry.io/otel/attribute"
 )
 
+// Caller represents the caller information of a function.
 type Caller struct {
 	// FilePath is the absolute file path of the caller
 	FilePath string
@@ -81,6 +82,7 @@ func (c Caller) MarshalJSON() ([]byte, error) {
 	return json.Marshal(data)
 }
 
+// LogAttributes returns the caller attributes in a structured slog format.
 func (c Caller) LogAttributes() []slog.Attr {
 	codeFilePath := slog.String(config.FILE_PATH, c.FilePath)
 	codeLineNumber := slog.Int(config.LINE_NUMBER, c.LineNumber)
@@ -90,6 +92,7 @@ func (c Caller) LogAttributes() []slog.Attr {
 	return []slog.Attr{codeFilePath, codeLineNumber, codeFunctionName, codeNamespace}
 }
 
+// SpanAttributes returns the caller attributes in a structured OpenTelemetry format.
 func (c Caller) SpanAttributes() []otel_attribute.KeyValue {
 	codeFilePath := otel_attribute.String(config.FILE_PATH, c.FilePath)
 	codeLineNumber := otel_attribute.Int(config.LINE_NUMBER, c.LineNumber)
