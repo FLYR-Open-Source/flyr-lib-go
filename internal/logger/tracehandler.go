@@ -70,7 +70,6 @@ func (h *TracingHandler) Handler() slog.Handler {
 	return h.next
 }
 
-// TODO: update doc
 // NewTracingHandler creates a new TracingHandler with the specified log level.
 //
 // This function wraps a given slog.Handler with a TracingHandler, which
