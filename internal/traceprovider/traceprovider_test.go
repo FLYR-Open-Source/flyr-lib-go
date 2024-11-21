@@ -1,4 +1,4 @@
-package tracer
+package traceprovider
 
 import (
 	"context"
@@ -9,7 +9,6 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/exporters/otlp/otlptrace"
 	"go.opentelemetry.io/otel/propagation"
 	semconv "go.opentelemetry.io/otel/semconv/v1.17.0"
 )
@@ -34,29 +33,32 @@ func TestNewTraceProvider(t *testing.T) {
 	ctx := context.Background()
 	cfg := getMonitoringConfig()
 
-	exporter := &otlptrace.Exporter{}
-
 	t.Run("SetsTracerProviderAsGlobal", func(t *testing.T) {
-		tracerProvider, _, err := newTraceProvider(ctx, cfg, exporter, true)
+		err := InitializeTracerProvider(ctx, cfg)
+		defer func() {
+			tracerProvider = nil
+		}()
 		require.NoError(t, err)
-		//nolint:errcheck
-		defer tracerProvider.Shutdown(ctx)
 
 		// Check if the global provider is set
 		require.Equal(t, tracerProvider, otel.GetTracerProvider())
 	})
 
 	t.Run("SetsCorrectResourceAttributes", func(t *testing.T) {
-		tracerProvider, res, err := newTraceProvider(ctx, cfg, exporter, false)
+		err := InitializeTracerProvider(ctx, cfg)
+		defer func() {
+			tracerProvider = nil
+		}()
 		require.NoError(t, err)
 
-		attributes := res.Attributes()
+		attributes := resourceInfo.Attributes()
 
 		// Verify that each attribute matches the expected values
+		assert.Contains(t, attributes, semconv.DeploymentEnvironment(cfg.Env()))
 		assert.Contains(t, attributes, semconv.ServiceName(cfg.Service()))
-		assert.Contains(t, attributes, attribute.String(config.VERSION_NAME, cfg.Version()))
-		assert.Contains(t, attributes, attribute.String(config.ENV_NAME, cfg.Env()))
-		assert.Contains(t, attributes, attribute.String(config.TENANT_NAME, cfg.Tenant()))
+		assert.Contains(t, attributes, semconv.ServiceVersion(cfg.Version()))
+		assert.Contains(t, attributes, attribute.String(config.CUSTON_ENV_NAME, cfg.Env()))
+		assert.Contains(t, attributes, attribute.String(config.CUSTOM_TENANT_NAME, cfg.Tenant()))
 
 		// Ensure tracerProvider is still usable
 		tracer := tracerProvider.Tracer("test-tracer")
@@ -65,7 +67,10 @@ func TestNewTraceProvider(t *testing.T) {
 	})
 
 	t.Run("ConfiguresTextMapPropagator", func(t *testing.T) {
-		_, _, err := newTraceProvider(ctx, cfg, exporter, false)
+		err := InitializeTracerProvider(ctx, cfg)
+		defer func() {
+			tracerProvider = nil
+		}()
 		require.NoError(t, err)
 
 		// Retrieve the global TextMapPropagator and confirm it’s a composite propagator.

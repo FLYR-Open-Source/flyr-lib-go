@@ -47,29 +47,38 @@ func getLoggingConfig() config.LoggerConfig {
 	cfg.EnvCfg = env
 	cfg.FlyrTenantCfg = flyrTenant
 	cfg.VersionCfg = version
+	cfg.LogLevelCfg = "debug"
 
 	return cfg
 }
 
+// run this file to see the output
 func main() {
 	ctx := context.Background()
 
 	logger.InitLogger(getLoggingConfig())
+
 	// start the default tracer
-	tc, err := tracer.StartDefaultTracer(ctx, getMonitoringConfig())
+	err := tracer.StartDefaultTracer(ctx, getMonitoringConfig())
 	if err != nil {
 		panic(err)
 	}
 	defer func() {
-		if tc != nil {
-			err := tracer.StopTracer(ctx, tc)
-			if err != nil {
-				logger.Error(ctx, "failed to stop tracer", err)
-			}
+		err = tracer.Shutdown(ctx)
+		if err != nil {
+			logger.Error(ctx, "failed to stop tracer", err)
 		}
 	}()
 
-	parentCtx := context.Background()
+	// we create a parent span that will contain the rest as children
+	parentCtx, span := tracer.StartSpan(ctx, "parent", trace.SpanKindInternal)
+	defer span.End()
+
+	fmt.Println()
+	fmt.Println("------------------------ Parent Span ------------------------")
+	fmt.Printf("%+v\n", span.Span)
+	fmt.Println("------------------------ End Parent Span ------------------------")
+	fmt.Println()
 
 	// myFunc1 with be wrapped with a span.
 	// We pass the parentCtx to the function so that the span is created with the parent context.
@@ -89,6 +98,10 @@ func myFunc1(ctx context.Context) {
 	defer span.End()
 
 	logger.Info(spanCtx, "hello from myFunc1", slog.Any("some_attribute", MyStruct{Name: "go", Age: 15}), slog.String("hello", "is hola in Spanish"))
+
+	fmt.Println()
+	// debug logs must not have correlation IDs
+	logger.Debug(spanCtx, "debug must not have correlation IDs")
 
 	fmt.Println()
 	// logging an error using a context with a span, the span will be flagged as errored
