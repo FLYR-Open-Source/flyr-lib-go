@@ -16,10 +16,12 @@ import (
 // InjectRootAttrs returns a new slog.Handler with the additional attributes applied.
 func InjectRootAttrs(h slog.Handler, cfg config.LoggerConfig) slog.Handler {
 	return h.WithAttrs([]slog.Attr{ // Add root attributes
-		slog.String(config.ENV_NAME, cfg.Env()),
-		slog.String(config.VERSION_NAME, cfg.Version()),
+		slog.String(config.DEPLOYMENT_ENVIRONMENT, cfg.Env()),
 		slog.String(config.SERVICE_NAME, cfg.Service()),
-		slog.String(config.TENANT_NAME, cfg.Tenant()),
+		slog.String(config.SERVICE_VERSION, cfg.Version()),
+
+		slog.String(config.CUSTON_ENV_NAME, cfg.Env()),
+		slog.String(config.CUSTOM_TENANT_NAME, cfg.Tenant()),
 	})
 }
 

@@ -3,35 +3,37 @@ package logger
 import (
 	"context"
 	"errors"
-	"log/slog"
 	"testing"
 
 	"github.com/FlyrInc/flyr-lib-go/config"
 	"github.com/stretchr/testify/assert"
+	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
 )
 
 func TestGetAttributes(t *testing.T) {
 	args := []interface{}{"key1", "value1", "key2", "value2"}
 
+	// if that test fails, it means the depth of the caller is different,
+	// therefore the caller information is not being retrieved correctly
 	t.Run("With correct code details", func(t *testing.T) {
 		attrs := getAttributes(context.Background(), nil, args...)
 
 		assert.GreaterOrEqual(t, len(attrs), 4)
 
-		codePath := attrs[0].(slog.Attr)
-		assert.Equal(t, config.CODE_PATH, codePath.Key)
+		codePath := attrs[0]
+		assert.Equal(t, string(semconv.CodeFilepathKey), codePath.Key)
 		assert.Contains(t, codePath.Value.String(), "src/testing/testing.go")
 
-		codeLine := attrs[1].(slog.Attr)
-		assert.Equal(t, config.CODE_LINE, codeLine.Key)
+		codeLine := attrs[1]
+		assert.Equal(t, string(semconv.CodeLineNumberKey), codeLine.Key)
 		assert.Positive(t, codeLine.Value.Int64())
 
-		codeFunc := attrs[2].(slog.Attr)
-		assert.Equal(t, config.CODE_FUNC, codeFunc.Key)
+		codeFunc := attrs[2]
+		assert.Equal(t, string(semconv.CodeFunctionKey), codeFunc.Key)
 		assert.Contains(t, codeFunc.Value.String(), "tRunner")
 
-		codeNs := attrs[3].(slog.Attr)
-		assert.Equal(t, config.CODE_NS, codeNs.Key)
+		codeNs := attrs[3]
+		assert.Equal(t, string(semconv.CodeNamespaceKey), codeNs.Key)
 		assert.Contains(t, codeNs.Value.String(), "testing")
 	})
 
@@ -40,7 +42,7 @@ func TestGetAttributes(t *testing.T) {
 
 		assert.Len(t, attrs, 5)
 
-		metadata := attrs[4].(slog.Attr)
+		metadata := attrs[4]
 		assert.Equal(t, config.LOG_METADATA_KEY, metadata.Key)
 		assert.Equal(t, "[key1=value1 key2=value2]", metadata.Value.String())
 	})
@@ -51,7 +53,7 @@ func TestGetAttributes(t *testing.T) {
 
 		assert.Len(t, attrs, 6)
 
-		errorMessage := attrs[5].(slog.Attr)
+		errorMessage := attrs[5]
 		assert.Equal(t, config.LOG_ERROR_KEY, errorMessage.Key)
 		assert.Equal(t, err.Error(), errorMessage.Value.String())
 	})
@@ -61,7 +63,7 @@ func TestGetAttributes(t *testing.T) {
 
 		assert.Len(t, attrs, 5)
 
-		metadata := attrs[4].(slog.Attr)
+		metadata := attrs[4]
 		assert.Equal(t, config.LOG_METADATA_KEY, metadata.Key)
 		assert.Equal(t, "[]", metadata.Value.String())
 	})

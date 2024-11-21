@@ -63,17 +63,20 @@ func TestInjectRootAttrs(t *testing.T) {
 	log := slog.New(InjectRootAttrs(handler, cfg))
 	log.Info("Test log message")
 
-	assert.Contains(t, output.log, config.ENV_NAME)
-	assert.Equal(t, output.log[config.ENV_NAME], cfg.Env())
+	assert.Contains(t, output.log, config.CUSTON_ENV_NAME)
+	assert.Equal(t, output.log[config.CUSTON_ENV_NAME], cfg.Env())
 
-	assert.Contains(t, output.log, config.ENV_NAME)
+	assert.Contains(t, output.log, config.DEPLOYMENT_ENVIRONMENT)
+	assert.Equal(t, output.log[config.DEPLOYMENT_ENVIRONMENT], cfg.Env())
+
+	assert.Contains(t, output.log, config.SERVICE_NAME)
 	assert.Equal(t, output.log[config.SERVICE_NAME], cfg.Service())
 
-	assert.Contains(t, output.log, config.VERSION_NAME)
-	assert.Equal(t, output.log[config.VERSION_NAME], cfg.Version())
+	assert.Contains(t, output.log, config.SERVICE_VERSION)
+	assert.Equal(t, output.log[config.SERVICE_VERSION], cfg.Version())
 
-	assert.Contains(t, output.log, config.TENANT_NAME)
-	assert.Equal(t, output.log[config.TENANT_NAME], cfg.Tenant())
+	assert.Contains(t, output.log, config.CUSTOM_TENANT_NAME)
+	assert.Equal(t, output.log[config.CUSTOM_TENANT_NAME], cfg.Tenant())
 }
 
 func TestReplaceAttributes(t *testing.T) {

@@ -3,6 +3,7 @@ package utils
 import (
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"runtime"
 	"strings"
 
@@ -39,14 +40,7 @@ func GetCallerName(numofSkippedFrames int) Caller {
 
 	details := runtime.FuncForPC(pc)
 	if details != nil {
-		functionName = details.Name()
-
-		// Split the function name to extract the namespace and function name
-		split := strings.Split(functionName, ".")
-		if len(split) > 1 {
-			namespace = split[0]
-			functionName = split[1]
-		}
+		namespace, functionName = splitFunctionName(details.Name())
 	}
 
 	return Caller{
@@ -57,6 +51,17 @@ func GetCallerName(numofSkippedFrames int) Caller {
 	}
 }
 
+// splitFunctionName splits full function name into namespace and function name
+// if the passed function name does not contain a namespace, then it returns an empty string for the namespace
+// and the passed function name.
+func splitFunctionName(function string) (namespace, functionName string) {
+	split := strings.Split(function, ".")
+	if len(split) > 1 {
+		return split[0], split[1]
+	}
+	return "", function
+}
+
 // String returns a string representation of the Caller struct.
 func (c Caller) String() string {
 	return fmt.Sprintf("%s:%d (%s)", c.FilePath, c.LineNumber, c.FunctionName)
@@ -64,12 +69,22 @@ func (c Caller) String() string {
 
 // Custom MarshalJSON method to dynamically set JSON field names
 func (c Caller) MarshalJSON() ([]byte, error) {
+
 	// Define a map to hold the JSON structure with dynamic keys
 	data := map[string]interface{}{
-		config.CODE_PATH: c.FilePath,
-		config.CODE_LINE: c.LineNumber,
-		config.CODE_FUNC: c.FunctionName,
-		config.CODE_NS:   c.Namespace,
+		config.FILE_PATH:             c.FilePath,
+		config.LINE_NUMBER:           c.LineNumber,
+		config.FUNCTION_NAME:         c.FunctionName,
+		config.FUNCTION_PACKAGE_NAME: c.Namespace,
 	}
 	return json.Marshal(data)
+}
+
+func (c Caller) LogAttributes() []slog.Attr {
+	codeFilePath := slog.String(config.FILE_PATH, c.FilePath)
+	codeLineNumber := slog.Int(config.LINE_NUMBER, c.LineNumber)
+	codeFunctionName := slog.String(config.FUNCTION_NAME, c.FunctionName)
+	codeNamespace := slog.String(config.FUNCTION_PACKAGE_NAME, c.Namespace)
+
+	return []slog.Attr{codeFilePath, codeLineNumber, codeFunctionName, codeNamespace}
 }

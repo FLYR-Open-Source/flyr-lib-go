@@ -13,17 +13,14 @@ const (
 	callerDepth = 3
 )
 
-func getAttributes(ctx context.Context, err error, args ...interface{}) []interface{} {
+func getAttributes(ctx context.Context, err error, args ...interface{}) []slog.Attr {
 	metadata := slog.Group(config.LOG_METADATA_KEY, args...)
 	injectAttrsToSpan(ctx, metadata)
 
 	caller := internalUtils.GetCallerName(callerDepth)
-	codeFilePath := slog.String(config.CODE_PATH, caller.FilePath)
-	codeLineNumber := slog.Int(config.CODE_LINE, caller.LineNumber)
-	codeFunctionName := slog.String(config.CODE_FUNC, caller.FunctionName)
-	codeNamespace := slog.String(config.CODE_NS, caller.Namespace)
+	callerAttrs := caller.LogAttributes()
 
-	attrs := []interface{}{codeFilePath, codeLineNumber, codeFunctionName, codeNamespace, metadata}
+	attrs := append(callerAttrs, metadata)
 
 	var errorMessage slog.Attr
 	if err != nil {

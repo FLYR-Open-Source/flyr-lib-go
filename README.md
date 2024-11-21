@@ -16,6 +16,14 @@ This library is an internal Go library for Flyr, providing essential utilities f
       - [Use your own Tracers](#use-your-own-tracers)
     - [Spans](#spans)
       - [Automatic Correlation](#automatic-correlation)
+    - [Distributed Tracing](#distributed-tracing)
+      - [HTTP Tracing](#http-tracing)
+      - [PubSub Tracing](#pubSub-tracing)
+        - [PubSub Provider](#pubsub-provider)
+        - [PubSub Consumer](#pubsub-consumer)
+      - [RabbitMQ Tracing](#rabbitmq-tracing)
+        - [RabbitMQ Provider](#rabbitmq-provider)
+        - [RabbitMQ Consumer](#rabbitmq-consumer)
     - [Middleware](#middleware)
     - [Testing](#testing)
     - [Metrics](#metrics)
@@ -147,6 +155,30 @@ When you create a new Span, it returns back a new `context.Context` value. This 
 When logging inside a block of code that is wrapped in a Span, it is recommended to pass to the Logger the new context that was includes the Span. That won't only inluce the Trace and Span IDs into the log, but also will automatically include into the Spans the attributes that are being passed to the Logger.
 
 That ensures useful information for debugging will be present at the same time in both the logs and the spans.
+
+#### Distributed Tracing
+TBD
+
+##### HTTP Tracing
+TBD
+
+##### PubSub Tracing
+TBD
+
+###### PubSub Provider
+TBD
+
+###### PubSub Consumer
+TBD
+
+##### RabbitMQ Tracing
+TBD
+
+###### RabbitMQ Provider
+TBD
+
+###### RabbitMQ Consumer
+TBD
 
 #### Middleware
 TBD

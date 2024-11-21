@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log/slog"
 
 	"github.com/FlyrInc/flyr-lib-go/config"
@@ -48,12 +49,14 @@ func main() {
 	// 	"deployment.environment.name": "dev",
 	// 	"service.version": "v1.0.0",
 	// 	"service.name": "some-service",
+	//  "env": "dev",
 	// 	"flyr_tenant": "fl",
-	// 	"code.filepath": "/Users/vasileios.pallas/Documents/Code/OOMS/Platform/flyr-lib-go/examples/logging/main.go",
-	// 	"code.lineno": 32,
+	// 	"code.filepath": ".../flyr-lib-go/examples/logging/main.go",
+	// 	"code.lineno": 43,
 	// 	"code.function": "main",
 	// 	"code.namespace": "main"
 	// }
+	fmt.Println()
 
 	logger.Debug(ctx, "This is a debug message")
 	// Output:
@@ -64,12 +67,14 @@ func main() {
 	// 	"deployment.environment.name": "dev",
 	// 	"service.version": "v1.0.0",
 	// 	"service.name": "some-service",
+	//  "env": "dev",
 	// 	"flyr_tenant": "fl",
-	// 	"code.filepath": "/Users/vasileios.pallas/Documents/Code/OOMS/Platform/flyr-lib-go/examples/logging/main.go",
-	// 	"code.lineno": 38,
+	// 	"code.filepath": ".../flyr-lib-go/examples/logging/main.go",
+	// 	"code.lineno": 61,
 	// 	"code.function": "main",
 	// 	"code.namespace": "main"
 	// }
+	fmt.Println()
 
 	logger.Warn(ctx, "This is a warning message")
 	// Output:
@@ -81,11 +86,13 @@ func main() {
 	// 	"service.version": "v1.0.0",
 	// 	"service.name": "some-service",
 	// 	"flyr_tenant": "fl",
-	// 	"code.filepath": "/Users/vasileios.pallas/Documents/Code/OOMS/Platform/flyr-lib-go/examples/logging/main.go",
-	// 	"code.lineno": 42,
+	//  "env": "dev",
+	// 	"code.filepath": ".../flyr-lib-go/examples/logging/main.go",
+	// 	"code.lineno": 79,
 	// 	"code.function": "main",
 	// 	"code.namespace": "main"
 	// }
+	fmt.Println()
 
 	logger.Error(ctx, "This is an error message", errors.New("this is an error"))
 	// Output:
@@ -97,12 +104,14 @@ func main() {
 	// 	"service.version": "v1.0.0",
 	// 	"service.name": "some-service",
 	// 	"flyr_tenant": "fl",
-	// 	"code.filepath": "/Users/vasileios.pallas/Documents/Code/OOMS/Platform/flyr-lib-go/examples/logging/main.go",
-	// 	"code.lineno": 47,
+	//  "env": "dev",
+	// 	"code.filepath": ".../flyr-lib-go/examples/logging/main.go",
+	// 	"code.lineno": 97,
 	// 	"code.function": "main",
 	// 	"code.namespace": "main",
 	// 	"error": "this is an error"
 	// }
+	fmt.Println()
 
 	// add metadata to the log
 	logger.Info(
@@ -118,15 +127,17 @@ func main() {
 	// 	"deployment.environment.name": "dev",
 	// 	"service.version": "v1.0.0",
 	// 	"service.name": "some-service",
+	//  "env": "dev",
 	// 	"flyr_tenant": "fl",
-	// 	"code.filepath": "/Users/vasileios.pallas/Documents/Code/OOMS/Platform/flyr-lib-go/examples/logging/main.go",
-	// 	"code.lineno": 53,
+	// 	"code.filepath": ".../flyr-lib-go/examples/logging/main.go",
+	// 	"code.lineno": 117,
 	// 	"code.function": "main",
 	// 	"code.namespace": "main",
 	// 	"metadata": {
 	// 		"someKey": "someValue"
 	// 	}
 	// }
+	fmt.Println()
 
 	type testStruct struct {
 		SomeKey string
@@ -148,9 +159,10 @@ func main() {
 	// 	"deployment.environment.name": "dev",
 	// 	"service.version": "v1.0.0",
 	// 	"service.name": "some-service",
+	//  "env": "dev",
 	// 	"flyr_tenant": "fl",
-	// 	"code.filepath": "/Users/vasileios.pallas/Documents/Code/OOMS/Platform/flyr-lib-go/examples/logging/main.go",
-	// 	"code.lineno": 126,
+	// 	"code.filepath": ".../flyr-lib-go/examples/logging/main.go",
+	// 	"code.lineno": 147,
 	// 	"code.function": "main",
 	// 	"code.namespace": "main",
 	// 	"metadata": {
@@ -162,4 +174,5 @@ func main() {
 	// 		}
 	// 	}
 	// }
+	fmt.Println()
 }

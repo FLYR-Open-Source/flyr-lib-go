@@ -25,7 +25,9 @@ func InitLogger(cfg config.LoggerConfig) {
 // Any attributes passed as arguments are added to the log message in the group "metadata",
 // and in the span that is retrieved from the given context.
 func Debug(ctx context.Context, message string, args ...interface{}) {
-	slog.DebugContext(ctx, message, getAttributes(ctx, nil, args...)...)
+	l := slog.Default()
+	attrs := getAttributes(ctx, nil, args...)
+	l.LogAttrs(ctx, slog.LevelDebug, message, attrs...)
 }
 
 // Info logs a message at the info level.
@@ -33,7 +35,9 @@ func Debug(ctx context.Context, message string, args ...interface{}) {
 // Any attributes passed as arguments are added to the log message in the group "metadata",
 // and in the span that is retrieved from the given context.
 func Info(ctx context.Context, message string, args ...interface{}) {
-	slog.InfoContext(ctx, message, getAttributes(ctx, nil, args...)...)
+	l := slog.Default()
+	attrs := getAttributes(ctx, nil, args...)
+	l.LogAttrs(ctx, slog.LevelInfo, message, attrs...)
 }
 
 // Warn logs a message at the warn level.
@@ -41,7 +45,9 @@ func Info(ctx context.Context, message string, args ...interface{}) {
 // Any attributes passed as arguments are added to the log message in the group "metadata",
 // and in the span that is retrieved from the given context.
 func Warn(ctx context.Context, message string, args ...interface{}) {
-	slog.WarnContext(ctx, message, getAttributes(ctx, nil, args...)...)
+	l := slog.Default()
+	attrs := getAttributes(ctx, nil, args...)
+	l.LogAttrs(ctx, slog.LevelWarn, message, attrs...)
 }
 
 // Error logs a message at the error level.
@@ -51,5 +57,7 @@ func Warn(ctx context.Context, message string, args ...interface{}) {
 // Furthermore, if an error is passed as an argument, it is added to the log message in the attribute "error",
 // and also sets the span as errored (if the a span cna be retrieved from the given context).
 func Error(ctx context.Context, message string, err error, args ...interface{}) {
-	slog.ErrorContext(ctx, message, getAttributes(ctx, err, args...)...)
+	l := slog.Default()
+	attrs := getAttributes(ctx, err, args...)
+	l.LogAttrs(ctx, slog.LevelError, message, attrs...)
 }
