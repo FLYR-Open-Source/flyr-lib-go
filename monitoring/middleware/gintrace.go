@@ -3,7 +3,7 @@
 
 // Based on https://github.com/DataDog/dd-trace-go/blob/8fb554ff7cf694267f9077ae35e27ce4689ed8b6/contrib/gin-gonic/gin/gintrace.go
 
-package otelgin // import "github.com/FlyrInc/flyr-lib-go/otelgin"
+package middleware // import "github.com/FlyrInc/flyr-lib-go/middleware"
 
 import (
 	"fmt"
@@ -20,23 +20,16 @@ import (
 	"github.com/FlyrInc/flyr-lib-go/internal/utils"
 )
 
-const (
-	tracerKey = "otel-go-contrib-tracer"
-	// ScopeName is the instrumentation scope name.
-	ScopeName = "request"
-)
-
-// Middleware returns middleware that will trace incoming requests.
-// The service parameter should describe the name of the (virtual)
-// server handling the request.
-func Middleware(service string) gin.HandlerFunc {
+// OtelGinMiddleware returns middleware that will trace incoming requests for the gin web framework.
+// The service parameter should describe the name of the (virtual) server handling the request.
+func OtelGinMiddleware(service string) gin.HandlerFunc {
 	cfg := config{}
 	if cfg.TracerProvider == nil {
 		cfg.TracerProvider = otel.GetTracerProvider()
 	}
 	tracer := cfg.TracerProvider.Tracer(
 		ScopeName,
-		oteltrace.WithInstrumentationVersion("v0.0.1"),
+		oteltrace.WithInstrumentationVersion("v0.0.1"), // TODO: Update instrumentation version
 	)
 	if cfg.Propagators == nil {
 		cfg.Propagators = otel.GetTextMapPropagator()
@@ -44,14 +37,6 @@ func Middleware(service string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		for _, f := range cfg.Filters {
 			if !f(c.Request) {
-				// Serve the request to the next middleware
-				// if a filter rejects the request.
-				c.Next()
-				return
-			}
-		}
-		for _, f := range cfg.GinFilters {
-			if !f(c) {
 				// Serve the request to the next middleware
 				// if a filter rejects the request.
 				c.Next()
@@ -69,12 +54,8 @@ func Middleware(service string) gin.HandlerFunc {
 			oteltrace.WithAttributes(semconv.HTTPRoute(c.FullPath())),
 			oteltrace.WithSpanKind(oteltrace.SpanKindServer),
 		}
-		var spanName string
-		if cfg.SpanNameFormatter == nil {
-			spanName = c.FullPath()
-		} else {
-			spanName = cfg.SpanNameFormatter(c.Request)
-		}
+
+		spanName := c.FullPath()
 		if spanName == "" {
 			spanName = fmt.Sprintf("HTTP %s route not found", c.Request.Method)
 		}
