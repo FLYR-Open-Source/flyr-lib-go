@@ -48,6 +48,8 @@ func OtelGinMiddleware(service string) gin.HandlerFunc {
 		defer func() {
 			c.Request = c.Request.WithContext(savedCtx)
 		}()
+
+		// Extract the context from incoming request headers
 		ctx := cfg.Propagators.Extract(savedCtx, propagation.HeaderCarrier(c.Request.Header))
 		opts := []oteltrace.SpanStartOption{
 			oteltrace.WithAttributes(utils.ServerRequestMetrics(service, c.Request)...),

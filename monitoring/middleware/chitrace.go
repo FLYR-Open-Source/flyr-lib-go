@@ -29,13 +29,12 @@ func OtelChiMiddleware(service string) func(http.Handler) http.Handler {
 		cfg.Propagators = otel.GetTextMapPropagator()
 	}
 
-	// Return the actual middleware
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			// Skip requests that don't match the filter
 			for _, f := range cfg.Filters {
 				if !f(r) {
-					// Serve the request to the next handler if the filter rejects it
+					// Serve the request to the next middleware
+					// if a filter rejects the request.
 					next.ServeHTTP(w, r)
 					return
 				}
@@ -44,7 +43,6 @@ func OtelChiMiddleware(service string) func(http.Handler) http.Handler {
 			// Extract the context from incoming request headers
 			ctx := cfg.Propagators.Extract(r.Context(), propagation.HeaderCarrier(r.Header))
 
-			// Prepare span options
 			opts := []oteltrace.SpanStartOption{
 				oteltrace.WithAttributes(utils.ServerRequestMetrics(service, r)...),
 				oteltrace.WithSpanKind(oteltrace.SpanKindServer),
@@ -54,10 +52,10 @@ func OtelChiMiddleware(service string) func(http.Handler) http.Handler {
 			ctx, span := tracer.Start(ctx, spanName, opts...)
 			defer span.End()
 
-			// Pass the span through the request context
+			// pass the span through the request context
 			r = r.WithContext(ctx)
 
-			// Wrap the response writer to capture the status code
+			// wrap the response writer to capture the status code
 			ww := chiMiddleware.NewWrapResponseWriter(w, r.ProtoMajor)
 			defer func() {
 				status := ww.Status()
@@ -68,10 +66,10 @@ func OtelChiMiddleware(service string) func(http.Handler) http.Handler {
 				}
 			}()
 
-			// Serve the request
+			// serve the request to the next middleware
 			next.ServeHTTP(ww, r)
 
-			// Set the route pattern in the span attributes
+			// set the route pattern in the span attributes
 			routePattern := chi.RouteContext(r.Context()).RoutePattern()
 			span.SetAttributes(semconv.HTTPRoute(routePattern))
 		})
