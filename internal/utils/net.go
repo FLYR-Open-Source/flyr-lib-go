@@ -121,12 +121,12 @@ func netProtocol(proto string) (name string, version string) {
 // HTTPServerStatus returns a span status code and message for an HTTP status code
 // value returned by a server. Status codes in the 400-499 range are not
 // returned as errors.
-func HTTPServerStatus(code int, errorMessage string) (codes.Code, string) {
+func HTTPServerStatus(code int) (codes.Code, string) {
 	if code < 100 || code >= 600 {
 		return codes.Error, fmt.Sprintf("Invalid HTTP status code %d", code)
 	}
 	if code >= 500 {
-		return codes.Error, errorMessage
+		return codes.Error, "The request has failed with status: " + http.StatusText(code)
 	}
 	return codes.Unset, ""
 }

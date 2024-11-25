@@ -237,45 +237,40 @@ func TestHTTPServerStatus(t *testing.T) {
 		wantMessage  string
 	}{
 		{
-			name:         "Valid 500-level status code",
-			code:         500,
-			errorMessage: "Internal Server Error",
-			wantCode:     otelcodes.Error,
-			wantMessage:  "Internal Server Error",
+			name:        "Valid 500-level status code",
+			code:        500,
+			wantCode:    otelcodes.Error,
+			wantMessage: "The request has failed with status: Internal Server Error",
 		},
 		{
-			name:         "Valid 400-level status code",
-			code:         404,
-			errorMessage: "Not Found",
-			wantCode:     otelcodes.Unset,
-			wantMessage:  "",
+			name:        "Valid 400-level status code",
+			code:        404,
+			wantCode:    otelcodes.Unset,
+			wantMessage: "",
 		},
 		{
-			name:         "Valid 200-level status code",
-			code:         200,
-			errorMessage: "OK",
-			wantCode:     otelcodes.Unset,
-			wantMessage:  "",
+			name:        "Valid 200-level status code",
+			code:        200,
+			wantCode:    otelcodes.Unset,
+			wantMessage: "",
 		},
 		{
-			name:         "Invalid status code below 100",
-			code:         99,
-			errorMessage: "Invalid Status",
-			wantCode:     otelcodes.Error,
-			wantMessage:  "Invalid HTTP status code 99",
+			name:        "Invalid status code below 100",
+			code:        99,
+			wantCode:    otelcodes.Error,
+			wantMessage: "Invalid HTTP status code 99",
 		},
 		{
-			name:         "Invalid status code above 599",
-			code:         600,
-			errorMessage: "Invalid Status",
-			wantCode:     otelcodes.Error,
-			wantMessage:  "Invalid HTTP status code 600",
+			name:        "Invalid status code above 599",
+			code:        600,
+			wantCode:    otelcodes.Error,
+			wantMessage: "Invalid HTTP status code 600",
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotCode, gotMessage := HTTPServerStatus(tt.code, tt.errorMessage)
+			gotCode, gotMessage := HTTPServerStatus(tt.code)
 			if gotCode != tt.wantCode || gotMessage != tt.wantMessage {
 				t.Errorf("HTTPServerStatus(%d, %q) = %v, %q; want %v, %q",
 					tt.code, tt.errorMessage, gotCode, gotMessage, tt.wantCode, tt.wantMessage)

@@ -71,7 +71,7 @@ func OtelGinMiddleware(service string) gin.HandlerFunc {
 		c.Next()
 
 		status := c.Writer.Status()
-		code, descr := utils.HTTPServerStatus(status, c.Errors.String())
+		code, descr := utils.HTTPServerStatus(status)
 		span.SetStatus(code, descr)
 		if status > 0 {
 			span.SetAttributes(semconv.HTTPStatusCode(status))
