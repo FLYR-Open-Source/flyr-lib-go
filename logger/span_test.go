@@ -6,6 +6,9 @@ import (
 	"time"
 
 	"log/slog"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestValueToJSONString(t *testing.T) {
@@ -80,4 +83,54 @@ func TestValueToJSONString(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestConvertToDatadogTags(t *testing.T) {
+	type myStruct struct {
+		Name string
+		Age  int
+	}
+
+	group := slog.Group(
+		"my_items",
+		slog.Any("response_body", myStruct{Name: "joe", Age: 30}),
+		slog.Int64("id", 10),
+		slog.String("name", "test"),
+		slog.Bool("is_active", true),
+		slog.Duration("duration", 10*time.Second),
+		slog.Float64("amount", 10.5),
+	)
+	value, err := valueToJSONString(group.Value)
+	require.NoError(t, err)
+
+	attributesResult := make(map[string]string)
+	convertToDatadogTags(group.Key, value, attributesResult)
+
+	v, ok := attributesResult["my_items.response_body.Name"]
+	assert.True(t, ok)
+	assert.Equal(t, "joe", v)
+
+	v, ok = attributesResult["my_items.response_body.Age"]
+	assert.True(t, ok)
+	assert.Equal(t, "30", v)
+
+	v, ok = attributesResult["my_items.id"]
+	assert.True(t, ok)
+	assert.Equal(t, "10", v)
+
+	v, ok = attributesResult["my_items.name"]
+	assert.True(t, ok)
+	assert.Equal(t, "test", v)
+
+	v, ok = attributesResult["my_items.is_active"]
+	assert.True(t, ok)
+	assert.Equal(t, "true", v)
+
+	v, ok = attributesResult["my_items.duration"]
+	assert.True(t, ok)
+	assert.Equal(t, "1e+10", v)
+
+	v, ok = attributesResult["my_items.amount"]
+	assert.True(t, ok)
+	assert.Equal(t, "10.5", v)
 }

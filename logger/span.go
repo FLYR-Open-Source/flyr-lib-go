@@ -38,7 +38,40 @@ func injectAttrsToSpan(ctx context.Context, attr slog.Attr) {
 		return // if it's null just ignore it and swallow the error
 	}
 
-	span.SetAttributes(attribute.String(attr.Key, value))
+	attributesResult := make(map[string]string)
+	convertToDatadogTags(attr.Key, value, attributesResult)
+	for k, v := range attributesResult {
+		span.SetAttributes(attribute.String(k, v))
+	}
+}
+
+// convertToDatadogTags converts a JSON string to a map of key-value pairs.
+func convertToDatadogTags(prefix string, jsonString string, result map[string]string) {
+	var data map[string]interface{}
+	if err := json.Unmarshal([]byte(jsonString), &data); err != nil {
+		return // if it's null just ignore it and swallow the error
+	}
+
+	flattenJSON(data, prefix, result)
+}
+
+// flattenJSON flattens a JSON object into a map of key-value pairs.
+//
+// The span attributes' key must have the format `key1.key2.key3` to be properly flattened.
+func flattenJSON(data map[string]interface{}, prefix string, result map[string]string) {
+	for key, value := range data {
+		fullKey := key
+		if prefix != "" {
+			fullKey = prefix + "." + key
+		}
+
+		switch v := value.(type) {
+		case map[string]interface{}:
+			flattenJSON(v, fullKey, result)
+		default:
+			result[fullKey] = fmt.Sprintf("%v", value)
+		}
+	}
 }
 
 // valueToJSONString converts a slog.Value to its JSON string representation.
