@@ -21,7 +21,7 @@ This library is an internal Go library for Flyr, providing essential utilities f
        - [HTTP Tracing](#http-tracing)
        - [PubSub Tracing](#pubsub-tracing)
        - [RabbitMQ Tracing](#rabbitmq-tracing)
-         - [RabbitMQ Provider](#rabbitmq-provider)
+         - [RabbitMQ Publisher](#rabbitmq-publisher)
          - [RabbitMQ Consumer](#rabbitmq-consumer)
      - [Middleware](#middleware)
    - [Testing](#testing)
@@ -206,48 +206,7 @@ The package [monitoring/http](./monitoring/http/) exposes two different function
 The `NewHttpClient()` can be used to create a new `http.Client` with Distributed Tracing enabled.
 If you have a client already, you can use the function `SetHttpTransport(client http.Client)` that enables Distributed Tracing for the given client. The same client is returned back.
 
-Create a new client using the library:
-```go
-package main
-
-import "github.com/FlyrInc/flyr-lib-go/http"
-
-func main() {
-  client := http.NewHttpClient()
-
-  req, _ := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-  res, err := client.Do(req)
-  if err != nil {
-    ... // handle error
-  }
-
-  defer res.Body.Close()
-  ...
-}
-```
-
-Enable distributed tracing to an existing `http.Client`:
-```go
-package main
-
-import "github.com/FlyrInc/flyr-lib-go/http"
-
-func main() {
-  client := http.Client{}
-  ... // add any setup to client
-
-  client = SetHttpTransport(client)
-
-  req, _ := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-  res, err := client.Do(req)
-  if err != nil {
-    ...
-  }
-
-  defer res.Body.Close()
-  ...
-}
-```
+You can see examples here: [examples/monitoring/http/main.go](./examples/monitoring/http/main.go)
 
 ##### PubSub Tracing
 
@@ -259,41 +218,21 @@ Link: [https://cloud.google.com/pubsub/docs/open-telemetry-tracing](https://clou
 
 All you need to do is to enable it on the client - both for publishing and consuming messages.
 
-```go
-client, err := pubsub.NewClientWithConfig(ctx, projectID, &pubsub.ClientConfig{
-  EnableOpenTelemetryTracing: true,
-})
-...
-```
+You can see examples here: [examples/monitoring/pubsub/main.go](./examples/monitoring/pubsub/main.go)
 
 ##### RabbitMQ Tracing
 
 The **RabbitMQ Tracing** provides visibility into message flows by capturing spans for both message production and consumption, enabling detailed insights into the performance and behavior of RabbitMQ-based communication.
 
-###### RabbitMQ Provider
-TBD
-
-###### RabbitMQ Consumer
-TBD
+You can see examples here: [examples/monitoring/rabbitmq/main.go](./examples/monitoring/rabbitmq/main.go)
 
 #### Middleware
 
 The library provides middleware for both the Gin and Chi frameworks in Go, responsible for creating the main span for incoming requests to endpoints, ensuring that each HTTP request is traced and correlated with the overall distributed trace.
 
-```go
-  package main
-
-  import "github.com/FlyrInc/flyr-lib-go/middleware"
-
-  func main() {
-    ... setup chi or gin
-
-    // for gin-gonic
-    engine.Use(middleware.OtelGinMiddleware())
-    // for chi
-    engine.Use(middleware.OtelChiMiddleware())
-  }
-```
+You can see the below examples:
+- gin: [examples/monitoring/webserver/gin/main.go](./examples/monitoring/webserver/gin/main.go)
+- chi: [examples/monitoring/webserver/chi/main.go](./examples/monitoring/webserver/chi/main.go)
 
 #### Testing
 

@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/propagation"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	sdktracetest "go.opentelemetry.io/otel/sdk/trace/tracetest"
 )
@@ -12,6 +13,10 @@ func GetFakeTracer() (*sdktrace.TracerProvider, FakeTracer) {
 	tc := sdktrace.NewTracerProvider(
 		sdktrace.WithBatcher(sdktracetest.NewInMemoryExporter()),
 	)
+
+	otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(
+		propagation.TraceContext{}, propagation.Baggage{}))
+
 	otel.SetTracerProvider(tc)
 
 	return tc, FakeTracer{Tracer: tc.Tracer("test-tracer")}

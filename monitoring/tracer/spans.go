@@ -1,4 +1,4 @@
-package tracer // import "github.com/FlyrInc/flyr-lib-go/tracer"
+package tracer // import "github.com/FlyrInc/flyr-lib-go/monitoring/tracer"
 
 import (
 	"context"

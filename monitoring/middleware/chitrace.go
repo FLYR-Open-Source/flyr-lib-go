@@ -1,4 +1,4 @@
-package middleware // import "github.com/FlyrInc/flyr-lib-go/middleware"
+package middleware // import "github.com/FlyrInc/flyr-lib-go/monitoring/middleware"
 
 import (
 	"fmt"
