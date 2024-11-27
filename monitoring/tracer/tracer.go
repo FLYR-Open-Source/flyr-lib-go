@@ -2,18 +2,15 @@ package tracer // import "github.com/FlyrInc/flyr-lib-go/tracer"
 
 import (
 	"context"
-	"errors"
 
 	"go.opentelemetry.io/otel"
 	oteltrace "go.opentelemetry.io/otel/trace"
+	"go.opentelemetry.io/otel/trace/noop"
 
-	"github.com/FlyrInc/flyr-lib-go/config"
+	"github.com/FlyrInc/flyr-lib-go/internal/config"
 	internalSpan "github.com/FlyrInc/flyr-lib-go/internal/span"
-	internaltracer "github.com/FlyrInc/flyr-lib-go/internal/traceprovider"
 	internalUtils "github.com/FlyrInc/flyr-lib-go/internal/utils"
 )
-
-var ErrTracerNameNotSet = errors.New("tracer name not set")
 
 const (
 	// The depth of the caller in the stack trace
@@ -41,29 +38,27 @@ var defaultTracer *Tracer
 // application. If tracing is not enabled, it returns nil without starting a tracer.
 //
 // It returns an error if any occurred.
-func StartDefaultTracer(ctx context.Context, cfg config.MonitoringConfig) error {
-	if !cfg.TracerEnabled() {
-		return nil
-	}
+func StartDefaultTracer(ctx context.Context) error {
+	cfg := config.NewMonitoringConfig()
 
-	if cfg.Service() == "" {
-		return ErrTracerNameNotSet
-	}
-
-	err := internaltracer.InitializeTracerProvider(ctx, cfg)
+	err := InitializeTracerProvider(ctx, cfg)
 	if err != nil {
 		return err
 	}
 
 	tc := otel.GetTracerProvider()
-	tracer := &Tracer{
-		tracer: tc.Tracer(
+
+	var tracer Tracer
+	if cfg.Service() == "" {
+		tracer.tracer = noop.Tracer{}
+	} else {
+		tracer.tracer = tc.Tracer(
 			cfg.Service(),
 			oteltrace.WithInstrumentationVersion("v0.0.1"), // TODO: Update instrumentation version
-		),
+		)
 	}
 
-	defaultTracer = tracer
+	defaultTracer = &tracer
 	return nil
 }
 

@@ -10,6 +10,8 @@ import (
 
 	"go.opentelemetry.io/otel/propagation"
 	oteltrace "go.opentelemetry.io/otel/trace"
+
+	internalConfig "github.com/FlyrInc/flyr-lib-go/internal/config"
 )
 
 const (
@@ -19,9 +21,10 @@ const (
 )
 
 type config struct {
-	TracerProvider oteltrace.TracerProvider
-	Propagators    propagation.TextMapPropagator
-	Filters        []filter
+	TracerProvider   oteltrace.TracerProvider
+	Propagators      propagation.TextMapPropagator
+	MonitoringConfig internalConfig.MonitoringConfig
+	Filters          []filter
 }
 
 // Filter is a predicate used to determine whether a given http.request should

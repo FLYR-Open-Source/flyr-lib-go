@@ -1,4 +1,4 @@
-package config // import "github.com/FlyrInc/flyr-lib-go/config"
+package config // import "github.com/FlyrInc/flyr-lib-go/internal/config"
 
 import (
 	semconv "go.opentelemetry.io/otel/semconv/v1.17.0"
@@ -6,14 +6,9 @@ import (
 
 // attribute names for the common tags that will be applied to every trace, span and log
 const (
-	SERVICE_NAME           = string(semconv.ServiceNameKey)
-	SERVICE_VERSION        = string(semconv.ServiceVersionKey)
-	DEPLOYMENT_ENVIRONMENT = string(semconv.DeploymentEnvironmentKey)
-
-	// The custom tag for the environment of the service
-	CUSTON_ENV_NAME = "env"
-	// The custom tag for the name of the tenant (for multi-tenancy)
-	CUSTOM_TENANT_NAME = "flyr_tenant"
+	SERVICE_NAME       = string(semconv.ServiceNameKey)
+	SERVICE_VERSION    = string(semconv.ServiceVersionKey)
+	SERVICE_INTANCE_ID = string(semconv.ServiceInstanceIDKey)
 )
 
 // attribute names for the caller tags that will be applied to every trace, span and log

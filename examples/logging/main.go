@@ -5,56 +5,43 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"os"
 
-	"github.com/FlyrInc/flyr-lib-go/config"
 	"github.com/FlyrInc/flyr-lib-go/logger"
 )
 
 const (
-	// You can pass the `OBSERVABILITY_SERVICE` environment variable to set the service name
+	// You can pass the `OTEL_SERVICE_NAME` environment variable to set the service name
 	serviceName = "some-service"
-	// You can pass the `OBSERVABILITY_ENV` environment variable to set the environment
-	env = "dev"
-	// You can pass the `OBSERVABILITY_FLYR_TENANT` environment variable to set the tenant
-	flyrTenant = "fl"
-	// You can pass the `OBSERVABILITY_VERSION` environment variable to set the version
-	version = "v1.0.0"
 	// You can pass the `LOG_LEVEL` environment variable to set the log level
 	logLevel = "debug"
 )
 
-func getLoggingConfig() config.LoggerConfig {
-	cfg := config.NewLoggerConfig()
-	cfg.ServiceCfg = serviceName
-	cfg.EnvCfg = env
-	cfg.FlyrTenantCfg = flyrTenant
-	cfg.VersionCfg = version
-	cfg.LogLevelCfg = logLevel
-
-	return cfg
+func init() {
+	os.Setenv("OTEL_SERVICE_NAME", serviceName)
+	os.Setenv("LOG_LEVEL", logLevel)
+	os.Setenv("OTEL_RESOURCE_ATTRIBUTES", "k8s.container.name={some-container},k8s.deployment.name={some-deployment},k8s.deployment.uid={some-uid},k8s.namespace.name={some-namespace},k8s.node.name={some-node},k8s.pod.name={some-pod},k8s.pod.uid={some-uid},k8s.replicaset.name={some-replicaset},k8s.replicaset.uid={some-uid},service.instance.id={some-namespace}.{some-pod}.{some-container},service.version={some-version}")
 }
 
 func main() {
 	ctx := context.Background()
 
 	// Initialize the logger
-	logger.InitLogger(getLoggingConfig())
+	logger.InitLogger()
 
 	logger.Info(ctx, "This is an info message")
 	// Output:
 	// {
 	// 	"time": "2024-11-07T17:53:20.108167Z",
-	// 	"level": "INFO",
-	// 	"message": "This is an info message",
-	// 	"deployment.environment.name": "dev",
-	// 	"service.version": "v1.0.0",
-	// 	"service.name": "some-service",
-	//  "env": "dev",
-	// 	"flyr_tenant": "fl",
-	// 	"code.filepath": ".../flyr-lib-go/examples/logging/main.go",
-	// 	"code.lineno": 43,
-	// 	"code.function": "main",
-	// 	"code.namespace": "main"
+	//  "level": "INFO",
+	//  "message": "This is an info message",
+	//  "service.name": "some-service",
+	//  "service.instance.id": "{some-namespace}.{some-pod}.{some-container}",
+	//  "service.version": "{some-version}",
+	//  "code.filepath": ".../flyr-lib-go/examples/logging/main.go",
+	//  "code.lineno": ...,
+	//  "code.function": "main",
+	//  "code.namespace": "main"
 	// }
 	fmt.Println()
 
@@ -64,15 +51,13 @@ func main() {
 	// 	"time": "2024-11-07T17:55:05.213138Z",
 	// 	"level": "DEBUG",
 	// 	"message": "This is a debug message",
-	// 	"deployment.environment.name": "dev",
-	// 	"service.version": "v1.0.0",
-	// 	"service.name": "some-service",
-	//  "env": "dev",
-	// 	"flyr_tenant": "fl",
-	// 	"code.filepath": ".../flyr-lib-go/examples/logging/main.go",
-	// 	"code.lineno": 61,
-	// 	"code.function": "main",
-	// 	"code.namespace": "main"
+	//  "service.name": "some-service",
+	//  "service.instance.id": "{some-namespace}.{some-pod}.{some-container}",
+	//  "service.version": "{some-version}",
+	//  "code.filepath": ".../flyr-lib-go/examples/logging/main.go",
+	//  "code.lineno": ...,
+	//  "code.function": "main",
+	//  "code.namespace": "main"
 	// }
 	fmt.Println()
 
@@ -82,15 +67,13 @@ func main() {
 	// 	"time": "2024-11-07T17:55:32.894155Z",
 	// 	"level": "WARN",
 	// 	"message": "This is a warning message",
-	// 	"deployment.environment.name": "dev",
-	// 	"service.version": "v1.0.0",
-	// 	"service.name": "some-service",
-	// 	"flyr_tenant": "fl",
-	//  "env": "dev",
-	// 	"code.filepath": ".../flyr-lib-go/examples/logging/main.go",
-	// 	"code.lineno": 79,
-	// 	"code.function": "main",
-	// 	"code.namespace": "main"
+	//  "service.name": "some-service",
+	//  "service.instance.id": "{some-namespace}.{some-pod}.{some-container}",
+	//  "service.version": "{some-version}",
+	//  "code.filepath": ".../flyr-lib-go/examples/logging/main.go",
+	//  "code.lineno": ...,
+	//  "code.function": "main",
+	//  "code.namespace": "main"
 	// }
 	fmt.Println()
 
@@ -100,16 +83,13 @@ func main() {
 	// 	"time": "2024-11-07T17:55:48.871878Z",
 	// 	"level": "ERROR",
 	// 	"message": "This is an error message",
-	// 	"deployment.environment.name": "dev",
-	// 	"service.version": "v1.0.0",
-	// 	"service.name": "some-service",
-	// 	"flyr_tenant": "fl",
-	//  "env": "dev",
-	// 	"code.filepath": ".../flyr-lib-go/examples/logging/main.go",
-	// 	"code.lineno": 97,
-	// 	"code.function": "main",
-	// 	"code.namespace": "main",
-	// 	"error": "this is an error"
+	//  "service.name": "some-service",
+	//  "service.instance.id": "{some-namespace}.{some-pod}.{some-container}",
+	//  "service.version": "{some-version}",
+	//  "code.filepath": ".../flyr-lib-go/examples/logging/main.go",
+	//  "code.lineno": ...,
+	//  "code.function": "main",
+	//  "code.namespace": "main"
 	// }
 	fmt.Println()
 
@@ -124,15 +104,13 @@ func main() {
 	// 	"time": "2024-11-07T17:56:36.935963Z",
 	// 	"level": "INFO",
 	// 	"message": "This is an info message with metadata",
-	// 	"deployment.environment.name": "dev",
-	// 	"service.version": "v1.0.0",
-	// 	"service.name": "some-service",
-	//  "env": "dev",
-	// 	"flyr_tenant": "fl",
-	// 	"code.filepath": ".../flyr-lib-go/examples/logging/main.go",
-	// 	"code.lineno": 117,
-	// 	"code.function": "main",
-	// 	"code.namespace": "main",
+	//  "service.name": "some-service",
+	//  "service.instance.id": "{some-namespace}.{some-pod}.{some-container}",
+	//  "service.version": "{some-version}",
+	//  "code.filepath": ".../flyr-lib-go/examples/logging/main.go",
+	//  "code.lineno": ...,
+	//  "code.function": "main",
+	//  "code.namespace": "main"
 	// 	"metadata": {
 	// 		"someKey": "someValue"
 	// 	}
@@ -156,15 +134,13 @@ func main() {
 	// 	"time": "2024-11-07T17:59:25.607843Z",
 	// 	"level": "INFO",
 	// 	"message": "This is an info message with multiple metadata",
-	// 	"deployment.environment.name": "dev",
-	// 	"service.version": "v1.0.0",
-	// 	"service.name": "some-service",
-	//  "env": "dev",
-	// 	"flyr_tenant": "fl",
-	// 	"code.filepath": ".../flyr-lib-go/examples/logging/main.go",
-	// 	"code.lineno": 147,
-	// 	"code.function": "main",
-	// 	"code.namespace": "main",
+	//  "service.name": "some-service",
+	//  "service.instance.id": "{some-namespace}.{some-pod}.{some-container}",
+	//  "service.version": "{some-version}",
+	//  "code.filepath": ".../flyr-lib-go/examples/logging/main.go",
+	//  "code.lineno": ...,
+	//  "code.function": "main",
+	//  "code.namespace": "main"
 	// 	"metadata": {
 	// 		"someKey": "someValue",
 	// 		"someInt": 1,

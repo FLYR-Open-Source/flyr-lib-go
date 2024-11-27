@@ -2,26 +2,21 @@ package logger
 
 import (
 	"log/slog"
+	"os"
 	"regexp"
 	"strings"
 	"testing"
 	"time"
 
-	"github.com/FlyrInc/flyr-lib-go/config"
+	"github.com/FlyrInc/flyr-lib-go/internal/config"
 	"github.com/stretchr/testify/assert"
 )
 
 func getLoggingConfig() config.LoggerConfig {
 	serviceName := "test-service"
-	env := "test-env"
-	flyrTenant := "test-tenant"
-	version := "test-version"
 
 	cfg := config.NewLoggerConfig()
 	cfg.ServiceCfg = serviceName
-	cfg.EnvCfg = env
-	cfg.FlyrTenantCfg = flyrTenant
-	cfg.VersionCfg = version
 
 	return cfg
 }
@@ -56,6 +51,9 @@ func (lo *logOutput) Write(p []byte) (n int, err error) {
 }
 
 func TestInjectRootAttrs(t *testing.T) {
+	os.Setenv("OTEL_RESOURCE_ATTRIBUTES", "k8s.container.name={some-container},k8s.deployment.name={some-deployment},k8s.deployment.uid={some-uid},k8s.namespace.name={some-namespace},k8s.node.name={some-node},k8s.pod.name={some-pod},k8s.pod.uid={some-uid},k8s.replicaset.name={some-replicaset},k8s.replicaset.uid={some-uid},service.instance.id={some-namespace}.{some-pod}.{some-container},service.version={some-version}")
+	defer os.Unsetenv("OTEL_RESOURCE_ATTRIBUTES")
+
 	cfg := getLoggingConfig()
 	output := &logOutput{}
 
@@ -63,20 +61,15 @@ func TestInjectRootAttrs(t *testing.T) {
 	log := slog.New(InjectRootAttrs(handler, cfg))
 	log.Info("Test log message")
 
-	assert.Contains(t, output.log, config.CUSTON_ENV_NAME)
-	assert.Equal(t, output.log[config.CUSTON_ENV_NAME], cfg.Env())
-
-	assert.Contains(t, output.log, config.DEPLOYMENT_ENVIRONMENT)
-	assert.Equal(t, output.log[config.DEPLOYMENT_ENVIRONMENT], cfg.Env())
-
 	assert.Contains(t, output.log, config.SERVICE_NAME)
 	assert.Equal(t, output.log[config.SERVICE_NAME], cfg.Service())
 
 	assert.Contains(t, output.log, config.SERVICE_VERSION)
-	assert.Equal(t, output.log[config.SERVICE_VERSION], cfg.Version())
+	assert.Equal(t, output.log[config.SERVICE_VERSION], "{some-version}")
 
-	assert.Contains(t, output.log, config.CUSTOM_TENANT_NAME)
-	assert.Equal(t, output.log[config.CUSTOM_TENANT_NAME], cfg.Tenant())
+	assert.Contains(t, output.log, config.SERVICE_INTANCE_ID)
+	assert.Equal(t, output.log[config.SERVICE_INTANCE_ID], "{some-namespace}.{some-pod}.{some-container}")
+
 }
 
 func TestReplaceAttributes(t *testing.T) {

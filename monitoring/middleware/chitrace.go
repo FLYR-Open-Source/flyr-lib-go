@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	internalConfig "github.com/FlyrInc/flyr-lib-go/internal/config"
 	"github.com/FlyrInc/flyr-lib-go/internal/utils"
 	"github.com/go-chi/chi/v5"
 	chiMiddleware "github.com/go-chi/chi/v5/middleware"
@@ -16,7 +17,7 @@ import (
 
 // OtelChiMiddleware returns middleware that will trace incoming requests for the chi web framework.
 // The service parameter should describe the name of the (virtual) server handling the request.
-func OtelChiMiddleware(service string) func(http.Handler) http.Handler {
+func OtelChiMiddleware() func(http.Handler) http.Handler {
 	cfg := config{}
 	if cfg.TracerProvider == nil {
 		cfg.TracerProvider = otel.GetTracerProvider()
@@ -27,6 +28,10 @@ func OtelChiMiddleware(service string) func(http.Handler) http.Handler {
 	)
 	if cfg.Propagators == nil {
 		cfg.Propagators = otel.GetTextMapPropagator()
+	}
+	if cfg.MonitoringConfig == nil {
+		monitoringConfig := internalConfig.NewMonitoringConfig()
+		cfg.MonitoringConfig = monitoringConfig
 	}
 
 	return func(next http.Handler) http.Handler {
@@ -44,7 +49,7 @@ func OtelChiMiddleware(service string) func(http.Handler) http.Handler {
 			ctx := cfg.Propagators.Extract(r.Context(), propagation.HeaderCarrier(r.Header))
 
 			opts := []oteltrace.SpanStartOption{
-				oteltrace.WithAttributes(utils.ServerRequestMetrics(service, r)...),
+				oteltrace.WithAttributes(utils.ServerRequestMetrics(cfg.MonitoringConfig.Service(), r)...),
 				oteltrace.WithSpanKind(oteltrace.SpanKindServer),
 			}
 

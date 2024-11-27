@@ -17,12 +17,13 @@ import (
 	semconv "go.opentelemetry.io/otel/semconv/v1.20.0"
 	oteltrace "go.opentelemetry.io/otel/trace"
 
+	internalConfig "github.com/FlyrInc/flyr-lib-go/internal/config"
 	"github.com/FlyrInc/flyr-lib-go/internal/utils"
 )
 
 // OtelGinMiddleware returns middleware that will trace incoming requests for the gin web framework.
 // The service parameter should describe the name of the (virtual) server handling the request.
-func OtelGinMiddleware(service string) gin.HandlerFunc {
+func OtelGinMiddleware() gin.HandlerFunc {
 	cfg := config{}
 	if cfg.TracerProvider == nil {
 		cfg.TracerProvider = otel.GetTracerProvider()
@@ -34,6 +35,11 @@ func OtelGinMiddleware(service string) gin.HandlerFunc {
 	if cfg.Propagators == nil {
 		cfg.Propagators = otel.GetTextMapPropagator()
 	}
+	if cfg.MonitoringConfig == nil {
+		monitoringConfig := internalConfig.NewMonitoringConfig()
+		cfg.MonitoringConfig = monitoringConfig
+	}
+
 	return func(c *gin.Context) {
 		for _, f := range cfg.Filters {
 			if !f(c.Request) {
@@ -52,7 +58,7 @@ func OtelGinMiddleware(service string) gin.HandlerFunc {
 		// Extract the context from incoming request headers
 		ctx := cfg.Propagators.Extract(savedCtx, propagation.HeaderCarrier(c.Request.Header))
 		opts := []oteltrace.SpanStartOption{
-			oteltrace.WithAttributes(utils.ServerRequestMetrics(service, c.Request)...),
+			oteltrace.WithAttributes(utils.ServerRequestMetrics(cfg.MonitoringConfig.Service(), c.Request)...),
 			oteltrace.WithAttributes(semconv.HTTPRoute(c.FullPath())),
 			oteltrace.WithSpanKind(oteltrace.SpanKindServer),
 		}

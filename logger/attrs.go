@@ -4,7 +4,7 @@ import (
 	"context"
 	"log/slog"
 
-	"github.com/FlyrInc/flyr-lib-go/config"
+	"github.com/FlyrInc/flyr-lib-go/internal/config"
 	internalUtils "github.com/FlyrInc/flyr-lib-go/internal/utils"
 )
 

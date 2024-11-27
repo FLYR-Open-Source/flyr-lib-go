@@ -7,7 +7,7 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/FlyrInc/flyr-lib-go/config"
+	"github.com/FlyrInc/flyr-lib-go/internal/config"
 	otel_attribute "go.opentelemetry.io/otel/attribute"
 )
 

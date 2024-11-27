@@ -15,8 +15,8 @@ func TestLoggerConfig(t *testing.T) {
 
 func TestLoggerConfigWithEnvVars(t *testing.T) {
 	en := map[string]string{
-		"OBSERVABILITY_SERVICE": "test-service",
-		"LOG_LEVEL":             "error",
+		"OTEL_SERVICE_NAME": "test-service",
+		"LOG_LEVEL":         "error",
 	}
 
 	cfg := NewLoggerConfig(withEnvironment(en))

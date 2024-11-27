@@ -1,4 +1,4 @@
-package config // import "github.com/FlyrInc/flyr-lib-go/config"
+package config // import "github.com/FlyrInc/flyr-lib-go/internal/config"
 
 import "github.com/caarlos0/env/v10"
 

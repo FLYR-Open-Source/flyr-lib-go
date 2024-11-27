@@ -5,8 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"os"
 
-	"github.com/FlyrInc/flyr-lib-go/config"
 	"github.com/FlyrInc/flyr-lib-go/logger"
 	"github.com/FlyrInc/flyr-lib-go/monitoring/tracer"
 	"go.opentelemetry.io/otel/trace"
@@ -20,51 +20,26 @@ type MyStruct struct {
 const (
 	// You can pass the `OBSERVABILITY_SERVICE` environment variable to set the service name
 	serviceName = "some-service"
-	// You can pass the `OBSERVABILITY_ENV` environment variable to set the environment
-	env = "dev"
-	// You can pass the `OBSERVABILITY_FLYR_TENANT` environment variable to set the tenant
-	flyrTenant = "fl"
-	// You can pass the `OBSERVABILITY_VERSION` environment variable to set the version
-	version = "v1.0.0"
-	// You can pass the `OBSERVABILITY_TRACER_ENABLED` environment variable to enable the tracer
-	enableTracer = true
 )
 
-func getMonitoringConfig() config.MonitoringConfig {
-	cfg := config.NewMonitoringConfig()
-	cfg.EnableTracer = enableTracer
-	cfg.ServiceCfg = serviceName
-	cfg.EnvCfg = env
-	cfg.FlyrTenantCfg = flyrTenant
-	cfg.VersionCfg = version
-
-	return cfg
-}
-
-func getLoggingConfig() config.LoggerConfig {
-	cfg := config.NewLoggerConfig()
-	cfg.ServiceCfg = serviceName
-	cfg.EnvCfg = env
-	cfg.FlyrTenantCfg = flyrTenant
-	cfg.VersionCfg = version
-	cfg.LogLevelCfg = "debug"
-
-	return cfg
+func init() {
+	os.Setenv("OTEL_SERVICE_NAME", serviceName)
+	os.Setenv("OTEL_RESOURCE_ATTRIBUTES", "k8s.container.name={some-container},k8s.deployment.name={some-deployment},k8s.deployment.uid={some-uid},k8s.namespace.name={some-namespace},k8s.node.name={some-node},k8s.pod.name={some-pod},k8s.pod.uid={some-uid},k8s.replicaset.name={some-replicaset},k8s.replicaset.uid={some-uid},service.instance.id={some-namespace}.{some-pod}.{some-container},service.version={some-version}")
 }
 
 // run this file to see the output
 func main() {
 	ctx := context.Background()
 
-	logger.InitLogger(getLoggingConfig())
+	logger.InitLogger()
 
 	// start the default tracer
-	err := tracer.StartDefaultTracer(ctx, getMonitoringConfig())
+	err := tracer.StartDefaultTracer(ctx)
 	if err != nil {
 		panic(err)
 	}
 	defer func() {
-		err = tracer.Shutdown(ctx)
+		err = tracer.ShutdownTracerProvider(ctx)
 		if err != nil {
 			logger.Error(ctx, "failed to stop tracer", err)
 		}

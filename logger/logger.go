@@ -3,7 +3,7 @@ package logger // import "github.com/FlyrInc/flyr-lib-go/logger"
 import (
 	"context"
 
-	"github.com/FlyrInc/flyr-lib-go/config"
+	"github.com/FlyrInc/flyr-lib-go/internal/config"
 	internalLogger "github.com/FlyrInc/flyr-lib-go/internal/logger"
 	slogmulti "github.com/samber/slog-multi"
 
@@ -13,7 +13,8 @@ import (
 // InitLogger initializes the logger with the given configuration.
 //
 // The logger is then selected as the default logger for the application.
-func InitLogger(cfg config.LoggerConfig) {
+func InitLogger() {
+	cfg := config.NewLoggerConfig()
 	loggerLevel := internalLogger.ParseLogLevel(cfg.LogLevel())
 
 	jsonHanlder := internalLogger.NewJSONLogHandler(loggerLevel)

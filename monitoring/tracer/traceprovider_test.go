@@ -1,34 +1,23 @@
-package traceprovider
+package tracer
 
 import (
 	"context"
 	"testing"
 
-	"github.com/FlyrInc/flyr-lib-go/config"
-	"github.com/stretchr/testify/assert"
+	"github.com/FlyrInc/flyr-lib-go/internal/config"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/propagation"
-	semconv "go.opentelemetry.io/otel/semconv/v1.17.0"
 )
 
 func getMonitoringConfig() config.MonitoringConfig {
 	serviceName := "test-service"
-	env := "test-env"
-	flyrTenant := "test-tenant"
-	version := "test-version"
 
 	cfg := config.NewMonitoringConfig()
-	cfg.EnableTracer = true
 	cfg.ServiceCfg = serviceName
-	cfg.EnvCfg = env
-	cfg.FlyrTenantCfg = flyrTenant
-	cfg.VersionCfg = version
 
 	return cfg
 }
-
 func TestNewTraceProvider(t *testing.T) {
 	ctx := context.Background()
 	cfg := getMonitoringConfig()
@@ -50,15 +39,6 @@ func TestNewTraceProvider(t *testing.T) {
 			tracerProvider = nil
 		}()
 		require.NoError(t, err)
-
-		attributes := resourceInfo.Attributes()
-
-		// Verify that each attribute matches the expected values
-		assert.Contains(t, attributes, semconv.DeploymentEnvironment(cfg.Env()))
-		assert.Contains(t, attributes, semconv.ServiceName(cfg.Service()))
-		assert.Contains(t, attributes, semconv.ServiceVersion(cfg.Version()))
-		assert.Contains(t, attributes, attribute.String(config.CUSTON_ENV_NAME, cfg.Env()))
-		assert.Contains(t, attributes, attribute.String(config.CUSTOM_TENANT_NAME, cfg.Tenant()))
 
 		// Ensure tracerProvider is still usable
 		tracer := tracerProvider.Tracer("test-tracer")
