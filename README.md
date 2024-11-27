@@ -106,6 +106,9 @@ metadata:
   name: {some-namespace}
 ```
 
+> [!IMPORTANT]
+> The precedence for the labels is [pod, namespace, node]. That means if in your pod you override the `environment` value (or even if you include an `env` label) the value from the Pod will be selected.
+
 ##### Example in a Pod
 
 ```yaml
