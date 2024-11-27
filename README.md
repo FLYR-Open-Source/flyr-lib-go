@@ -261,7 +261,7 @@ All you need to do is to enable it on the client - both for publishing and consu
 
 ```go
 client, err := pubsub.NewClientWithConfig(ctx, projectID, &pubsub.ClientConfig{
-        EnableOpenTelemetryTracing: true,
+  EnableOpenTelemetryTracing: true,
 })
 ...
 ```
