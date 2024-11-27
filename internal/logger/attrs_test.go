@@ -65,10 +65,10 @@ func TestInjectRootAttrs(t *testing.T) {
 	assert.Equal(t, output.log[config.SERVICE_NAME], cfg.Service())
 
 	assert.Contains(t, output.log, config.SERVICE_VERSION)
-	assert.Equal(t, output.log[config.SERVICE_VERSION], "{some-version}")
+	assert.Equal(t, "{some-version}", output.log[config.SERVICE_VERSION])
 
 	assert.Contains(t, output.log, config.SERVICE_INTANCE_ID)
-	assert.Equal(t, output.log[config.SERVICE_INTANCE_ID], "{some-namespace}.{some-pod}.{some-container}")
+	assert.Equal(t, "{some-namespace}.{some-pod}.{some-container}", output.log[config.SERVICE_INTANCE_ID])
 
 }
 
