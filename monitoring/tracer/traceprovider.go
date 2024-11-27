@@ -36,7 +36,7 @@ var (
 // propagation, which is essential for distributed tracing.
 //
 // It returns the initialized TracerProvider and an error if any occurred.
-func InitializeTracerProvider(ctx context.Context, cfg config.MonitoringConfig) error {
+func initializeTracerProvider(ctx context.Context, cfg config.MonitoringConfig) error {
 	if cfg.Service() == "" {
 		otel.SetTracerProvider(noop.NewTracerProvider())
 		return nil

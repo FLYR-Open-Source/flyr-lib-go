@@ -23,7 +23,7 @@ func TestNewTraceProvider(t *testing.T) {
 	cfg := getMonitoringConfig()
 
 	t.Run("SetsTracerProviderAsGlobal", func(t *testing.T) {
-		err := InitializeTracerProvider(ctx, cfg)
+		err := initializeTracerProvider(ctx, cfg)
 		defer func() {
 			tracerProvider = nil
 		}()
@@ -34,7 +34,7 @@ func TestNewTraceProvider(t *testing.T) {
 	})
 
 	t.Run("SetsCorrectResourceAttributes", func(t *testing.T) {
-		err := InitializeTracerProvider(ctx, cfg)
+		err := initializeTracerProvider(ctx, cfg)
 		defer func() {
 			tracerProvider = nil
 		}()
@@ -47,7 +47,7 @@ func TestNewTraceProvider(t *testing.T) {
 	})
 
 	t.Run("ConfiguresTextMapPropagator", func(t *testing.T) {
-		err := InitializeTracerProvider(ctx, cfg)
+		err := initializeTracerProvider(ctx, cfg)
 		defer func() {
 			tracerProvider = nil
 		}()

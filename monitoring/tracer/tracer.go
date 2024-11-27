@@ -41,7 +41,7 @@ var defaultTracer *Tracer
 func StartDefaultTracer(ctx context.Context) error {
 	cfg := config.NewMonitoringConfig()
 
-	err := InitializeTracerProvider(ctx, cfg)
+	err := initializeTracerProvider(ctx, cfg)
 	if err != nil {
 		return err
 	}
