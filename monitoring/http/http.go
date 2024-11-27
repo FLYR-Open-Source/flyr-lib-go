@@ -15,7 +15,7 @@ import (
 //
 // Returns the configured http.Client with the OpenTelemetry transport set.
 func SetHttpTransport(client http.Client) http.Client {
-	client.Transport = otelhttp.NewTransport(client.Transport)
+	client.Transport = otelhttp.NewTransport(http.DefaultTransport)
 	return client
 }
 

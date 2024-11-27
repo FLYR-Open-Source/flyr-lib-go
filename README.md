@@ -215,12 +215,13 @@ import "github.com/FlyrInc/flyr-lib-go/http"
 func main() {
   client := http.NewHttpClient()
 
-  resp, err := client.Get("https://example.com")
+  req, _ := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+  res, err := client.Do(req)
   if err != nil {
     ... // handle error
   }
 
-  defer resp.Body.Close()
+  defer res.Body.Close()
   ...
 }
 ```
@@ -237,12 +238,13 @@ func main() {
 
   client = SetHttpTransport(client)
 
-  resp, err := client.Get("https://example.com")
+  req, _ := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+  res, err := client.Do(req)
   if err != nil {
     ...
   }
 
-  defer resp.Body.Close()
+  defer res.Body.Close()
   ...
 }
 ```
