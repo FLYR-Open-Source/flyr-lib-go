@@ -174,6 +174,9 @@ On top of the Span interface from Otel, the library also exposes two more method
 By default the Span interface from Otel exposes only the method `End` to end the Span.
 The new method `EndWithError` is also ending the Span, but it will flag the Span as errored and will also include the error into the Span Events (as it must be based on Otel). On the other hand, `EndSuccessfully` ends the Span and updates the Status as `Ok`.
 
+> [!IMPORTANT]
+> You must **always** close the Spans, otherwise you might experience OOM-kills in your services. One way to always ensure the spans are closing, you can use the [go-spancheck](https://github.com/jjti/go-spancheck) rule in the [golangci-lint](https://github.com/golangci/golangci-lint).
+
 ##### Automatic Correlation
 
 In order for the library to give a better experience when working with Traces, Spans and Logs, it also provides some automations to make the usage easier.
