@@ -17,6 +17,7 @@ const (
 	logLevel = "debug"
 )
 
+// You don't need this part since it's automated in Kubernetes
 func init() {
 	os.Setenv("OTEL_SERVICE_NAME", serviceName)
 	os.Setenv("LOG_LEVEL", logLevel)
