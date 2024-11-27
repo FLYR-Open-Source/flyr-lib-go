@@ -4,32 +4,31 @@ This library is an internal Go library for Flyr, providing essential utilities f
 
 ## Table of Contents
 
-- [Features](#features)
-- [Installation](#installation)
-- [Usage](#usage)
-  - [Logging](#logging)
-    - [Environment Variables](#environment-variables)
-  - [Monitoring](#monitoring)
-    - [Kubernetes Setup](#kubernetes-setup)
-    - [Traces](#traces)
-      - [Use the default Tracer](#use-the-default-tracer)
-      - [Use your own Tracers](#use-your-own-tracers)
-    - [Spans](#spans)
-      - [Automatic Correlation](#automatic-correlation)
-    - [Distributed Tracing](#distributed-tracing)
-      - [HTTP Tracing](#http-tracing)
-      - [PubSub Tracing](#pubSub-tracing)
-        - [PubSub Provider](#pubsub-provider)
-        - [PubSub Consumer](#pubsub-consumer)
-      - [RabbitMQ Tracing](#rabbitmq-tracing)
-        - [RabbitMQ Provider](#rabbitmq-provider)
-        - [RabbitMQ Consumer](#rabbitmq-consumer)
-    - [Middleware](#middleware)
-    - [Testing](#testing)
-    - [Metrics](#metrics)
-  - [Documentation](#documentation)
-    - [Internal Documentation](#internal-documentation)
-    - [Otel Documentation](#otel-documentation)
+1. [Features](#features)
+2. [Installation](#installation)
+3. [Usage](#usage)
+   - [Logging](#logging)
+     - [Environment Variables](#environment-variables)
+   - [Monitoring](#monitoring)
+     - [Kubernetes Setup](#kubernetes-setup)
+       - [Example in Namespace](#example-in-namespace)
+       - [Example in a Pod](#example-in-a-pod)
+     - [Traces](#traces)
+       - [Use of the Tracer](#use-of-the-tracer)
+     - [Spans](#spans)
+       - [Automatic Correlation](#automatic-correlation)
+     - [Distributed Tracing](#distributed-tracing)
+       - [HTTP Tracing](#http-tracing)
+       - [PubSub Tracing](#pubsub-tracing)
+       - [RabbitMQ Tracing](#rabbitmq-tracing)
+         - [RabbitMQ Provider](#rabbitmq-provider)
+         - [RabbitMQ Consumer](#rabbitmq-consumer)
+     - [Middleware](#middleware)
+   - [Testing](#testing)
+   - [Metrics](#metrics)
+4. [Documentation](#documentation)
+   - [Internal Documentation](#internal-documentation)
+   - [Otel Documentation](#otel-documentation)
 
 ## Features
 
@@ -189,22 +188,82 @@ That ensures useful information for debugging will be present at the same time i
 > When you add an error log, the span will be flaged as errored and will also include the error into the Span Events (as it must be based on Otel).
 
 #### Distributed Tracing
-TBD
+
+**Distributed Tracing** provides visibility into the flow of requests as they traverse through various services in a distributed system. This capability is essential for understanding the interactions between microservices, identifying performance bottlenecks, and diagnosing issues. Each trace captures the entire lifecycle of a request, recording its journey across different services and components. By analyzing traces, you can visualize how requests propagate through your system and identify areas for optimization. This library supports distributed tracing by leveraging OpenTelemetry, ensuring consistent trace propagation and context management across different services and frameworks.
+
+The below sections provide examples to enable Distributed Tracing for various different communication protocols.
 
 ##### HTTP Tracing
-TBD
+
+**HTTP Tracing** captures and monitors HTTP requests and responses, allowing you to trace the path of an HTTP call through various services, measure latency, and identify potential issues in request handling.
+
+The library provides a very simple way to enable Distributed Tracing for HTTP requests.
+The package [monitoring/http](./monitoring/http/) exposes two different functions.
+
+The `NewHttpClient()` can be used to create a new `http.Client` with Distributed Tracing enabled.
+If you have a client already, you can use the function `SetHttpTransport(client http.Client)` that enables Distributed Tracing for the given client. The same client is returned back.
+
+Create a new client using the library:
+```go
+package main
+
+import "github.com/FlyrInc/flyr-lib-go/http"
+
+func main() {
+  client := http.NewHttpClient()
+
+  resp, err := client.Get("https://example.com")
+  if err != nil {
+    ... // handle error
+  }
+
+  defer resp.Body.Close()
+  ...
+}
+```
+
+Enable distributed tracing to an existing `http.Client`:
+```go
+package main
+
+import "github.com/FlyrInc/flyr-lib-go/http"
+
+func main() {
+  client := http.Client{}
+  ... // add any setup to client
+
+  client = SetHttpTransport(client)
+
+  resp, err := client.Get("https://example.com")
+  if err != nil {
+    ...
+  }
+
+  defer resp.Body.Close()
+  ...
+}
+```
 
 ##### PubSub Tracing
-TBD
 
-###### PubSub Provider
-TBD
+The **PubSub Tracing** enables tracking and monitoring of messages as they are published and consumed within a Pub/Sub system, providing visibility into the lifecycle and performance of message-driven workflows.
 
-###### PubSub Consumer
-TBD
+The library does not expose any functions that can be used, because the ["cloud.google.com/go/pubsub"]("cloud.google.com/go/pubsub") module already supports Open Telemetry!
+
+Link: [https://cloud.google.com/pubsub/docs/open-telemetry-tracing](https://cloud.google.com/pubsub/docs/open-telemetry-tracing)
+
+All you need to do is to enable it on the client - both for publishing and consuming messages.
+
+```go
+client, err := pubsub.NewClientWithConfig(ctx, projectID, &pubsub.ClientConfig{
+        EnableOpenTelemetryTracing: true,
+})
+...
+```
 
 ##### RabbitMQ Tracing
-TBD
+
+The **RabbitMQ Tracing** provides visibility into message flows by capturing spans for both message production and consumption, enabling detailed insights into the performance and behavior of RabbitMQ-based communication.
 
 ###### RabbitMQ Provider
 TBD
@@ -213,7 +272,23 @@ TBD
 TBD
 
 #### Middleware
-TBD
+
+The library provides middleware for both the Gin and Chi frameworks in Go, responsible for creating the main span for incoming requests to endpoints, ensuring that each HTTP request is traced and correlated with the overall distributed trace.
+
+```go
+  package main
+
+  import "github.com/FlyrInc/flyr-lib-go/middleware"
+
+  func main() {
+    ... setup chi or gin
+
+    // for gin-gonic
+    engine.Use(middleware.OtelGinMiddleware())
+    // for chi
+    engine.Use(middleware.OtelChiMiddleware())
+  }
+```
 
 #### Testing
 

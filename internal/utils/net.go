@@ -1,4 +1,4 @@
-package utils
+package utils // import "github.com/FlyrInc/flyr-lib-go/internal/utils"
 
 import (
 	"fmt"

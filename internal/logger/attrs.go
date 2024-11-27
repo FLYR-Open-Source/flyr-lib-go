@@ -1,4 +1,4 @@
-package logger
+package logger // import "github.com/FlyrInc/flyr-lib-go/internal/logger"
 
 import (
 	"context"

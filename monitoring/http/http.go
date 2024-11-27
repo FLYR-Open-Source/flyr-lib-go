@@ -1,4 +1,4 @@
-package http
+package http // import "github.com/FlyrInc/flyr-lib-go/http"
 
 import (
 	"net/http"

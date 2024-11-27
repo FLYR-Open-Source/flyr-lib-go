@@ -1,4 +1,4 @@
-package span
+package span // import "github.com/FlyrInc/flyr-lib-go/internal/span"
 
 import (
 	"context"
