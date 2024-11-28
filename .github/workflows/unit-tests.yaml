@@ -1,0 +1,32 @@
+name: Unit Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+
+env:
+  GO_VER: 1.23.1
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Setup Golang"
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VER }}
+          check-latest: false
+          cache: false
+          cache-dependency-path: "./go.sum"
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Test
+        run: go run gotest.tools/gotestsum@latest --junitfile unit-tests.xml --format pkgname
+      - name: Test Summary
+        uses: test-summary/action@v1
+        with:
+          paths: "unit-tests.xml"
+        if: always()
