@@ -17,9 +17,9 @@ func TestGetAttributes(t *testing.T) {
 	// if that test fails, it means the depth of the caller is different,
 	// therefore the caller information is not being retrieved correctly
 	t.Run("With correct code details", func(t *testing.T) {
-		attrs := NewAttribute(context.Background()).
+		attrs := NewAttribute().
 			WithMetadata(args...).
-			Get()
+			Get(context.Background())
 
 		assert.GreaterOrEqual(t, len(attrs), 4)
 
@@ -41,9 +41,9 @@ func TestGetAttributes(t *testing.T) {
 	})
 
 	t.Run("With metadata", func(t *testing.T) {
-		attrs := NewAttribute(context.Background()).
+		attrs := NewAttribute().
 			WithMetadata(args...).
-			Get()
+			Get(context.Background())
 
 		assert.Len(t, attrs, 5)
 
@@ -54,10 +54,10 @@ func TestGetAttributes(t *testing.T) {
 
 	t.Run("With an error", func(t *testing.T) {
 		err := errors.New("test error")
-		attrs := NewAttribute(context.Background()).
+		attrs := NewAttribute().
 			WithMetadata(args...).
 			WithError(err).
-			Get()
+			Get(context.Background())
 
 		assert.Len(t, attrs, 6)
 
@@ -67,7 +67,7 @@ func TestGetAttributes(t *testing.T) {
 	})
 
 	t.Run("Without extra metadata", func(t *testing.T) {
-		attrs := NewAttribute(context.Background()).Get()
+		attrs := NewAttribute().Get(context.Background())
 
 		assert.Len(t, attrs, 5)
 

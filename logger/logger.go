@@ -36,10 +36,10 @@ func InitLogger() {
 // and in the span that is retrieved from the given context.
 func Debug(ctx context.Context, message string, args ...interface{}) {
 	l := slog.Default()
-	attrs := NewAttribute(ctx).
+	attrs := NewAttribute().
 		WithOutInjectingAttrsToSpan().
 		WithMetadata(args...).
-		Get()
+		Get(ctx)
 	l.LogAttrs(ctx, slog.LevelDebug, message, attrs...)
 }
 
@@ -49,9 +49,9 @@ func Debug(ctx context.Context, message string, args ...interface{}) {
 // and in the span that is retrieved from the given context.
 func Info(ctx context.Context, message string, args ...interface{}) {
 	l := slog.Default()
-	attrs := NewAttribute(ctx).
+	attrs := NewAttribute().
 		WithMetadata(args...).
-		Get()
+		Get(ctx)
 	l.LogAttrs(ctx, slog.LevelInfo, message, attrs...)
 }
 
@@ -61,9 +61,9 @@ func Info(ctx context.Context, message string, args ...interface{}) {
 // and in the span that is retrieved from the given context.
 func Warn(ctx context.Context, message string, args ...interface{}) {
 	l := slog.Default()
-	attrs := NewAttribute(ctx).
+	attrs := NewAttribute().
 		WithMetadata(args...).
-		Get()
+		Get(ctx)
 	l.LogAttrs(ctx, slog.LevelWarn, message, attrs...)
 }
 
@@ -75,9 +75,9 @@ func Warn(ctx context.Context, message string, args ...interface{}) {
 // and also sets the span as errored (if the a span cna be retrieved from the given context).
 func Error(ctx context.Context, message string, err error, args ...interface{}) {
 	l := slog.Default()
-	attrs := NewAttribute(ctx).
+	attrs := NewAttribute().
 		WithMetadata(args...).
 		WithError(err).
-		Get()
+		Get(ctx)
 	l.LogAttrs(ctx, slog.LevelError, message, attrs...)
 }

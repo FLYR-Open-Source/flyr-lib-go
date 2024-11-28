@@ -15,7 +15,6 @@ const (
 
 // Attribute is a wrapper around the log attributes
 type Attribute struct {
-	ctx               context.Context
 	err               error
 	metadata          []interface{}
 	injectAttrsToSpan bool
@@ -40,10 +39,10 @@ func (a *Attribute) WithOutInjectingAttrsToSpan() *Attribute {
 }
 
 // Get returns the log attributes
-func (a *Attribute) Get() []slog.Attr {
+func (a *Attribute) Get(ctx context.Context) []slog.Attr {
 	metadata := slog.Group(config.LOG_METADATA_KEY, a.metadata...)
 	if a.injectAttrsToSpan {
-		injectAttrsToSpan(a.ctx, metadata)
+		injectAttrsToSpan(ctx, metadata)
 	}
 
 	caller := internalUtils.GetCallerName(callerDepth)
@@ -54,7 +53,7 @@ func (a *Attribute) Get() []slog.Attr {
 	var errorMessage slog.Attr
 	if a.err != nil {
 		errorMessage = slog.String(config.LOG_ERROR_KEY, a.err.Error())
-		setErroredSpan(a.ctx, a.err) // Set spans as errored
+		setErroredSpan(ctx, a.err) // Set spans as errored
 		attrs = append(attrs, errorMessage)
 	}
 
@@ -62,6 +61,6 @@ func (a *Attribute) Get() []slog.Attr {
 }
 
 // NewAttribute creates a new attribute
-func NewAttribute(ctx context.Context) *Attribute {
-	return &Attribute{ctx: ctx, injectAttrsToSpan: true}
+func NewAttribute() *Attribute {
+	return &Attribute{injectAttrsToSpan: true}
 }
