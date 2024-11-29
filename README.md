@@ -43,7 +43,7 @@ This library is an internal Go library for Flyr, providing essential utilities f
 To install `flyr-lib-go`, add it to your module’s dependencies:
 
 ```bash
-$ export GOPRIVATE=github.com/FlyrInc/flyr-lib-go/*
+$ export GOPRIVATE=github.com/FlyrInc
 $ go get github.com/FlyrInc/flyr-lib-go
 ```
 
@@ -257,7 +257,7 @@ In order to access the internal documentation, you can run `make docs` and then 
 - [Observability primer](https://opentelemetry.io/docs/concepts/observability-primer/)
 - [Go](https://opentelemetry.io/docs/languages/go/)
   - [Getting Started](https://opentelemetry.io/docs/languages/go/getting-started/)
-- [RabbitMQ]
+- RabbitMQ
   - [Otel Example](https://devandchill.com/posts/2021/12/go-step-by-step-guide-for-implementing-tracing-on-a-microservices-architecture-2/2/)
-- [GCP PubSub]
+- GCP PubSub
   - [Otel Example](https://cloud.google.com/pubsub/docs/open-telemetry-tracing)
