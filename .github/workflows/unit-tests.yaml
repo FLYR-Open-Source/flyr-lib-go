@@ -26,7 +26,7 @@ jobs:
       - name: Test
         run: go run gotest.tools/gotestsum@latest --junitfile unit-tests.xml --format pkgname
       - name: Test Summary
-        uses: test-summary/action@v1
+        uses: test-summary/action@v2
         with:
           paths: "unit-tests.xml"
         if: always()
