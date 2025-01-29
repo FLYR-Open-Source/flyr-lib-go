@@ -7,7 +7,9 @@ import (
 	"github.com/FlyrInc/flyr-lib-go/internal/config"
 	"go.opentelemetry.io/otel"
 
+	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/sdk/resource"
@@ -21,9 +23,25 @@ var ErrTracerProviderNotInitialized = errors.New("tracer provider not initialize
 // ErrTracerProviderAlreadyInitialized is returned when the tracer provider is already initialized
 var ErrTracerProviderAlreadyInitialized = errors.New("tracer provider already initialized")
 
+// ErrExporterClientNotSupported is returned when the exporter client is not supported
+var ErrExporterClientNotSupported = errors.New("exporter client not supported")
+
 var (
 	tracerProvider *sdktrace.TracerProvider
 )
+
+// getExporterClient returns an OTLP exporter client based on the exporter protocol.
+// If the exporter protocol is not supported, it returns nil.
+func getExporterClient(cfg config.MonitoringConfig) otlptrace.Client {
+	switch cfg.ExporterProtocol() {
+	case "grpc":
+		return otlptracegrpc.NewClient()
+	case "http":
+		return otlptracehttp.NewClient()
+	default:
+		return nil
+	}
+}
 
 // initializeTracerProvider creates and configures a new OpenTelemetry TracerProvider.
 //
@@ -42,7 +60,12 @@ func initializeTracerProvider(ctx context.Context, cfg config.MonitoringConfig) 
 		return nil
 	}
 
-	exporter, err := otlptrace.New(ctx, otlptracehttp.NewClient())
+	client := getExporterClient(cfg)
+	if client == nil {
+		return ErrExporterClientNotSupported
+	}
+
+	exporter, err := otlptrace.New(ctx, client)
 
 	if err != nil {
 		return err
@@ -54,6 +77,9 @@ func initializeTracerProvider(ctx context.Context, cfg config.MonitoringConfig) 
 		resource.WithTelemetrySDK(),
 		resource.WithContainer(),
 		resource.WithHost(),
+		resource.WithAttributes(
+			attribute.String(config.EXPORTER_PROTOCOL, cfg.ExporterProtocol()),
+		),
 	)
 	if err != nil {
 		return err
