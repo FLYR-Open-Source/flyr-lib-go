@@ -21,8 +21,6 @@ This library is an internal Go library for Flyr, providing essential utilities f
        - [HTTP Tracing](#http-tracing)
        - [PubSub Tracing](#pubsub-tracing)
        - [RabbitMQ Tracing](#rabbitmq-tracing)
-         - [RabbitMQ Publisher](#rabbitmq-publisher)
-         - [RabbitMQ Consumer](#rabbitmq-consumer)
      - [Middleware](#middleware)
    - [Testing](#testing)
    - [Metrics](#metrics)
@@ -43,8 +41,8 @@ This library is an internal Go library for Flyr, providing essential utilities f
 To install `flyr-lib-go`, add it to your module’s dependencies:
 
 ```bash
-$ export GOPRIVATE=github.com/FlyrInc/flyr-lib-go/*
-$ go get github.com/FlyrInc/flyr-lib-go
+export GOPRIVATE=github.com/FlyrInc/flyr-lib-go/*
+go get github.com/FlyrInc/flyr-lib-go
 ```
 
 ## Usage
@@ -95,6 +93,7 @@ The annotation is: `instrumentation.opentelemetry.io/inject-sdk: otel-collector/
 > Also, to prevent both the Datadog Agent and the Otel Collector to collect logs, you **must** include the label `ad.datadoghq.com/logs_exclude: "true"` to all the pods.
 
 ##### Example in Namespace
+
 ```yaml
 apiVersion: v1
 kind: Namespace
@@ -150,6 +149,7 @@ You can see examples of how to use the default Tracer in [examples/monitoring/si
 #### Spans
 
 A **Span** represents a unit of work or operation. Spans are the building blocks of Trace. In OpenTelemetry, they include the following information:
+
 - Name
 - Parent span ID (empty for root spans)
 - Start and End Timestamps
@@ -234,6 +234,7 @@ You can see examples here: [examples/monitoring/rabbitmq/main.go](./examples/mon
 The library provides middleware for both the Gin and Chi frameworks in Go, responsible for creating the main span for incoming requests to endpoints, ensuring that each HTTP request is traced and correlated with the overall distributed trace.
 
 You can see the below examples:
+
 - gin: [examples/monitoring/webserver/gin/main.go](./examples/monitoring/webserver/gin/main.go)
 - chi: [examples/monitoring/webserver/chi/main.go](./examples/monitoring/webserver/chi/main.go)
 
@@ -242,6 +243,7 @@ You can see the below examples:
 The library also exposes the [pkg/testhelpers/](./pkg/testhelpers/), which contains mock implementations for a Traces and a Span. You can use it to write tests in your codebase.
 
 ### Metrics
+
 TBD
 
 ### Documentation

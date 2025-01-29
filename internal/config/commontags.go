@@ -25,3 +25,8 @@ const (
 	LOG_ERROR_KEY    = "error"
 	LOG_METADATA_KEY = "metadata"
 )
+
+// exporter attributes
+const (
+	EXPORTER_PROTOCOL = "otel.exporter.protocol"
+)

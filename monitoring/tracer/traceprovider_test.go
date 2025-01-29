@@ -10,14 +10,38 @@ import (
 	"go.opentelemetry.io/otel/propagation"
 )
 
-func getMonitoringConfig() config.MonitoringConfig {
+func getMonitoringConfig() config.Monitoring {
 	serviceName := "test-service"
 
 	cfg := config.NewMonitoringConfig()
 	cfg.ServiceCfg = serviceName
+	cfg.ExporterProtocolCfg = "http"
 
 	return cfg
 }
+
+func TestGetExporterClient(t *testing.T) {
+	cfg := getMonitoringConfig()
+
+	t.Run("ReturnsGRPCClient", func(t *testing.T) {
+		cfg.ExporterProtocolCfg = "grpc"
+		client := getExporterClient(cfg)
+		require.NotNil(t, client)
+	})
+
+	t.Run("ReturnsHTTPClient", func(t *testing.T) {
+		cfg.ExporterProtocolCfg = "http"
+		client := getExporterClient(cfg)
+		require.NotNil(t, client)
+	})
+
+	t.Run("ReturnsNilForUnsupportedProtocol", func(t *testing.T) {
+		cfg.ExporterProtocolCfg = "unsupported"
+		client := getExporterClient(cfg)
+		require.Nil(t, client)
+	})
+}
+
 func TestNewTraceProvider(t *testing.T) {
 	ctx := context.Background()
 	cfg := getMonitoringConfig()
