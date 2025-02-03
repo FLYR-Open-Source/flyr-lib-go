@@ -7,6 +7,7 @@ import (
 	flyrContext "github.com/FlyrInc/flyr-lib-go/context"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 // Mock struct and interface
@@ -36,7 +37,7 @@ func TestGetObjectFromContextReturnsExpectedOutput(t *testing.T) {
 
 	object, err := flyrContext.GetObjectFromContext[MockHelpersBaseInterface](ctx, flyrContext.ContextKey("mockStruct"))
 
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	assert.NotNil(t, object)
 	assert.IsType(t, &MockHelpersBaseStruct{}, object)

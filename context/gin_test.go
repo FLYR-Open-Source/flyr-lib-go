@@ -7,6 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 // Mock struct and interface
@@ -34,7 +35,7 @@ func TestGetObjectFromGinContextReturnsExpectedOutput(t *testing.T) {
 
 	object, err := flyrContext.GetObjectFromGinContext[MockHelpersGinInterface](ctx, "mockStruct")
 
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	assert.NotNil(t, object)
 	assert.IsType(t, &MockHelpersGinStruct{}, object)
