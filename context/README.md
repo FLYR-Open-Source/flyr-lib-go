@@ -4,7 +4,7 @@
 This package contains functions interacting with various context types.
 
 ## Usage
-This package contains support for adding and retrieing objects from the base Go context and the Gin context.
+This package contains support for adding and retrieving objects from the base Go context and the Gin context.
 
 ### Base Go context
 Two pieces of functionality are supplied in order to facilitate adding and retrieving objects from the base Go context. The `ContextKey` type extends `string` and should be used as a key for the aforementioned operations (this is recommended to avoid type collision in the base go Context). The `GetObjectFromContext()` generic function attempts to retrieve the object with the given key and cast it to the specified type.
