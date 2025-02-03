@@ -1,4 +1,4 @@
-package flyr_context_test
+package context_test
 
 import (
 	"testing"

@@ -1,4 +1,4 @@
-# flyr-lib-go/google
+# flyr-lib-go/google/core
 
 ## Overview
 This package contains interfaces defining functionality for other packages that wrap Google Pub/Cloud Platform services.

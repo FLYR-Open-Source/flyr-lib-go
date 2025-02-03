@@ -1,12 +1,12 @@
-// Package flyr_pubsub contains functionality for interacting with Google Pub/Sub.
-// The primary mechanism used for this is the GooglePubSubProvider which implements the interface defined in flyr_google.
-package flyr_pubsub
+// Package flyr-lib-go/google/pubsub contains functionality for interacting with Google Pub/Sub.
+// The primary mechanism used for this is the GooglePubSubProvider which implements the interface defined in flyr-lib-go/google/core.
+package pubsub
 
 import (
 	"context"
 	"errors"
 
-	flyrGoogle "github.com/FlyrInc/flyr-lib-go/google"
+	flyrGoogle "github.com/FlyrInc/flyr-lib-go/google/core"
 )
 
 // A GooglePubSubProvider serves as the primary mechanism for interacting (e.g., receiving and sending messages) with Google Pub/Sub.

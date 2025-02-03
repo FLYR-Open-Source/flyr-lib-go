@@ -1,4 +1,4 @@
-package flyr_context
+package context
 
 import (
 	"context"

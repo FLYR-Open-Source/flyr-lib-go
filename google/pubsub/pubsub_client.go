@@ -1,10 +1,10 @@
-package flyr_pubsub
+package pubsub
 
 import (
 	"context"
 
 	"cloud.google.com/go/pubsub"
-	flyrGoogle "github.com/FlyrInc/flyr-lib-go/google"
+	flyrGoogle "github.com/FlyrInc/flyr-lib-go/google/core"
 )
 
 // Interfaces abstracting the Google Pub/Sub API

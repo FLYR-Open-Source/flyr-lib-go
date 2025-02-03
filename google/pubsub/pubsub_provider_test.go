@@ -1,11 +1,11 @@
-package flyr_pubsub_test
+package pubsub_test
 
 import (
 	"context"
 	"errors"
 	"testing"
 
-	flyrGoogle "github.com/FlyrInc/flyr-lib-go/google"
+	flyrGoogle "github.com/FlyrInc/flyr-lib-go/google/core"
 	flyrPubSub "github.com/FlyrInc/flyr-lib-go/google/pubsub"
 	"github.com/stretchr/testify/assert"
 )
