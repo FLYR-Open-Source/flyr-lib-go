@@ -32,11 +32,17 @@ var (
 
 // getExporterClient returns an OTLP exporter client based on the exporter protocol.
 // If the exporter protocol is not supported, it returns nil.
+//
+// Valid values are:
+//
+// - grpc to use OTLP/gRPC
+//
+// - http/protobuf to use OTLP/HTTP + protobuf
 func getExporterClient(cfg config.MonitoringConfig) otlptrace.Client {
-	switch cfg.ExporterProtocol() {
+	switch cfg.ExporterTracesProtocol() {
 	case "grpc":
 		return otlptracegrpc.NewClient()
-	case "http":
+	case "http/protobuf":
 		return otlptracehttp.NewClient()
 	default:
 		return nil
@@ -78,7 +84,7 @@ func initializeTracerProvider(ctx context.Context, cfg config.MonitoringConfig) 
 		resource.WithContainer(),
 		resource.WithHost(),
 		resource.WithAttributes(
-			attribute.String(config.EXPORTER_PROTOCOL, cfg.ExporterProtocol()),
+			attribute.String(config.EXPORTER_PROTOCOL, cfg.ExporterTracesProtocol()),
 		),
 	)
 	if err != nil {

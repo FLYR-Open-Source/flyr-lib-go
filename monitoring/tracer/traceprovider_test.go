@@ -15,7 +15,7 @@ func getMonitoringConfig() config.Monitoring {
 
 	cfg := config.NewMonitoringConfig()
 	cfg.ServiceCfg = serviceName
-	cfg.ExporterProtocolCfg = "http"
+	cfg.ExporterProtocolCfg = "grpc"
 
 	return cfg
 }
@@ -30,7 +30,7 @@ func TestGetExporterClient(t *testing.T) {
 	})
 
 	t.Run("ReturnsHTTPClient", func(t *testing.T) {
-		cfg.ExporterProtocolCfg = "http"
+		cfg.ExporterProtocolCfg = "http/protobuf"
 		client := getExporterClient(cfg)
 		require.NotNil(t, client)
 	})
