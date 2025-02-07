@@ -13,7 +13,7 @@ type ContextKey string
 func GetObjectFromContext[T any](ctx context.Context, key ContextKey) (T, error) {
 	object, ok := ctx.Value(key).(T)
 	if !ok {
-		return object, fmt.Errorf("context object \"%s\" was not found or is not the expected type", key)
+		return object, fmt.Errorf("context object %q was not found or is not the expected type", key)
 	}
 
 	return object, nil

@@ -34,7 +34,12 @@ func main() {
     if err != nil {
         // error handling
     }
-    defer pubsubClose()
+    defer func() {
+        err = pubsubClose()
+        if err != nil {
+            // error handling
+        }
+     }
 
     // subsequent operations
 }
@@ -44,7 +49,7 @@ Additionally, a similar mechanism exists for adding the pub/sub resources to a G
 import (
 	"context"
 
-	flyrPubSub "github.com/FlyrInc/flyr-lib-go/google/pubsub"
+	flyrGoogleGin "github.com/FlyrInc/flyr-lib-go/google/gin"
 
     "github.com/gin-gonic/gin"
 )
@@ -56,18 +61,23 @@ func main() {
 
     ginEngine := ...
 
-    ctx, pubsubClose, err := flyrPubSub.AddPubSubToContextWithGin(ctx, ginEngine, googleProjectID)
+    ctx, pubsubClose, err := flyrGoogleGin.AddPubSubToContextWithGin(ctx, ginEngine, googleProjectID)
     if err != nil {
         // error handling
     }
-    defer pubsubClose()
+    defer func() {
+        err = pubsubClose()
+        if err != nil {
+            // error handling
+        }
+     }
 
     // subsequent operations
 }
 ```
 
 ### Retrieving
-The `GooglePubSubProvider{}` can be retrieved from the Go context (i.e., `context.Context{}`). (Note that the relevant interfaces should be referenced as opposed to the concrete implementation types.) This is done by providing the appropriate `ContextKey{}` (from the `flyr-lib-go/context` package) to the `context.Context.Value()` method. The key for the provider (`PubSubProviderKey`) is contained in the `flyr-lib-go/google/core` package.
+The `GooglePubSubProvider{}` can be retrieved from the Go context (i.e., `context.Context{}`). (Note that the relevant interfaces should be referenced as opposed to the concrete implementation types.) This is done by providing the appropriate `ContextKey{}` (from the `flyr-lib-go/context/base` package) to the `context.Context.Value()` method. The key for the provider (`PubSubProviderKey`) is contained in the `flyr-lib-go/google/core` package.
 ```
 func Example() {
     // Retrieve the provider and cast it to the relevant interface
@@ -79,7 +89,7 @@ func Example() {
     // subsequent operations
 }
 ```
-The `GetObjectFromContext()` function from the `flyr-lib-go/context` package can be used to simplify object retrieval.
+The `GetObjectFromContext()` function from the `flyr-lib-go/context/base` package can be used to simplify object retrieval.
 ```
 func Example() {
     // Retrieve the provider by specifying the return type and the ContextKey
@@ -91,7 +101,7 @@ func Example() {
     // subsequent operations
 }
 ```
-If using Gin, the `GetObjectFromGinContext()` function from the `flyr-lib-go/context` package can be used instead.
+If using Gin, the `GetObjectFromGinContext()` function from the `flyr-lib-go/context/gin` package can be used instead.
 ```
 func Example() {
     // Retrieve the provider by specifying the return type and the context key

@@ -11,12 +11,12 @@ import (
 func GetObjectFromGinContext[T any](ctx *gin.Context, key string) (T, error) {
 	object, ok := ctx.Get(key)
 	if !ok {
-		return *new(T), fmt.Errorf("context object with key \"%s\" was not found", key)
+		return *new(T), fmt.Errorf("context object with key %q was not found", key)
 	}
 
 	result, ok := object.(T)
 	if !ok {
-		return *new(T), fmt.Errorf("context object with key \"%s\" is not the expected type", key)
+		return *new(T), fmt.Errorf("context object with key %q is not the expected type", key)
 	}
 
 	return result, nil

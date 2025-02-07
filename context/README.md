@@ -12,7 +12,7 @@ Two pieces of functionality are supplied in order to facilitate adding and retri
 import (
     "context"
 
-	flyrContext "github.com/FlyrInc/flyr-lib-go/context"
+	flyrContext "github.com/FlyrInc/flyr-lib-go/context/base"
 )
 
 func Example(ctx context.Context, myObject any) {
@@ -35,7 +35,7 @@ One piece of functionality is supplied in order to facilitate adding and retriev
 import (
 	"context"
 
-    flyrContext "github.com/FlyrInc/flyr-lib-go/context"
+    flyrContext "github.com/FlyrInc/flyr-lib-go/context/gin"
 
     "github.com/gin-gonic/gin"
 )
