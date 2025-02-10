@@ -7,6 +7,7 @@ import (
 
 	flyrGoogle "github.com/FlyrInc/flyr-lib-go/google/core"
 	flyrPubSub "github.com/FlyrInc/flyr-lib-go/google/pubsub"
+
 	"github.com/stretchr/testify/assert"
 )
 

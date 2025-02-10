@@ -3,9 +3,10 @@ package pubsub
 import (
 	"context"
 
-	"cloud.google.com/go/pubsub"
 	flyrContextBase "github.com/FlyrInc/flyr-lib-go/context/base"
 	flyrGoogle "github.com/FlyrInc/flyr-lib-go/google/core"
+
+	"cloud.google.com/go/pubsub"
 )
 
 // AddPubSubToContext adds the pub/sub provider to the given context and returns it.
