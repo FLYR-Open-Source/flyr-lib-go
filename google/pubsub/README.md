@@ -10,8 +10,8 @@ The primary functionality of this package is provided by the `GooglePubSubProvid
 The `GooglePubSubProvider{}` is abstracted by the interface defined in the `flyr-lib-go/google/core` package:
 ```
 type PubSubProvider interface {
-	ProcessSubMessages(ctx context.Context, subscriptionName string, f func(c context.Context, m PubSubMessage)) error
-	SendPubSubMessage(ctx context.Context, topicName string, message []byte, attributes map[string]string) error
+    ProcessSubMessages(ctx context.Context, subscriptionName string, f func(c context.Context, m PubSubMessage)) error
+    SendPubSubMessage(ctx context.Context, topicName string, message []byte, attributes map[string]string) error
 }
 ```
 This prevents tightly coupling applications to this package, and also helps mock dependencies for unit testing.
@@ -20,9 +20,9 @@ This prevents tightly coupling applications to this package, and also helps mock
 In order to add the provider for use in an application, the function `AddPubSubToContext()` should be called during application startup. (Note that this function requires the Google project ID where the topics and/or subscriptions used by the application reside.)
 ```
 import (
-	"context"
+    "context"
 
-	flyrPubSub "github.com/FlyrInc/flyr-lib-go/google/pubsub"
+    flyrPubSub "github.com/FlyrInc/flyr-lib-go/google/pubsub"
 )
 
 func main() {
@@ -39,7 +39,7 @@ func main() {
         if err != nil {
             // error handling
         }
-     }
+    }
 
     // subsequent operations
 }
@@ -47,9 +47,9 @@ func main() {
 Additionally, a similar mechanism exists for adding the pub/sub resources to a Gin engine. This allows for retrieval of the pub/sub resources from a Gin context.
 ```
 import (
-	"context"
+    "context"
 
-	flyrGoogleGin "github.com/FlyrInc/flyr-lib-go/google/gin"
+    flyrGoogleGin "github.com/FlyrInc/flyr-lib-go/google/gin"
 
     "github.com/gin-gonic/gin"
 )
@@ -83,8 +83,8 @@ func Example() {
     // Retrieve the provider and cast it to the relevant interface
     object, ok := ctx.Value(config.ContextKey(core.PubSubProviderKey)).(core.PubSubProvider)
     if !ok {
-		// error handling   
-	}
+        // error handling   
+    }
 
     // subsequent operations
 }
@@ -94,9 +94,9 @@ The `GetObjectFromContext()` function from the `flyr-lib-go/context/base` packag
 func Example() {
     // Retrieve the provider by specifying the return type and the ContextKey
     provider, err := config.GetObjectFromContext[core.PubSubProvider](ctx, config.ContextKey(core.PubSubProviderKey))
-	if err != nil {
-		// error handling
-	}
+    if err != nil {
+        // error handling
+    }
 
     // subsequent operations
 }
@@ -106,9 +106,9 @@ If using Gin, the `GetObjectFromGinContext()` function from the `flyr-lib-go/con
 func Example() {
     // Retrieve the provider by specifying the return type and the context key
     provider, err := config.GetObjectFromGinContext[core.PubSubProvider](ctx, core.PubSubProviderKey)
-	if err != nil {
-		// error handling
-	}
+    if err != nil {
+        // error handling
+    }
 
     // subsequent operations
 }

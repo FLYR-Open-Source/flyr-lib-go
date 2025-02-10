@@ -12,7 +12,7 @@ Two pieces of functionality are supplied in order to facilitate adding and retri
 import (
     "context"
 
-	flyrContext "github.com/FlyrInc/flyr-lib-go/context/base"
+    flyrContext "github.com/FlyrInc/flyr-lib-go/context/base"
 )
 
 func Example(ctx context.Context, myObject any) {
@@ -21,9 +21,9 @@ func Example(ctx context.Context, myObject any) {
 
     // Retrieve an object previously added to the context by specifying the return type and the ContextKey
     object, err := flyrContext.GetObjectFromContext[myPackage.MyType](ctx, flyrContext.ContextKey(myPackage.ObjectKey))
-	if err != nil {
-		// error handling
-	}
+    if err != nil {
+        // error handling
+    }
 
     // subsequent operations
 }
@@ -33,7 +33,7 @@ func Example(ctx context.Context, myObject any) {
 One piece of functionality is supplied in order to facilitate adding and retrieving objects from the Gin context. The `GetObjectFromGinContext()` generic function attempts to retrieve the object with the given key and cast it to the specified type.
 ```
 import (
-	"context"
+    "context"
 
     flyrContext "github.com/FlyrInc/flyr-lib-go/context/gin"
 
@@ -41,17 +41,17 @@ import (
 )
 
 func MyObject() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		c.Set(myPackage.ObjectKey, &myPackage.MyType{})
-	}
+    return func(c *gin.Context) {
+        c.Set(myPackage.ObjectKey, &myPackage.MyType{})
+    }
 }
 
 func Example() {
     // Retrieve an object previously added to the context by specifying the return type and the context key
     object, err := flyrContext.GetObjectFromGinContext[myPackage.MyType](ctx, myPackage.ObjectKey)
-	if err != nil {
-		// error handling
-	}
+    if err != nil {
+        // error handling
+    }
 
     // subsequent operations
 }
