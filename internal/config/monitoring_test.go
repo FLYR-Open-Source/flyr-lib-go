@@ -7,20 +7,55 @@ import (
 )
 
 func TestMonitoringConfig(t *testing.T) {
-	cfg := NewMonitoringConfig()
-
-	assert.Equalf(t, "", cfg.Service(), "default Service() return value is not correct")
-	assert.Equalf(t, "", cfg.ExporterProtocol(), "default ExporterProtocol() return value is not correct")
-}
-
-func TestMonitoringConfigWithEnvVars(t *testing.T) {
-	en := map[string]string{
-		"OTEL_SERVICE_NAME":           "test-service",
-		"OTEL_EXPORTER_OTLP_PROTOCOL": "http",
+	tests := []struct {
+		name                  string
+		variables             map[string]string
+		expectedService       string
+		expectedTraceExporter string
+	}{
+		{
+			name:                  "with empty values",
+			variables:             map[string]string{},
+			expectedTraceExporter: "",
+		},
+		{
+			name: "with service",
+			variables: map[string]string{
+				"OTEL_SERVICE_NAME": "my-service",
+			},
+			expectedService:       "my-service",
+			expectedTraceExporter: "",
+		},
+		{
+			name: "with global trace exporter protocol",
+			variables: map[string]string{
+				"OTEL_EXPORTER_OTLP_PROTOCOL": "grpc",
+			},
+			expectedTraceExporter: "grpc",
+		},
+		{
+			name: "with custom trace exporter protocol",
+			variables: map[string]string{
+				"OTEL_EXPORTER_OTLP_TRACES_PROTOCOL": "http/protobuf",
+			},
+			expectedTraceExporter: "http/protobuf",
+		},
+		{
+			name: "custom trace exporter protocol must take precedence over global trace exporter protocol",
+			variables: map[string]string{
+				"OTEL_EXPORTER_OTLP_PROTOCOL":        "grpc",
+				"OTEL_EXPORTER_OTLP_TRACES_PROTOCOL": "http/protobuf",
+			},
+			expectedTraceExporter: "http/protobuf",
+		},
 	}
 
-	cfg := NewMonitoringConfig(withEnvironment(en))
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cfg := NewMonitoringConfig(withEnvironment(tt.variables))
 
-	assert.Equalf(t, "test-service", cfg.Service(), "environment override Service() return value is not correct")
-	assert.Equalf(t, "http", cfg.ExporterProtocol(), "environment override ExporterProtocol() return value is not correct")
+			assert.Equalf(t, tt.expectedService, cfg.Service(), "Service() return value is not correct")
+			assert.Equalf(t, tt.expectedTraceExporter, cfg.ExporterTracesProtocol(), "ExporterTracesProtocol() return value is not correct")
+		})
+	}
 }
