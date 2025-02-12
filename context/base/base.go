@@ -1,4 +1,4 @@
-package context
+package base
 
 import (
 	"context"
@@ -9,6 +9,7 @@ import (
 type ContextKey string
 
 // GetObjectFromContext retrieves an object using the given ContextKey, casts it to the specified type, and returns it.
+//
 // An error is returned if no object is found for the given key or it cannot be cast to the specified type.
 func GetObjectFromContext[T any](ctx context.Context, key ContextKey) (T, error) {
 	object, ok := ctx.Value(key).(T)
