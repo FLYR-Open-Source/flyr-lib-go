@@ -21,5 +21,5 @@ test-coverage:
 	go tool cover -html=cover/coverage.out
 
 .PHONY: add-license
-git-hooks:
-	addlicense -check -l mit -f ./LICENSE -c "FLYR, Inc" **/*.go
+add-license:
+	@find . -type f -name "*.go" | xargs addlicense -l mit -f ./LICENSE -c "FLYR, Inc"
