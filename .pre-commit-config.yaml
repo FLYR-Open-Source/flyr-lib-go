@@ -3,4 +3,4 @@ repos:
   rev: v1.1.1
   hooks:
   - id: addlicense
-    args: [ "-l", "mit", "-f", "./LICENSE", "-c", "FLYR, Inc", "**/*.go" ]
+    args: ["-check", "-l", "mit", "-f", "./LICENSE", "-c", "FLYR, Inc", "**/*.go" ]
