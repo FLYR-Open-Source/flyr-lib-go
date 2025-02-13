@@ -30,4 +30,5 @@ add-license:
 
 .PHONY: pre-commit-hook
 pre-commit-hook:
-	ln -sf scripts/license-pre-commit.sh .git/hooks/pre-commit
+	cp ./scripts/license-pre-commit.sh .git/hooks/pre-commit
+	chmod +x .git/hooks/pre-commit
