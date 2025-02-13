@@ -1,0 +1,5 @@
+package testhelpers
+
+func MyFn() {
+
+}
