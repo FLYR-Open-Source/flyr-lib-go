@@ -2,9 +2,8 @@ repos:
 - repo: local
   hooks:
     - id: addlicense
-      name: addlicense
+      name: Add copyright headers
       entry: addlicense
-      language: system
-      types: [file]
-      files: \.go$
+      language: golang
+      types: [text]
       args: ["-l", "mit", "-f", "./LICENSE", "-c", "FLYR, Inc", "**/*.go" ]
