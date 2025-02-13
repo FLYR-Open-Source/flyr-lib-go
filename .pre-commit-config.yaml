@@ -6,4 +6,4 @@ repos:
       entry: addlicense
       language: golang
       types: [text]
-      args: ["-l", "mit", "-f", "./LICENSE", "-c", "FLYR, Inc", "**/*.go" ]
+      args: ["-check", "-l", "mit", "-f", "./LICENSE", "-c", "FLYR, Inc", "**/*.go" ]
