@@ -1,6 +1,10 @@
 repos:
-- repo: https://github.com/google/addlicense
-  rev: v1.1.1
+- repo: local
   hooks:
-  - id: addlicense
-    args: ["-check", "-l", "mit", "-f", "./LICENSE", "-c", "FLYR, Inc", "**/*.go" ]
+    - id: addlicense
+      name: addlicense
+      entry: addlicense
+      language: system
+      types: [file]
+      files: \.go$
+      args: ["-l", "mit", "-f", "./LICENSE", "-c", "FLYR, Inc", "**/*.go" ]

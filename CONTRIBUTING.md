@@ -7,23 +7,23 @@ to help get your contribution accepted.
 
 Wehn you raise a PR, it will also try to run pre-commits. We use the [pre-commit framework](https://github.com/pre-commit/pre-commit), that you can install via brew:
 
-```sh
+```bash
 brew install pre-commit
 ```
 
 Then run:
 
-```sh
+```bash
 make git-hooks
 ```
 
 ## Lint
 
-```sh
+```bash
 brew install golangci-lint
 ```
 
-```sh
+```bash
 make lint
 ```
 
