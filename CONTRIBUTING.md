@@ -17,6 +17,16 @@ Then run:
 make git-hooks
 ```
 
+## Lint
+
+```sh
+brew install golangci-lint
+```
+
+```sh
+make lint
+```
+
 ### TBD
 
 Add more details for contributions
