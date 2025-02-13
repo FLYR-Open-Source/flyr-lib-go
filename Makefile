@@ -20,6 +20,6 @@ test-coverage:
 	go test -coverprofile=cover/coverage.out ./...
 	go tool cover -html=cover/coverage.out
 
-.PHONY: git-hooks
+.PHONY: add-license
 git-hooks:
-	pre-commit install
+	addlicense -check -l mit -f ./LICENSE -c "FLYR, Inc" **/*.go
