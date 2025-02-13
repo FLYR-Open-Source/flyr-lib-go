@@ -1,5 +1,0 @@
-package testhelpers
-
-func MyFn() {
-
-}
