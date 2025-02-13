@@ -19,3 +19,7 @@ test:
 test-coverage:
 	go test -coverprofile=cover/coverage.out ./...
 	go tool cover -html=cover/coverage.out
+
+.PHONY: git-hooks
+git-hooks:
+	pre-commit install

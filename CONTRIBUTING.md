@@ -11,6 +11,12 @@ Wehn you raise a PR, it will also try to run pre-commits. We use the [pre-commit
 brew install pre-commit
 ```
 
+Then run:
+
+```sh
+make git-hooks
+```
+
 ### TBD
 
 Add more details for contributions
