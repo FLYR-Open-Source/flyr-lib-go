@@ -22,6 +22,10 @@ jobs:
           cache: false
           go-version-file: './go.mod'
           cache-dependency-path: './go.sum'
+
+
+      - name: List files
+        run: ls -R
       - name: Install addlicense
         run: go install github.com/google/addlicense@latest
       - name: Check license headers
