@@ -25,6 +25,6 @@ echo "$FILES"
 
 # Add fixed files back to the commit
 git add $FILES
-git commit -m "chore: add license headers"
+git commit -m "chore: add license headers" --no-verify # Skip pre-commit hook to avoid infinite loop
 
 echo "License headers applied."
