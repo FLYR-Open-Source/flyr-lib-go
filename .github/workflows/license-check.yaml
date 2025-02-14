@@ -1,14 +1,16 @@
-name: Unit Tests
-
+name: License Check
 on:
   push:
     branches:
       - main
   pull_request:
 
+permissions:
+  contents: read
 
 jobs:
   build:
+    name: check-license
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -20,10 +22,8 @@ jobs:
           cache: false
           go-version-file: './go.mod'
           cache-dependency-path: './go.sum'
-      - name: Test
-        run: go run gotest.tools/gotestsum@latest --junitfile unit-tests.xml --format pkgname
-      - name: Test Summary
-        uses: test-summary/action@v2
-        with:
-          paths: "unit-tests.xml"
-        if: always()
+      - name: Install addlicense
+        run: go install github.com/google/addlicense@latest
+      - name: Check license headers
+        run: |
+          addlicense -check -l mit -f ./LICENSE -c "FLYR, Inc" $(find . -type f -name "*.go")
