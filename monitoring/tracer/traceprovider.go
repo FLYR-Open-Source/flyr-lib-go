@@ -1,3 +1,25 @@
+// MIT License
+//
+// Copyright (c) 2025 FLYR, Inc.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 package tracer // import "github.com/FlyrInc/flyr-lib-go/monitoring/tracer"
 
 import (
@@ -7,7 +29,9 @@ import (
 	"github.com/FlyrInc/flyr-lib-go/internal/config"
 	"go.opentelemetry.io/otel"
 
+	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/sdk/resource"
@@ -21,9 +45,31 @@ var ErrTracerProviderNotInitialized = errors.New("tracer provider not initialize
 // ErrTracerProviderAlreadyInitialized is returned when the tracer provider is already initialized
 var ErrTracerProviderAlreadyInitialized = errors.New("tracer provider already initialized")
 
+// ErrExporterClientNotSupported is returned when the exporter client is not supported
+var ErrExporterClientNotSupported = errors.New("exporter client not supported")
+
 var (
 	tracerProvider *sdktrace.TracerProvider
 )
+
+// getExporterClient returns an OTLP exporter client based on the exporter protocol.
+// If the exporter protocol is not supported, it returns nil.
+//
+// Valid values are:
+//
+// - grpc to use OTLP/gRPC
+//
+// - http/protobuf to use OTLP/HTTP + protobuf
+func getExporterClient(cfg config.MonitoringConfig) otlptrace.Client {
+	switch cfg.ExporterTracesProtocol() {
+	case "grpc":
+		return otlptracegrpc.NewClient()
+	case "http/protobuf":
+		return otlptracehttp.NewClient()
+	default:
+		return nil
+	}
+}
 
 // initializeTracerProvider creates and configures a new OpenTelemetry TracerProvider.
 //
@@ -42,7 +88,12 @@ func initializeTracerProvider(ctx context.Context, cfg config.MonitoringConfig) 
 		return nil
 	}
 
-	exporter, err := otlptrace.New(ctx, otlptracehttp.NewClient())
+	client := getExporterClient(cfg)
+	if client == nil {
+		return ErrExporterClientNotSupported
+	}
+
+	exporter, err := otlptrace.New(ctx, client)
 
 	if err != nil {
 		return err
@@ -54,6 +105,9 @@ func initializeTracerProvider(ctx context.Context, cfg config.MonitoringConfig) 
 		resource.WithTelemetrySDK(),
 		resource.WithContainer(),
 		resource.WithHost(),
+		resource.WithAttributes(
+			attribute.String(config.EXPORTER_PROTOCOL, cfg.ExporterTracesProtocol()),
+		),
 	)
 	if err != nil {
 		return err

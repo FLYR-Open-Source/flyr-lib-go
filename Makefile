@@ -19,3 +19,16 @@ test:
 test-coverage:
 	go test -coverprofile=cover/coverage.out ./...
 	go tool cover -html=cover/coverage.out
+
+.PHONY: check-license
+check-license:
+	@find . -type f -name "*.go" | xargs addlicense -check -l mit -f ./LICENSE -c "FLYR, Inc"
+
+.PHONY: add-license
+add-license:
+	@find . -type f -name "*.go" | xargs addlicense -l mit -f ./LICENSE -c "FLYR, Inc"
+
+.PHONY: pre-commit-hook
+pre-commit-hook:
+	cp ./scripts/license-pre-commit.sh .git/hooks/pre-commit
+	chmod +x .git/hooks/pre-commit
