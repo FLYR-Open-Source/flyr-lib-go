@@ -8,7 +8,11 @@ import (
 
 // GetObjectFromGinContext retrieves an object using the given context key, casts it to the specified type, and returns it.
 //
+// If an object is found it will not be nil or nil equivalent unless that is what was added to the context.
+//
 // An error is returned if no object is found for the given key or it cannot be cast to the specified type.
+//
+// If an error is returned, the returned object will be the nil equivalent of T (which can be nil).
 func GetObjectFromGinContext[T any](ctx *gin.Context, key string) (T, error) {
 	object, ok := ctx.Get(key)
 	if !ok {
