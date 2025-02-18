@@ -1,3 +1,6 @@
+# The files that will be included in the test coverage report
+TEST_FILES=$(shell go list ./... | grep -v ./examples)
+
 .PHONY: tidy
 tidy:
 	go mod tidy
@@ -13,11 +16,11 @@ lint:
 
 .PHONY: test
 test:
-	gotestsum -- -short --cover ./...
+	gotestsum -- -short --cover $(TEST_FILES)
 
 .PHONY: test-coverage
 test-coverage:
-	go test -coverprofile coverage.out ./... -json > unit-test-results.json
+	go test -coverprofile coverage.out $(TEST_FILES) -json > unit-test-results.json
 
 .PHONY: check-license
 check-license:
