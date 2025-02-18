@@ -17,7 +17,7 @@ test:
 
 .PHONY: test-coverage
 test-coverage:
-	go test -coverprofile coverage.out ./...
+	go test -coverprofile coverage.out ./... -json > unit-test-results.json
 
 .PHONY: check-license
 check-license:

@@ -4,3 +4,4 @@
 # Coverage
 cover/*
 coverage.out
+unit-test-results.json
