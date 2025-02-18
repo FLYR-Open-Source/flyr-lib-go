@@ -17,8 +17,7 @@ test:
 
 .PHONY: test-coverage
 test-coverage:
-	go test -coverprofile=cover/coverage.out ./...
-	go tool cover -html=cover/coverage.out
+	go test -coverprofile coverage.out ./...
 
 .PHONY: check-license
 check-license:

@@ -1,0 +1,147 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+      - release/**
+    types: [opened, synchronize, reopened, labeled]
+  push:
+    branches:
+      - main
+      - release/**
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  golangci:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: "Setup Golang"
+        uses: actions/setup-go@v5
+        with:
+          check-latest: false
+          cache: false
+          go-version-file: './go.mod'
+          cache-dependency-path: './go.sum'
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: v1.60.1
+          args: "--timeout 5m --enable gofmt,testifylint,misspell -v"
+  check-license:
+    name: Check License
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: "Setup Golang"
+        uses: actions/setup-go@v5
+        with:
+          check-latest: false
+          cache: false
+          go-version-file: './go.mod'
+          cache-dependency-path: './go.sum'
+      - name: Install addlicense
+        run: go install github.com/google/addlicense@latest
+      - name: Check license headers
+        run: |
+          addlicense -check -l mit -f ./LICENSE -c "FLYR, Inc" $(find . -type f -name "*.go")
+  gosec:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    env:
+      GO111MODULE: on
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+      - name: Run Gosec Security Scanner
+        uses: securego/gosec@master
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: "Setup Golang"
+        uses: actions/setup-go@v5
+        with:
+          check-latest: false
+          cache: false
+          go-version-file: './go.mod'
+          cache-dependency-path: './go.sum'
+      - name: Cache Local Bin
+        id: cache-bin-restore
+        uses: actions/cache/restore@v4
+        with:
+          path: bin
+          key: ${{ runner.os }}-bin-${{ hashFiles('Makefile') }}
+      - name: Run Tests
+        continue-on-error: true
+        run: |
+          make test-coverage
+      - uses: robherley/go-test-action@v0
+        with:
+          fromJSONFile: unit-test-results.json
+      - name: Save Local Bin
+        id: cache-bin-save
+        uses: actions/cache/save@v4
+        with:
+          path: bin
+          key: ${{ steps.cache-bin-restore.outputs.cache-primary-key }}
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        id: upload-test-results
+        with:
+          name: sonar-reports-test-results
+          path: |
+            unit-test-results.json
+            coverage.out
+  sonar-cloud:
+    runs-on: ubuntu-latest
+    needs: [unit-tests]
+    if: success() || failure()
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: Download Artifacts
+      uses: actions/download-artifact@v4
+      with:
+        pattern: sonar-reports-*
+        merge-multiple: true
+        path: sonar-reports
+    - name: Get Version
+      id: version
+      run: echo "version=$(git describe --tags --abbrev=0)" >> "$GITHUB_OUTPUT"
+    - name: Get Reports
+      id: get-reports
+      run: |
+        SARIF_FILES=""
+        for file in $(find sonar-reports -name '*.sarif'); do
+          if [ -z "$SARIF_FILES" ]; then
+            SARIF_FILES="$file"
+          else
+            SARIF_FILES="$SARIF_FILES,$file"
+          fi
+        done
+        echo "sarif_files=$SARIF_FILES" >> "$GITHUB_OUTPUT"
+    - name: SonarQube Scan
+      uses: SonarSource/sonarqube-scan-action@v4.2.1
+      env:
+        SONAR_TOKEN: ${{ secrets.SONARCLOUD_TOKEN }}
+      with:
+        args: >
+          -Dsonar.go.coverage.reportPaths=sonar-reports/coverage.out
+          -Dsonar.go.tests.reportPaths=sonar-reports/unit-test-results.json
+          -Dsonar.sarifReportPaths=${{ steps.get-reports.outputs.sarif_files }}
+          -Dsonar.projectVersion=${{ steps.version.outputs.version }}

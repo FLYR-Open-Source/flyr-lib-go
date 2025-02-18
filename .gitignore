@@ -1,3 +1,6 @@
-cover/*
 .DS_Store
 **/.DS_Store
+
+# Coverage
+cover/*
+coverage.out
