@@ -1,6 +1,6 @@
 # flyr-lib-go
 
-This library is an internal Go library for Flyr, providing essential utilities for logging and observability, leveraging `slog` for structured logging and OpenTelemetry (OTel) libraries for tracing. This library ensures consistent instrumentation across services by correlating logs and traces, making it easier to troubleshoot and understand application behavior in production.
+This library is an internal Go library for Flyr, providing essential utilities and best practices for Golang applications.
 
 ## Table of Contents
 
@@ -31,10 +31,11 @@ This library is an internal Go library for Flyr, providing essential utilities f
 ## Features
 
 - **Structured Logging**: Provides a unified interface for logging, utilizing `slog` for JSON-based structured logs.
-- **Tracing**: Supports distributed tracing through OpenTelemetry, enabling the creation and management of traces and spans.
+- **Distributed Tracing**: Supports distributed tracing through OpenTelemetry, enabling the creation and management of traces and spans.
 - **Error Handling**: Flags spans as errored when an error is logged, providing clear visibility into failed operations.
 - **Contextual Correlation**: Automatically correlates logs with spans by adding attributes from the log entries to the active span, allowing for streamlined debugging and monitoring.
 - **Middlewares**: Provide Tracing middlewares for [gin](https://gin-gonic.com/) and [chi](https://go-chi.io/#/) frameworks.
+- **Test implementations**: Provide implementation best practices for testing GRPC services, GCP resources, OpenTelemetry etc. These impelementations can be found in the `pkg/` directory.
 
 ## Installation
 

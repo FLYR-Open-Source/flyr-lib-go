@@ -32,6 +32,10 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
+// NewClient creates a new pubsub.Client connected to a local test server.
+//
+// It can be used for both publish and subscribe operations.
+// It also also be used for both unit and integration tests.
 func NewClient(ctx context.Context) (*pstest.Server, *pubsub.Client, error) {
 	srv := pstest.NewServer()
 	opts := []option.ClientOption{
