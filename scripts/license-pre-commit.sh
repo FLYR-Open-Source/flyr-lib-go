@@ -18,13 +18,5 @@ if [[ -z "$FILES" ]]; then
     exit 0
 fi
 
-# Run addlicense to check & fix files
-echo "$FILES" | xargs addlicense -l mit -f LICENSE -c "FLYR, Inc"
-
-echo "$FILES"
-
-# Add fixed files back to the commit
-git add $FILES
-git commit -m "chore: add license headers" --no-verify # Skip pre-commit hook to avoid infinite loop
-
-echo "License headers applied."
+echo "License headers are missing. Please run 'make add-license' to apply."
+exit 1
