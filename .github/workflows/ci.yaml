@@ -65,6 +65,26 @@ jobs:
         uses: actions/checkout@v4
       - name: Run Gosec Security Scanner
         uses: securego/gosec@master
+  trivy:
+      name: Trivy Scan
+      runs-on: ubuntu-latest
+      if: ${{ github.event.action != 'labeled' }}
+      steps:
+      - uses: actions/checkout@v4
+      - name: Run Trivy vulnerability scanner filesystem
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: "fs"
+          scan-ref: '.'
+          hide-progress: false
+          format: "sarif"
+          output: "trivy-results-fs.sarif"
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        id: upload-artifact
+        with:
+          name: sonar-reports-trivy-fs
+          path: trivy-results-fs.sarif
   unit-tests:
     name: Unit Tests
     runs-on: ubuntu-latest

@@ -2,8 +2,6 @@ module github.com/FlyrInc/flyr-lib-go
 
 go 1.23.0
 
-toolchain go1.23.5
-
 require (
 	cloud.google.com/go/pubsub v1.45.1
 	github.com/caarlos0/env/v10 v10.0.0
