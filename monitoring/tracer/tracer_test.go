@@ -26,7 +26,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/FlyrInc/flyr-lib-go/pkg/testhelpers"
+	testhelpers "github.com/FlyrInc/flyr-lib-go/pkg/testhelpers/monitoring"
 	"github.com/stretchr/testify/assert"
 	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
 	oteltrace "go.opentelemetry.io/otel/trace"

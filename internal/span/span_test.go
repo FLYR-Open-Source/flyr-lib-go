@@ -27,7 +27,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/FlyrInc/flyr-lib-go/pkg/testhelpers"
+	testhelpers "github.com/FlyrInc/flyr-lib-go/pkg/testhelpers/monitoring"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/otel/codes"

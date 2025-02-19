@@ -26,7 +26,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/FlyrInc/flyr-lib-go/pkg/testhelpers"
+	testhelpers "github.com/FlyrInc/flyr-lib-go/pkg/testhelpers/monitoring"
 	"github.com/stretchr/testify/assert"
 )
 

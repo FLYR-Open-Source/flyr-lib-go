@@ -20,6 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// Package testhelpers provides implementation that can be helpful while testing your applications.
-// It includes fake implemnetation for Open Telemetry resources, GCP resources, etc.
-package testhelpers
+// Package monitoring in testhelpers provides fakers for Tracer and Spans.
+// They can be used in tests to avoid the need for a real tracer.
+// Also, the FakeSpan makes it easy to test the behavior of a Span.
+package monitoring
