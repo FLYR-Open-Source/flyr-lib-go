@@ -20,21 +20,25 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package testhelpers // import "github.com/FlyrInc/flyr-lib-go/pkg/testhelpers"
+package pubsub
 
 import (
 	"context"
 
-	oteltrace "go.opentelemetry.io/otel/trace"
+	"cloud.google.com/go/pubsub"
+	"cloud.google.com/go/pubsub/pstest"
+	"google.golang.org/api/option"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
-type FakeTracer struct {
-	oteltrace.Tracer
-}
-
-func (t FakeTracer) Start(ctx context.Context, name string, opts ...oteltrace.SpanStartOption) (context.Context, oteltrace.Span) {
-	spanCtx, span := t.Tracer.Start(ctx, name)
-
-	newCtx, newSpan := overrideContextValue(spanCtx, span)
-	return newCtx, &newSpan
+func NewClient(ctx context.Context) (*pstest.Server, *pubsub.Client, error) {
+	srv := pstest.NewServer()
+	opts := []option.ClientOption{
+		option.WithEndpoint(srv.Addr),
+		option.WithoutAuthentication(),
+		option.WithGRPCDialOption(grpc.WithTransportCredentials(insecure.NewCredentials())),
+	}
+	client, err := pubsub.NewClient(ctx, "test-project", opts...)
+	return srv, client, err
 }

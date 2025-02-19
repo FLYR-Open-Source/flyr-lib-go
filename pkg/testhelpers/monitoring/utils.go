@@ -20,6 +20,20 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// Package testhelpers provides implementation that can be helpful while testing your applications.
-// It includes fake implemnetation for Open Telemetry resources, GCP resources, etc.
-package testhelpers
+package monitoring // import "github.com/FlyrInc/flyr-lib-go/pkg/testhelpers/monitoring"
+
+import (
+	"context"
+
+	oteltrace "go.opentelemetry.io/otel/trace"
+)
+
+type traceContextKeyType int
+
+const currentSpanKey traceContextKeyType = iota
+
+func overrideContextValue(ctx context.Context, span oteltrace.Span) (context.Context, FakeSpan) {
+	fakeSpan := FakeSpan{Span: span}
+	ctx = context.WithValue(ctx, currentSpanKey, fakeSpan)
+	return ctx, fakeSpan
+}
