@@ -13,3 +13,12 @@ updates:
     registries: "*" # Does not make sense for GHA, but at least one update must reference each registry
     schedule:
       interval: "monthly"
+  - directory: "."
+    package-ecosystem: "gomod"
+    schedule:
+      interval: "monthly"
+    rebase-strategy: "disabled"
+    groups:
+      minor:
+        patterns: ["*"]
+        update-types: [ "minor", "patch" ]
