@@ -20,6 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// Package testhelpers provides implementation that can be helpful while testing your applications.
-// It includes fake implemnetation for Open Telemetry resources, GCP resources, etc.
-package testhelpers
+// Package grpc in testhelpers provides a simple way to create a fake gRPC server.
+// The fake gRPC server can be used to either test gRPC clients, or GCP resources.
+// This package is used for testing purposes only.
+package grpc
