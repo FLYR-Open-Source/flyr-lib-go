@@ -20,41 +20,29 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package testhelpers // import "github.com/FlyrInc/flyr-lib-go/pkg/testhelpers"
+package pubsub
 
 import (
 	"context"
 
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/propagation"
-	sdktrace "go.opentelemetry.io/otel/sdk/trace"
-	sdktracetest "go.opentelemetry.io/otel/sdk/trace/tracetest"
+	"cloud.google.com/go/pubsub"
+	"cloud.google.com/go/pubsub/pstest"
+	"google.golang.org/api/option"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
-func GetFakeTracer() (*sdktrace.TracerProvider, FakeTracer) {
-	tc := sdktrace.NewTracerProvider(
-		sdktrace.WithBatcher(sdktracetest.NewInMemoryExporter()),
-	)
-
-	otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(
-		propagation.TraceContext{}, propagation.Baggage{}))
-
-	otel.SetTracerProvider(tc)
-
-	return tc, FakeTracer{Tracer: tc.Tracer("test-tracer")}
-}
-
-func GetFakeSpan(ctx context.Context) (context.Context, FakeSpan) {
-	tc := sdktrace.NewTracerProvider(
-		sdktrace.WithBatcher(sdktracetest.NewInMemoryExporter()),
-	)
-	otel.SetTracerProvider(tc)
-	defer func() {
-		//nolint:errcheck
-		tc.Shutdown(context.Background())
-	}()
-
-	tc, tracer := GetFakeTracer()
-	newCtx, newSpan := tracer.Start(ctx, "test-span")
-	return newCtx, FakeSpan{Span: newSpan}
+// NewClient creates a new pubsub.Client connected to a local test server.
+//
+// It can be used for both publish and subscribe operations.
+// It also also be used for both unit and integration tests.
+func NewClient(ctx context.Context) (*pstest.Server, *pubsub.Client, error) {
+	srv := pstest.NewServer()
+	opts := []option.ClientOption{
+		option.WithEndpoint(srv.Addr),
+		option.WithoutAuthentication(),
+		option.WithGRPCDialOption(grpc.WithTransportCredentials(insecure.NewCredentials())),
+	}
+	client, err := pubsub.NewClient(ctx, "test-project", opts...)
+	return srv, client, err
 }

@@ -20,20 +20,41 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package testhelpers // import "github.com/FlyrInc/flyr-lib-go/pkg/testhelpers"
+package monitoring // import "github.com/FlyrInc/flyr-lib-go/pkg/testhelpers/monitoring"
 
 import (
 	"context"
 
-	oteltrace "go.opentelemetry.io/otel/trace"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/propagation"
+	sdktrace "go.opentelemetry.io/otel/sdk/trace"
+	sdktracetest "go.opentelemetry.io/otel/sdk/trace/tracetest"
 )
 
-type traceContextKeyType int
+func GetFakeTracer() (*sdktrace.TracerProvider, FakeTracer) {
+	tc := sdktrace.NewTracerProvider(
+		sdktrace.WithBatcher(sdktracetest.NewInMemoryExporter()),
+	)
 
-const currentSpanKey traceContextKeyType = iota
+	otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(
+		propagation.TraceContext{}, propagation.Baggage{}))
 
-func overrideContextValue(ctx context.Context, span oteltrace.Span) (context.Context, FakeSpan) {
-	fakeSpan := FakeSpan{Span: span}
-	ctx = context.WithValue(ctx, currentSpanKey, fakeSpan)
-	return ctx, fakeSpan
+	otel.SetTracerProvider(tc)
+
+	return tc, FakeTracer{Tracer: tc.Tracer("test-tracer")}
+}
+
+func GetFakeSpan(ctx context.Context) (context.Context, FakeSpan) {
+	tc := sdktrace.NewTracerProvider(
+		sdktrace.WithBatcher(sdktracetest.NewInMemoryExporter()),
+	)
+	otel.SetTracerProvider(tc)
+	defer func() {
+		//nolint:errcheck
+		tc.Shutdown(context.Background())
+	}()
+
+	tc, tracer := GetFakeTracer()
+	newCtx, newSpan := tracer.Start(ctx, "test-span")
+	return newCtx, FakeSpan{Span: newSpan}
 }
