@@ -22,46 +22,46 @@
 
 package grpc
 
-// import (
-// 	"context"
+import (
+	"context"
 
-// 	"cloud.google.com/go/logging/apiv2/loggingpb"
-// 	"google.golang.org/api/option"
-// 	"google.golang.org/grpc"
+	"cloud.google.com/go/logging/apiv2/loggingpb"
+	"google.golang.org/api/option"
+	"google.golang.org/grpc"
 
-// 	testhelpers "github.com/FlyrInc/flyr-lib-go/pkg/testhelpers/grpc"
-// )
+	testhelpers "github.com/FlyrInc/flyr-lib-go/pkg/testhelpers/grpc"
+)
 
-// // MockLoggingServiceServer is a mock implementation of the LoggingServiceV2Server interface.
-// type MockLoggingServiceServer struct {
-// 	loggingpb.UnimplementedLoggingServiceV2Server
-// 	Entries           []*loggingpb.LogEntry
-// 	ListLogEntriesErr error
-// }
+// MockLoggingServiceServer is a mock implementation of the LoggingServiceV2Server interface.
+type MockLoggingServiceServer struct {
+	loggingpb.UnimplementedLoggingServiceV2Server
+	Entries           []*loggingpb.LogEntry
+	ListLogEntriesErr error
+}
 
-// func (m *MockLoggingServiceServer) WithEntries(entries []*loggingpb.LogEntry) {
-// 	m.Entries = entries
-// }
+func (m *MockLoggingServiceServer) WithEntries(entries []*loggingpb.LogEntry) {
+	m.Entries = entries
+}
 
-// func (m *MockLoggingServiceServer) WithListLogEntriesError(err error) {
-// 	m.ListLogEntriesErr = err
-// }
+func (m *MockLoggingServiceServer) WithListLogEntriesError(err error) {
+	m.ListLogEntriesErr = err
+}
 
-// // ListLogEntries implements the ListLogEntries method of the LoggingServiceV2Server interface.
-// func (m *MockLoggingServiceServer) ListLogEntries(ctx context.Context, req *loggingpb.ListLogEntriesRequest) (*loggingpb.ListLogEntriesResponse, error) {
-// 	if m.ListLogEntriesErr != nil {
-// 		return nil, m.ListLogEntriesErr
-// 	}
-// 	return &loggingpb.ListLogEntriesResponse{
-// 		Entries: m.Entries,
-// 	}, nil
-// }
+// ListLogEntries implements the ListLogEntries method of the LoggingServiceV2Server interface.
+func (m *MockLoggingServiceServer) ListLogEntries(ctx context.Context, req *loggingpb.ListLogEntriesRequest) (*loggingpb.ListLogEntriesResponse, error) {
+	if m.ListLogEntriesErr != nil {
+		return nil, m.ListLogEntriesErr
+	}
+	return &loggingpb.ListLogEntriesResponse{
+		Entries: m.Entries,
+	}, nil
+}
 
-// func NewLoggingServiceServer(mockServer loggingpb.LoggingServiceV2Server) (*grpc.Server, []option.ClientOption, error) {
-// 	cb := func(grpcServer *grpc.Server) error {
-// 		loggingpb.RegisterLoggingServiceV2Server(grpcServer, mockServer)
-// 		return nil
-// 	}
+func NewLoggingServiceServer(mockServer loggingpb.LoggingServiceV2Server) (*grpc.Server, []option.ClientOption, error) {
+	cb := func(grpcServer *grpc.Server) error {
+		loggingpb.RegisterLoggingServiceV2Server(grpcServer, mockServer)
+		return nil
+	}
 
-// 	return testhelpers.SetupMockGrpcServer(cb)
-// }
+	return testhelpers.SetupMockGrpcServer(cb)
+}
