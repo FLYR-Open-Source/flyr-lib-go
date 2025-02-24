@@ -25,7 +25,6 @@ package main
 import (
 	"context"
 	"errors"
-	"fmt"
 	"log/slog"
 	"os"
 
@@ -47,6 +46,10 @@ const (
 // You don't need this part since it's automated in Kubernetes
 func init() {
 	os.Setenv("OTEL_SERVICE_NAME", serviceName)
+	// this is a flag for exporting the traces in stdout
+	os.Setenv("OTEL_EXPORTER_OTLP_TEST", "true")
+	// set the log level to debug
+	os.Setenv("LOG_LEVEL", "debug")
 	os.Setenv("OTEL_RESOURCE_ATTRIBUTES", "k8s.container.name={some-container},k8s.deployment.name={some-deployment},k8s.deployment.uid={some-uid},k8s.namespace.name={some-namespace},k8s.node.name={some-node},k8s.pod.name={some-pod},k8s.pod.uid={some-uid},k8s.replicaset.name={some-replicaset},k8s.replicaset.uid={some-uid},service.instance.id={some-namespace}.{some-pod}.{some-container},service.version={some-version}")
 }
 
@@ -72,12 +75,6 @@ func main() {
 	parentCtx, span := tracer.StartSpan(ctx, "parent", trace.SpanKindInternal)
 	defer span.End()
 
-	fmt.Println()
-	fmt.Println("------------------------ Parent Span ------------------------")
-	fmt.Printf("%+v\n", span.Span)
-	fmt.Println("------------------------ End Parent Span ------------------------")
-	fmt.Println()
-
 	// myFunc1 with be wrapped with a span.
 	// We pass the parentCtx to the function so that the span is created with the parent context.
 	myFunc1(parentCtx)
@@ -89,29 +86,16 @@ func main() {
 }
 
 func myFunc1(ctx context.Context) {
-	fmt.Println()
-	fmt.Println("------------------------ Start myFunc1 ------------------------")
-
 	spanCtx, span := tracer.StartSpan(ctx, "myFunc1", trace.SpanKindInternal)
 	defer span.End()
 
 	logger.Info(spanCtx, "hello from myFunc1", slog.Any("some_attribute", MyStruct{Name: "go", Age: 15}), slog.String("hello", "is hola in Spanish"))
 
-	fmt.Println()
 	// debug logs must not have correlation IDs
 	logger.Debug(spanCtx, "debug must not have correlation IDs")
 
-	fmt.Println()
 	// logging an error using a context with a span, the span will be flagged as errored
 	logger.Error(spanCtx, "error from myFunc1", errors.New("an error had occurred in myFunc1"))
-
-	fmt.Println()
-	// the span (in attributes) will contain the attributes we passed on the above logs
-	// and the error (in events) since we logged an error
-	fmt.Printf("%+v\n", span.Span)
-
-	fmt.Println("------------------------ End myFunc1 ------------------------")
-	fmt.Println()
 
 	// childFunc will be wrapped with a span.
 	// Since we are passing the spanCtx to the function, the span will be created with the span context.
@@ -120,36 +104,16 @@ func myFunc1(ctx context.Context) {
 }
 
 func myFunc2(ctx context.Context) {
-	fmt.Println()
-	fmt.Println("------------------------ Start myFunc2 ------------------------")
-
 	spanCtx, span := tracer.StartSpan(ctx, "myFunc1", trace.SpanKindInternal)
 	defer span.End()
 
 	logger.Info(spanCtx, "hello from myFunc2", slog.Any("response", MyStruct{Name: "java", Age: 28}), slog.String("hello", "is hallo in Dutch"))
 
-	fmt.Println()
 	// logging an error using a context with a span, the span will be flagged as errored
 	logger.Error(spanCtx, "error from myFunc2", errors.New("an error had occurred in myFunc2"))
-
-	fmt.Println()
-	// the span (in attributes) will contain the attributes we passed on the above logs
-	// and the error (in events) since we logged an error
-	fmt.Printf("%+v\n", span.Span)
-
-	fmt.Println("------------------------ End myFunc2 ------------------------")
-	fmt.Println()
 }
 
 func childFunc(ctx context.Context) {
-	fmt.Println()
-	fmt.Println("------------------------ Start childFunc ------------------------")
-
 	_, span := tracer.StartSpan(ctx, "childFunc", trace.SpanKindInternal)
 	defer span.End()
-
-	// the span must not contain any more attributes that the default ones (caller information)
-	fmt.Printf("%+v\n", span.Span)
-
-	fmt.Println("------------------------ Start childFunc ------------------------")
 }
