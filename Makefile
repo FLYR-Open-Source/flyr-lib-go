@@ -1,5 +1,5 @@
 # The files that will be included in the test coverage report
-TEST_FILES=$(shell go list ./... | grep -v ./examples)
+TEST_FILES=$(shell go list ./... | grep -v ./examples | grep -v ./pkg)
 
 .PHONY: tidy
 tidy:

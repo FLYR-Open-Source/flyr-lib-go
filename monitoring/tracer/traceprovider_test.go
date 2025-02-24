@@ -42,25 +42,40 @@ func getMonitoringConfig() config.Monitoring {
 	return cfg
 }
 
-func TestGetExporterClient(t *testing.T) {
+func TestGetExporter(t *testing.T) {
+	ctx := context.Background()
 	cfg := getMonitoringConfig()
 
-	t.Run("ReturnsGRPCClient", func(t *testing.T) {
-		cfg.ExporterProtocolCfg = "grpc"
-		client := getExporterClient(cfg)
+	t.Run("ReturnsStdoutExporter", func(t *testing.T) {
+		cfg.ExporterProtocolCfg = ""
+		cfg.TestExporterCfg = true
+		client, err := getExporter(ctx, cfg)
 		require.NotNil(t, client)
+		require.NoError(t, err)
+	})
+
+	t.Run("ReturnsGRPCExporter", func(t *testing.T) {
+		cfg.ExporterProtocolCfg = "grpc"
+		cfg.TestExporterCfg = false
+		client, err := getExporter(ctx, cfg)
+		require.NotNil(t, client)
+		require.NoError(t, err)
 	})
 
 	t.Run("ReturnsHTTPClient", func(t *testing.T) {
 		cfg.ExporterProtocolCfg = "http/protobuf"
-		client := getExporterClient(cfg)
+		cfg.TestExporterCfg = false
+		client, err := getExporter(ctx, cfg)
 		require.NotNil(t, client)
+		require.NoError(t, err)
 	})
 
 	t.Run("ReturnsNilForUnsupportedProtocol", func(t *testing.T) {
 		cfg.ExporterProtocolCfg = "unsupported"
-		client := getExporterClient(cfg)
+		cfg.TestExporterCfg = false
+		client, err := getExporter(ctx, cfg)
 		require.Nil(t, client)
+		require.NoError(t, err)
 	})
 }
 
