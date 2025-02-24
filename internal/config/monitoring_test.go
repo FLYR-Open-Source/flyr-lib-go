@@ -30,10 +30,11 @@ import (
 
 func TestMonitoringConfig(t *testing.T) {
 	tests := []struct {
-		name                  string
-		variables             map[string]string
-		expectedService       string
-		expectedTraceExporter string
+		name                    string
+		variables               map[string]string
+		expectedService         string
+		expectedTraceExporter   string
+		expectedMetricsExporter string
 	}{
 		{
 			name:                  "with empty values",
@@ -45,15 +46,17 @@ func TestMonitoringConfig(t *testing.T) {
 			variables: map[string]string{
 				"OTEL_SERVICE_NAME": "my-service",
 			},
-			expectedService:       "my-service",
-			expectedTraceExporter: "",
+			expectedService:         "my-service",
+			expectedTraceExporter:   "",
+			expectedMetricsExporter: "",
 		},
 		{
 			name: "with global trace exporter protocol",
 			variables: map[string]string{
 				"OTEL_EXPORTER_OTLP_PROTOCOL": "grpc",
 			},
-			expectedTraceExporter: "grpc",
+			expectedTraceExporter:   "grpc",
+			expectedMetricsExporter: "grpc",
 		},
 		{
 			name: "with custom trace exporter protocol",
@@ -68,7 +71,24 @@ func TestMonitoringConfig(t *testing.T) {
 				"OTEL_EXPORTER_OTLP_PROTOCOL":        "grpc",
 				"OTEL_EXPORTER_OTLP_TRACES_PROTOCOL": "http/protobuf",
 			},
-			expectedTraceExporter: "http/protobuf",
+			expectedTraceExporter:   "http/protobuf",
+			expectedMetricsExporter: "grpc",
+		},
+		{
+			name: "with custom metrics exporter protocol",
+			variables: map[string]string{
+				"OTEL_EXPORTER_OTLP_METRICS_PROTOCOL": "http/protobuf",
+			},
+			expectedMetricsExporter: "http/protobuf",
+		},
+		{
+			name: "custom metrics exporter protocol must take precedence over global trace exporter protocol",
+			variables: map[string]string{
+				"OTEL_EXPORTER_OTLP_PROTOCOL":         "grpc",
+				"OTEL_EXPORTER_OTLP_METRICS_PROTOCOL": "http/protobuf",
+			},
+			expectedTraceExporter:   "grpc",
+			expectedMetricsExporter: "http/protobuf",
 		},
 	}
 
@@ -78,6 +98,7 @@ func TestMonitoringConfig(t *testing.T) {
 
 			assert.Equalf(t, tt.expectedService, cfg.Service(), "Service() return value is not correct")
 			assert.Equalf(t, tt.expectedTraceExporter, cfg.ExporterTracesProtocol(), "ExporterTracesProtocol() return value is not correct")
+			assert.Equalf(t, tt.expectedMetricsExporter, cfg.ExporterMetricsProtocol(), "ExporterMetricsProtocol() return value is not correct")
 		})
 	}
 }

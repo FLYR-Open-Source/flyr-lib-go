@@ -52,9 +52,9 @@ var defaultTracer *Tracer
 // StartDefaultTracer initializes and starts the default OpenTelemetry Tracer.
 //
 // This function checks if tracing is enabled in the provided configuration. If tracing
-// is enabled, It creates a new Tracer by using the default Trace Provider. It also validates that the
+// is enabled, It creates a new Tracer by using the default TraceProvider. It also validates that the
 // tracer name (the service name in that case) is set in the configuration. If the tracer name is not provided,
-// it returns an error indicating that the service name must be set.
+// a noop Tracer is initialised as a default.
 //
 // The function also sets the global default tracer to be used for tracing in the
 // application. If tracing is not enabled, it returns nil without starting a tracer.
