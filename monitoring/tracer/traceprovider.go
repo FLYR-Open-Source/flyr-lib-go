@@ -77,7 +77,7 @@ func getExporter(ctx context.Context, cfg config.MonitoringConfig) (sdktrace.Spa
 		client := otlptracehttp.NewClient()
 		return otlptrace.New(ctx, client)
 	default:
-		return nil, nil
+		return nil, ErrExporterClientNotSupported
 	}
 }
 

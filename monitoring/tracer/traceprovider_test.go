@@ -75,7 +75,7 @@ func TestGetExporter(t *testing.T) {
 		cfg.TestExporterCfg = false
 		client, err := getExporter(ctx, cfg)
 		require.Nil(t, client)
-		require.NoError(t, err)
+		require.ErrorIs(t, err, ErrExporterClientNotSupported)
 	})
 }
 
