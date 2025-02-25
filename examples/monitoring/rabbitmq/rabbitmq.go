@@ -24,6 +24,7 @@ package main
 
 import (
 	"context"
+	"log/slog"
 	"os"
 
 	"github.com/FlyrInc/flyr-lib-go/logger"
@@ -41,6 +42,10 @@ const (
 // You don't need this part since it's automated in Kubernetes
 func init() {
 	os.Setenv("OTEL_SERVICE_NAME", serviceName)
+	// this is a flag for exporting the traces in stdout
+	os.Setenv("OTEL_EXPORTER_OTLP_TEST", "true")
+	// set the log level to debug
+	os.Setenv("LOG_LEVEL", "debug")
 	os.Setenv("OTEL_RESOURCE_ATTRIBUTES", "k8s.container.name={some-container},k8s.deployment.name={some-deployment},k8s.deployment.uid={some-uid},k8s.namespace.name={some-namespace},k8s.node.name={some-node},k8s.pod.name={some-pod},k8s.pod.uid={some-uid},k8s.replicaset.name={some-replicaset},k8s.replicaset.uid={some-uid},service.instance.id={some-namespace}.{some-pod}.{some-container},service.version={some-version}")
 }
 
@@ -70,15 +75,16 @@ func publishMessage(ctx context.Context) {
 	defer span.End()
 	span.SetAttributes(attribute.String("queue", "some-queue"))
 	span.SetAttributes(attribute.String("exchange", "some-exchange"))
-	/* header */ _ = rabbitmq.InjectAMQPHeaders(spanCtx)
+	headers := rabbitmq.InjectAMQPHeaders(spanCtx)
 	// pass the headers to the message and publish it
-	logger.Debug(spanCtx, "message published")
+	logger.Debug(spanCtx, "message published", slog.Any("headers", headers))
 }
 
 func consumeMessage(ctx context.Context) {
 	headers := map[string]interface{}{}
 	ctxWithHeaders := rabbitmq.ExtractAMQPHeaders(ctx, headers)
-	spanCtx, _ := tracer.StartSpan(ctxWithHeaders, "consumer", oteltrace.SpanKindConsumer)
+	spanCtx, span := tracer.StartSpan(ctxWithHeaders, "consumer", oteltrace.SpanKindConsumer)
+	defer span.End()
 
-	logger.Debug(spanCtx, "message consumed")
+	logger.Debug(spanCtx, "message consumed", slog.Any("headers", headers))
 }
