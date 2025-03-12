@@ -1,10 +1,10 @@
-module github.com/FlyrInc/flyr-lib-go/examples/monitoring/pubsub
+module github.com/FLYR-Open-Source/flyr-lib-go/examples/monitoring/pubsub
 
 go 1.23.4
 
 require (
 	cloud.google.com/go/pubsub v1.47.0
-	github.com/FlyrInc/flyr-lib-go v0.0.0
+	github.com/FLYR-Open-Source/flyr-lib-go v0.0.0
 	google.golang.org/api v0.222.0
 )
 
@@ -53,4 +53,4 @@ require (
 	google.golang.org/protobuf v1.36.5 // indirect
 )
 
-replace github.com/FlyrInc/flyr-lib-go => ../../..
+replace github.com/FLYR-Open-Source/flyr-lib-go => ../../..

@@ -29,7 +29,7 @@ import (
 
 	"cloud.google.com/go/logging/apiv2/loggingpb"
 	"cloud.google.com/go/logging/logadmin"
-	testhelpers "github.com/FlyrInc/flyr-lib-go/examples/testhelpers/grpc"
+	testhelpers "github.com/FLYR-Open-Source/flyr-lib-go/examples/testhelpers/grpc"
 	"google.golang.org/api/iterator"
 	logtypepb "google.golang.org/genproto/googleapis/logging/type"
 	"google.golang.org/protobuf/types/known/timestamppb"

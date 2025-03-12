@@ -30,7 +30,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/FlyrInc/flyr-lib-go/internal/config"
+	"github.com/FLYR-Open-Source/flyr-lib-go/internal/config"
 	"github.com/stretchr/testify/assert"
 )
 

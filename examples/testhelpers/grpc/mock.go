@@ -29,7 +29,7 @@ import (
 	"google.golang.org/api/option"
 	"google.golang.org/grpc"
 
-	testhelpers "github.com/FlyrInc/flyr-lib-go/pkg/testhelpers/grpc"
+	testhelpers "github.com/FLYR-Open-Source/flyr-lib-go/pkg/testhelpers/grpc"
 )
 
 // MockLoggingServiceServer is a mock implementation of the LoggingServiceV2Server interface.

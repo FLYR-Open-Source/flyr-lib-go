@@ -1,8 +1,8 @@
-module github.com/FlyrInc/flyr-lib-go/examples/logging
+module github.com/FLYR-Open-Source/flyr-lib-go/examples/logging
 
 go 1.23.4
 
-require github.com/FlyrInc/flyr-lib-go v0.0.0
+require github.com/FLYR-Open-Source/flyr-lib-go v0.0.0
 
 require (
 	github.com/caarlos0/env/v10 v10.0.0 // indirect
@@ -20,4 +20,4 @@ require (
 	golang.org/x/text v0.22.0 // indirect
 )
 
-replace github.com/FlyrInc/flyr-lib-go => ../..
+replace github.com/FLYR-Open-Source/flyr-lib-go => ../..

@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package pubsub // import "github.com/FlyrInc/flyr-lib-go/monitoring/pubsub"
+package pubsub // import "github.com/FLYR-Open-Source/flyr-lib-go/monitoring/pubsub"
 
 import (
 	"context"

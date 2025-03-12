@@ -8,7 +8,7 @@ tidy:
 .PHONY: docs
 docs:
 	$(GOBIN)/godoc -http=:6060
-	# Visit: http://localhost:6060/pkg/github.com/FlyrInc/flyr-lib-go/
+	# Visit: http://localhost:6060/pkg/github.com/FLYR-Open-Source/flyr-lib-go/
 
 .PHONY: lint
 lint:

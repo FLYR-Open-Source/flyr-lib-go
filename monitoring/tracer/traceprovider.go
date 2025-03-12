@@ -20,13 +20,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package tracer // import "github.com/FlyrInc/flyr-lib-go/monitoring/tracer"
+package tracer // import "github.com/FLYR-Open-Source/flyr-lib-go/monitoring/tracer"
 
 import (
 	"context"
 	"errors"
 
-	"github.com/FlyrInc/flyr-lib-go/internal/config"
+	"github.com/FLYR-Open-Source/flyr-lib-go/internal/config"
 	"go.opentelemetry.io/otel"
 
 	"go.opentelemetry.io/otel/attribute"

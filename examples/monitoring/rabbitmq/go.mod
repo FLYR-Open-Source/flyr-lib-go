@@ -1,9 +1,9 @@
-module github.com/FlyrInc/flyr-lib-go/examples/monitoring/rabbitmq
+module github.com/FLYR-Open-Source/flyr-lib-go/examples/monitoring/rabbitmq
 
 go 1.23.4
 
 require (
-	github.com/FlyrInc/flyr-lib-go v0.0.0
+	github.com/FLYR-Open-Source/flyr-lib-go v0.0.0
 	go.opentelemetry.io/otel v1.34.0
 	go.opentelemetry.io/otel/trace v1.34.0
 )
@@ -34,4 +34,4 @@ require (
 	google.golang.org/protobuf v1.36.5 // indirect
 )
 
-replace github.com/FlyrInc/flyr-lib-go => ../../..
+replace github.com/FLYR-Open-Source/flyr-lib-go => ../../..

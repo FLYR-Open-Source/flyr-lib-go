@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package monitoring // import "github.com/FlyrInc/flyr-lib-go/pkg/testhelpers/monitoring"
+package monitoring // import "github.com/FLYR-Open-Source/flyr-lib-go/pkg/testhelpers/monitoring"
 
 import (
 	"go.opentelemetry.io/otel/attribute"
