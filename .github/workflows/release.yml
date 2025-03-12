@@ -20,6 +20,3 @@ jobs:
       pull-requests: write # to be able to comment on released pull requests
     with:
       dryRun: ${{ inputs.dryRun || false }}
-    secrets:
-      FLYR_SEMANTIC_RELEASE_APP_ID: ${{ secrets.FLYR_SEMANTIC_RELEASE_APP_ID }}
-      FLYR_SEMANTIC_RELEASE_PRIVATE_KEY: ${{ secrets.FLYR_SEMANTIC_RELEASE_PRIVATE_KEY }}

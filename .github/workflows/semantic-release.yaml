@@ -11,11 +11,6 @@ on:
       downloadArtifact:
         description: 'Download Artifact'
         type: string
-    secrets:
-      FLYR_SEMANTIC_RELEASE_APP_ID:
-        required: true
-      FLYR_SEMANTIC_RELEASE_PRIVATE_KEY:
-        required: true
     outputs:
       new_release_published:
         description: 'Whether a new release was published'
@@ -73,16 +68,9 @@ jobs:
 
     runs-on: ubuntu-latest
     steps:
-      - name: Generate token
-        id: generate_token
-        uses: tibdex/github-app-token@v2
-        with:
-          app_id: ${{ secrets.FLYR_SEMANTIC_RELEASE_APP_ID }}
-          private_key: ${{ secrets.FLYR_SEMANTIC_RELEASE_PRIVATE_KEY }}
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          token: ${{ steps.generate_token.outputs.token }}
           fetch-depth: 0
           ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.ref || '' }}
       - name: Temporarily merge PR branch
@@ -108,7 +96,5 @@ jobs:
             @semantic-release/changelog
             @semantic-release/git
             conventional-changelog-conventionalcommits
-            @davidspekorg/semantic-release-helm
-            @davidspekorg/semantic-release-jira-notes
         env:
-          GITHUB_TOKEN: ${{ steps.generate_token.outputs.token }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
