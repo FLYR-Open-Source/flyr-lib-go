@@ -32,6 +32,7 @@ import (
 	"github.com/FLYR-Open-Source/flyr-lib-go/internal/config"
 	internalSpan "github.com/FLYR-Open-Source/flyr-lib-go/internal/span"
 	internalUtils "github.com/FLYR-Open-Source/flyr-lib-go/internal/utils"
+	"github.com/FLYR-Open-Source/flyr-lib-go/internal/version"
 )
 
 const (
@@ -76,7 +77,7 @@ func StartDefaultTracer(ctx context.Context) error {
 	} else {
 		tracer.tracer = tc.Tracer(
 			cfg.Service(),
-			oteltrace.WithInstrumentationVersion("v0.0.1"), // TODO: Update instrumentation version
+			oteltrace.WithInstrumentationVersion(version.Version()),
 		)
 	}
 

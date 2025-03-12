@@ -19,6 +19,7 @@ import (
 
 	internalConfig "github.com/FLYR-Open-Source/flyr-lib-go/internal/config"
 	"github.com/FLYR-Open-Source/flyr-lib-go/internal/utils"
+	"github.com/FLYR-Open-Source/flyr-lib-go/internal/version"
 )
 
 // OtelGinMiddleware returns middleware that will trace incoming requests for the gin web framework.
@@ -30,7 +31,7 @@ func OtelGinMiddleware() gin.HandlerFunc {
 	}
 	tracer := cfg.TracerProvider.Tracer(
 		ScopeName,
-		oteltrace.WithInstrumentationVersion("v0.0.1"), // TODO: Update instrumentation version
+		oteltrace.WithInstrumentationVersion(version.Version()),
 	)
 	if cfg.Propagators == nil {
 		cfg.Propagators = otel.GetTextMapPropagator()

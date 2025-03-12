@@ -28,6 +28,7 @@ import (
 
 	internalConfig "github.com/FLYR-Open-Source/flyr-lib-go/internal/config"
 	"github.com/FLYR-Open-Source/flyr-lib-go/internal/utils"
+	"github.com/FLYR-Open-Source/flyr-lib-go/internal/version"
 	"github.com/go-chi/chi/v5"
 	chiMiddleware "github.com/go-chi/chi/v5/middleware"
 	"go.opentelemetry.io/otel"
@@ -46,7 +47,7 @@ func OtelChiMiddleware() func(http.Handler) http.Handler {
 	}
 	tracer := cfg.TracerProvider.Tracer(
 		ScopeName,
-		oteltrace.WithInstrumentationVersion("v0.0.1"), // TODO: Update instrumentation version
+		oteltrace.WithInstrumentationVersion(version.Version()),
 	)
 	if cfg.Propagators == nil {
 		cfg.Propagators = otel.GetTextMapPropagator()
