@@ -26,7 +26,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/FlyrInc/flyr-lib-go/internal/config"
+	"github.com/FLYR-Open-Source/flyr-lib-go/internal/config"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/metric/noop"
@@ -49,7 +49,7 @@ var (
 // It returns the created Meter and an error if any occurred.
 //
 // For learning more about the Otel Metrics Data Model, please reference to https://opentelemetry.io/docs/specs/otel/metrics/data-model
-func GetDefaultMeter(ctx context.Context) (metric.Meter, error) {
+func StartDefaultMeter(ctx context.Context) (metric.Meter, error) {
 	if meter != nil {
 		return meter, nil
 	}

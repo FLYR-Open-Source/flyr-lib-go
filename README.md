@@ -42,8 +42,7 @@ This library is an internal Go library for Flyr, providing essential utilities a
 To install `flyr-lib-go`, add it to your module’s dependencies:
 
 ```bash
-export GOPRIVATE=github.com/FlyrInc/flyr-lib-go/*
-go get github.com/FlyrInc/flyr-lib-go
+go get github.com/FLYR-Open-Source/flyr-lib-go
 ```
 
 ## Usage
@@ -251,7 +250,7 @@ TBD
 
 #### Internal Documentation
 
-In order to access the internal documentation, you can run `make docs` and then visit `http://localhost:6060/pkg/github.com/FlyrInc/flyr-lib-go/`.
+In order to access the internal documentation, you can run `make docs` and then visit `http://localhost:6060/pkg/github.com/FLYR-Open-Source/flyr-lib-go/`.
 
 #### Otel Documentation
 

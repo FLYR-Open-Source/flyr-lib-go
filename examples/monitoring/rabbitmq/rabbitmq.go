@@ -24,12 +24,14 @@ package main
 
 import (
 	"context"
-	"net/http"
+	"log/slog"
 	"os"
 
-	"github.com/FlyrInc/flyr-lib-go/logger"
-	httpTrace "github.com/FlyrInc/flyr-lib-go/monitoring/http"
-	"github.com/FlyrInc/flyr-lib-go/monitoring/tracer"
+	"github.com/FLYR-Open-Source/flyr-lib-go/logger"
+	"github.com/FLYR-Open-Source/flyr-lib-go/monitoring/rabbitmq"
+	"github.com/FLYR-Open-Source/flyr-lib-go/monitoring/tracer"
+	"go.opentelemetry.io/otel/attribute"
+	oteltrace "go.opentelemetry.io/otel/trace"
 )
 
 const (
@@ -40,6 +42,10 @@ const (
 // You don't need this part since it's automated in Kubernetes
 func init() {
 	os.Setenv("OTEL_SERVICE_NAME", serviceName)
+	// this is a flag for exporting the traces in stdout
+	os.Setenv("OTEL_EXPORTER_OTLP_TEST", "true")
+	// set the log level to debug
+	os.Setenv("LOG_LEVEL", "debug")
 	os.Setenv("OTEL_RESOURCE_ATTRIBUTES", "k8s.container.name={some-container},k8s.deployment.name={some-deployment},k8s.deployment.uid={some-uid},k8s.namespace.name={some-namespace},k8s.node.name={some-node},k8s.pod.name={some-pod},k8s.pod.uid={some-uid},k8s.replicaset.name={some-replicaset},k8s.replicaset.uid={some-uid},service.instance.id={some-namespace}.{some-pod}.{some-container},service.version={some-version}")
 }
 
@@ -60,38 +66,25 @@ func main() {
 		}
 	}()
 
-	withNewClient()
-
-	withExistingClient()
+	publishMessage(ctx)
+	consumeMessage(ctx)
 }
 
-func withNewClient() {
-	ctx := context.Background()
-	url := "https://www.example.com"
-	client := httpTrace.NewHttpClient() // start new HTTP client with tracing
-	req, _ := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-
-	res, err := client.Do(req)
-	if err != nil {
-		logger.Error(ctx, "failed to make request", err)
-	}
-
-	defer res.Body.Close()
+func publishMessage(ctx context.Context) {
+	spanCtx, span := tracer.StartSpan(ctx, "publisher", oteltrace.SpanKindProducer)
+	defer span.End()
+	span.SetAttributes(attribute.String("queue", "some-queue"))
+	span.SetAttributes(attribute.String("exchange", "some-exchange"))
+	headers := rabbitmq.InjectAMQPHeaders(spanCtx)
+	// pass the headers to the message and publish it
+	logger.Debug(spanCtx, "message published", slog.Any("headers", headers))
 }
 
-func withExistingClient() {
-	ctx := context.Background()
-	url := "https://www.example.com"
+func consumeMessage(ctx context.Context) {
+	headers := map[string]interface{}{}
+	ctxWithHeaders := rabbitmq.ExtractAMQPHeaders(ctx, headers)
+	spanCtx, span := tracer.StartSpan(ctxWithHeaders, "consumer", oteltrace.SpanKindConsumer)
+	defer span.End()
 
-	client := http.Client{}
-	// add any setup to client
-
-	client = httpTrace.SetHttpTransport(client)
-	req, _ := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-	res, err := client.Do(req)
-	if err != nil {
-		logger.Error(ctx, "failed to make request", err)
-	}
-
-	defer res.Body.Close()
+	logger.Debug(spanCtx, "message consumed", slog.Any("headers", headers))
 }

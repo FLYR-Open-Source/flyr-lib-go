@@ -29,7 +29,7 @@ import (
 
 	"cloud.google.com/go/pubsub"
 
-	testhelpers "github.com/FlyrInc/flyr-lib-go/pkg/testhelpers/gcp/pubsub"
+	testhelpers "github.com/FLYR-Open-Source/flyr-lib-go/pkg/testhelpers/gcp/pubsub"
 )
 
 func TestTopic(t *testing.T) {

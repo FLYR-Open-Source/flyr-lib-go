@@ -20,14 +20,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package middleware // import "github.com/FlyrInc/flyr-lib-go/monitoring/middleware"
+package middleware // import "github.com/FLYR-Open-Source/flyr-lib-go/monitoring/middleware"
 
 import (
 	"fmt"
 	"net/http"
 
-	internalConfig "github.com/FlyrInc/flyr-lib-go/internal/config"
-	"github.com/FlyrInc/flyr-lib-go/internal/utils"
+	internalConfig "github.com/FLYR-Open-Source/flyr-lib-go/internal/config"
+	"github.com/FLYR-Open-Source/flyr-lib-go/internal/utils"
 	"github.com/go-chi/chi/v5"
 	chiMiddleware "github.com/go-chi/chi/v5/middleware"
 	"go.opentelemetry.io/otel"

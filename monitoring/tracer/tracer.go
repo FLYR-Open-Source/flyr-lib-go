@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package tracer // import "github.com/FlyrInc/flyr-lib-go/monitoring/tracer"
+package tracer // import "github.com/FLYR-Open-Source/flyr-lib-go/monitoring/tracer"
 
 import (
 	"context"
@@ -29,9 +29,9 @@ import (
 	oteltrace "go.opentelemetry.io/otel/trace"
 	"go.opentelemetry.io/otel/trace/noop"
 
-	"github.com/FlyrInc/flyr-lib-go/internal/config"
-	internalSpan "github.com/FlyrInc/flyr-lib-go/internal/span"
-	internalUtils "github.com/FlyrInc/flyr-lib-go/internal/utils"
+	"github.com/FLYR-Open-Source/flyr-lib-go/internal/config"
+	internalSpan "github.com/FLYR-Open-Source/flyr-lib-go/internal/span"
+	internalUtils "github.com/FLYR-Open-Source/flyr-lib-go/internal/utils"
 )
 
 const (

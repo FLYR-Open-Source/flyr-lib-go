@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package http // import "github.com/FlyrInc/flyr-lib-go/monitoring/http"
+package http // import "github.com/FLYR-Open-Source/flyr-lib-go/monitoring/http"
 
 import (
 	"net/http"

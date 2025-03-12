@@ -27,12 +27,13 @@ import (
 	"errors"
 	"time"
 
-	"github.com/FlyrInc/flyr-lib-go/internal/config"
+	"github.com/FLYR-Open-Source/flyr-lib-go/internal/config"
 	"go.opentelemetry.io/otel"
 
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc"
 	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetrichttp"
+	"go.opentelemetry.io/otel/exporters/stdout/stdoutmetric"
 	"go.opentelemetry.io/otel/metric/noop"
 	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/resource"
@@ -57,6 +58,11 @@ var (
 //
 // - http/protobuf to use OTLP/HTTP + protobuf
 func getExporter(ctx context.Context, cfg config.MonitoringConfig) (sdkmetric.Exporter, error) {
+	// If the the test flag is enabled, return a new stdout exporter
+	if cfg.IsTestExporter() {
+		return stdoutmetric.New()
+	}
+
 	switch cfg.ExporterTracesProtocol() {
 	case "grpc":
 		return otlpmetricgrpc.New(ctx)

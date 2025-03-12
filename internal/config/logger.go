@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package config // import "github.com/FlyrInc/flyr-lib-go/internal/config"
+package config // import "github.com/FLYR-Open-Source/flyr-lib-go/internal/config"
 
 type LoggerConfig interface {
 	LogLevel() string

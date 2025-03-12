@@ -35,6 +35,7 @@ func TestMonitoringConfig(t *testing.T) {
 		expectedService         string
 		expectedTraceExporter   string
 		expectedMetricsExporter string
+		expectedTestExporter    bool
 	}{
 		{
 			name:                  "with empty values",
@@ -90,6 +91,20 @@ func TestMonitoringConfig(t *testing.T) {
 			expectedTraceExporter:   "grpc",
 			expectedMetricsExporter: "http/protobuf",
 		},
+		{
+			name: "test flag is enabled",
+			variables: map[string]string{
+				"OTEL_EXPORTER_OTLP_TEST": "true",
+			},
+			expectedTestExporter: true,
+		},
+		{
+			name: "test flag is disabled",
+			variables: map[string]string{
+				"OTEL_EXPORTER_OTLP_TEST": "false",
+			},
+			expectedTestExporter: false,
+		},
 	}
 
 	for _, tt := range tests {
@@ -99,6 +114,7 @@ func TestMonitoringConfig(t *testing.T) {
 			assert.Equalf(t, tt.expectedService, cfg.Service(), "Service() return value is not correct")
 			assert.Equalf(t, tt.expectedTraceExporter, cfg.ExporterTracesProtocol(), "ExporterTracesProtocol() return value is not correct")
 			assert.Equalf(t, tt.expectedMetricsExporter, cfg.ExporterMetricsProtocol(), "ExporterMetricsProtocol() return value is not correct")
+			assert.Equalf(t, tt.expectedTestExporter, cfg.IsTestExporter(), "IsTestExporter() return value is not correct")
 		})
 	}
 }

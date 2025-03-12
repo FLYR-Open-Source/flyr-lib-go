@@ -29,9 +29,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/FlyrInc/flyr-lib-go/logger"
-	"github.com/FlyrInc/flyr-lib-go/monitoring/middleware"
-	"github.com/FlyrInc/flyr-lib-go/monitoring/tracer"
+	"github.com/FLYR-Open-Source/flyr-lib-go/logger"
+	"github.com/FLYR-Open-Source/flyr-lib-go/monitoring/middleware"
+	"github.com/FLYR-Open-Source/flyr-lib-go/monitoring/tracer"
 	"github.com/gin-gonic/gin"
 	"go.opentelemetry.io/otel/trace"
 )

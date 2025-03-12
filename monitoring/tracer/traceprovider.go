@@ -20,19 +20,20 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package tracer // import "github.com/FlyrInc/flyr-lib-go/monitoring/tracer"
+package tracer // import "github.com/FLYR-Open-Source/flyr-lib-go/monitoring/tracer"
 
 import (
 	"context"
 	"errors"
 
-	"github.com/FlyrInc/flyr-lib-go/internal/config"
+	"github.com/FLYR-Open-Source/flyr-lib-go/internal/config"
 	"go.opentelemetry.io/otel"
 
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
+	"go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
@@ -52,22 +53,31 @@ var (
 	tracerProvider *sdktrace.TracerProvider
 )
 
-// getExporterClient returns an OTLP exporter client based on the exporter protocol.
+// getExporter returns an OTLP exporter based on the exporter protocol.
 // If the exporter protocol is not supported, it returns nil.
+//
+// If the test flag is enabled, it returns a new stdout exporter.
 //
 // Valid values are:
 //
 // - grpc to use OTLP/gRPC
 //
 // - http/protobuf to use OTLP/HTTP + protobuf
-func getExporterClient(cfg config.MonitoringConfig) otlptrace.Client {
+func getExporter(ctx context.Context, cfg config.MonitoringConfig) (sdktrace.SpanExporter, error) {
+	// If the the test flag is enabled, return a new stdout exporter
+	if cfg.IsTestExporter() {
+		return stdouttrace.New()
+	}
+
 	switch cfg.ExporterTracesProtocol() {
 	case "grpc":
-		return otlptracegrpc.NewClient()
+		client := otlptracegrpc.NewClient()
+		return otlptrace.New(ctx, client)
 	case "http/protobuf":
-		return otlptracehttp.NewClient()
+		client := otlptracehttp.NewClient()
+		return otlptrace.New(ctx, client)
 	default:
-		return nil
+		return nil, ErrExporterClientNotSupported
 	}
 }
 
@@ -87,13 +97,7 @@ func initializeTracerProvider(ctx context.Context, cfg config.MonitoringConfig) 
 		return nil
 	}
 
-	client := getExporterClient(cfg)
-	if client == nil {
-		return ErrExporterClientNotSupported
-	}
-
-	exporter, err := otlptrace.New(ctx, client)
-
+	exporter, err := getExporter(ctx, cfg)
 	if err != nil {
 		return err
 	}

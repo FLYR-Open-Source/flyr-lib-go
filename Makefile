@@ -1,5 +1,5 @@
 # The files that will be included in the test coverage report
-TEST_FILES=$(shell go list ./... | grep -v ./examples)
+TEST_FILES=$(shell go list ./... | grep -v ./examples | grep -v ./pkg)
 
 .PHONY: tidy
 tidy:
@@ -8,7 +8,7 @@ tidy:
 .PHONY: docs
 docs:
 	$(GOBIN)/godoc -http=:6060
-	# Visit: http://localhost:6060/pkg/github.com/FlyrInc/flyr-lib-go/
+	# Visit: http://localhost:6060/pkg/github.com/FLYR-Open-Source/flyr-lib-go/
 
 .PHONY: lint
 lint:
