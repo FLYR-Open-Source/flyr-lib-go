@@ -29,7 +29,7 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/FlyrInc/flyr-lib-go/logger"
+	"github.com/FLYR-Open-Source/flyr-lib-go/logger"
 )
 
 const (

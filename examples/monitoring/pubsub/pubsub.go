@@ -27,11 +27,11 @@ import (
 	"os"
 
 	"cloud.google.com/go/pubsub"
-	"github.com/FlyrInc/flyr-lib-go/logger"
-	"github.com/FlyrInc/flyr-lib-go/monitoring/tracer"
+	"github.com/FLYR-Open-Source/flyr-lib-go/logger"
+	"github.com/FLYR-Open-Source/flyr-lib-go/monitoring/tracer"
 	"google.golang.org/api/option"
 
-	pubsubTrace "github.com/FlyrInc/flyr-lib-go/monitoring/pubsub"
+	pubsubTrace "github.com/FLYR-Open-Source/flyr-lib-go/monitoring/pubsub"
 )
 
 const (

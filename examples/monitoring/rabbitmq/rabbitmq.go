@@ -27,9 +27,9 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/FlyrInc/flyr-lib-go/logger"
-	"github.com/FlyrInc/flyr-lib-go/monitoring/rabbitmq"
-	"github.com/FlyrInc/flyr-lib-go/monitoring/tracer"
+	"github.com/FLYR-Open-Source/flyr-lib-go/logger"
+	"github.com/FLYR-Open-Source/flyr-lib-go/monitoring/rabbitmq"
+	"github.com/FLYR-Open-Source/flyr-lib-go/monitoring/tracer"
 	"go.opentelemetry.io/otel/attribute"
 	oteltrace "go.opentelemetry.io/otel/trace"
 )

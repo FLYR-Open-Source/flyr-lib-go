@@ -1,8 +1,8 @@
-module github.com/FlyrInc/flyr-lib-go/examples/monitoring/http
+module github.com/FLYR-Open-Source/flyr-lib-go/examples/monitoring/http
 
 go 1.23.4
 
-require github.com/FlyrInc/flyr-lib-go v0.0.0
+require github.com/FLYR-Open-Source/flyr-lib-go v0.0.0
 
 require (
 	github.com/caarlos0/env/v10 v10.0.0 // indirect
@@ -34,4 +34,4 @@ require (
 	google.golang.org/protobuf v1.36.5 // indirect
 )
 
-replace github.com/FlyrInc/flyr-lib-go => ../../..
+replace github.com/FLYR-Open-Source/flyr-lib-go => ../../..

@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package tracer // import "github.com/FlyrInc/flyr-lib-go/monitoring/tracer"
+package tracer // import "github.com/FLYR-Open-Source/flyr-lib-go/monitoring/tracer"
 
 import (
 	"context"
@@ -29,7 +29,7 @@ import (
 	"go.opentelemetry.io/otel/codes"
 	oteltrace "go.opentelemetry.io/otel/trace"
 
-	"github.com/FlyrInc/flyr-lib-go/internal/span"
+	"github.com/FLYR-Open-Source/flyr-lib-go/internal/span"
 )
 
 type SpanKind = oteltrace.SpanKind

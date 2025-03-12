@@ -1,10 +1,10 @@
-module github.com/FlyrInc/flyr-lib-go/examples/testhelpers/grpc
+module github.com/FLYR-Open-Source/flyr-lib-go/examples/testhelpers/grpc
 
 go 1.23.4
 
 require (
 	cloud.google.com/go/logging v1.13.0
-	github.com/FlyrInc/flyr-lib-go v0.0.0
+	github.com/FLYR-Open-Source/flyr-lib-go v0.0.0
 	google.golang.org/api v0.222.0
 	google.golang.org/genproto v0.0.0-20250122153221-138b5a5a4fd4
 	google.golang.org/grpc v1.70.0
@@ -41,4 +41,4 @@ require (
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250212204824-5a70512c5d8b // indirect
 )
 
-replace github.com/FlyrInc/flyr-lib-go => ../../..
+replace github.com/FLYR-Open-Source/flyr-lib-go => ../../..

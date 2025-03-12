@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package logger // import "github.com/FlyrInc/flyr-lib-go/logger"
+package logger // import "github.com/FLYR-Open-Source/flyr-lib-go/logger"
 
 import (
 	"context"
@@ -28,7 +28,7 @@ import (
 	"fmt"
 	"log/slog"
 
-	"github.com/FlyrInc/flyr-lib-go/internal/span"
+	"github.com/FLYR-Open-Source/flyr-lib-go/internal/span"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
 )

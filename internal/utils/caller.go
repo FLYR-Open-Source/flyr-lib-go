@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package utils // import "github.com/FlyrInc/flyr-lib-go/internal/utils"
+package utils // import "github.com/FLYR-Open-Source/flyr-lib-go/internal/utils"
 
 import (
 	"encoding/json"
@@ -29,7 +29,7 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/FlyrInc/flyr-lib-go/internal/config"
+	"github.com/FLYR-Open-Source/flyr-lib-go/internal/config"
 	otel_attribute "go.opentelemetry.io/otel/attribute"
 )
 

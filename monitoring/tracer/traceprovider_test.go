@@ -26,7 +26,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/FlyrInc/flyr-lib-go/internal/config"
+	"github.com/FLYR-Open-Source/flyr-lib-go/internal/config"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/propagation"

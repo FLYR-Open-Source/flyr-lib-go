@@ -27,9 +27,9 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/FlyrInc/flyr-lib-go/logger"
-	httpTrace "github.com/FlyrInc/flyr-lib-go/monitoring/http"
-	"github.com/FlyrInc/flyr-lib-go/monitoring/tracer"
+	"github.com/FLYR-Open-Source/flyr-lib-go/logger"
+	httpTrace "github.com/FLYR-Open-Source/flyr-lib-go/monitoring/http"
+	"github.com/FLYR-Open-Source/flyr-lib-go/monitoring/tracer"
 )
 
 const (

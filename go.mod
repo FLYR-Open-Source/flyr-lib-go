@@ -1,4 +1,4 @@
-module github.com/FlyrInc/flyr-lib-go
+module github.com/FLYR-Open-Source/flyr-lib-go
 
 go 1.23.0
 
