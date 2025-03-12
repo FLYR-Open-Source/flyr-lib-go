@@ -20,17 +20,19 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package config // import "github.com/FlyrInc/flyr-lib-go/internal/config"
+package config // import "github.com/FLYR-Open-Source/flyr-lib-go/internal/config"
 
 type MonitoringConfig interface {
 	Service() string
 	ExporterTracesProtocol() string
+	IsTestExporter() bool
 }
 
 type Monitoring struct {
 	ServiceCfg               string `env:"OTEL_SERVICE_NAME"`
 	ExporterProtocolCfg      string `env:"OTEL_EXPORTER_OTLP_PROTOCOL"`        // Specifies the OTLP transport protocol to be used for all telemetry data.
 	ExporterTraceProtocolCfg string `env:"OTEL_EXPORTER_OTLP_TRACES_PROTOCOL"` // Specifies the OTLP transport protocol to be used for trace data.
+	TestExporterCfg          bool   `env:"OTEL_EXPORTER_OTLP_TEST"`            // Specifies whether the OTLP exporter should be used in test mode.
 }
 
 func NewMonitoringConfig(opts ...Option) Monitoring {
@@ -54,4 +56,9 @@ func (d Monitoring) ExporterTracesProtocol() string {
 
 	// if the trace protocol is not set, use the general exporter protocol
 	return d.ExporterProtocolCfg
+}
+
+// IsTestExporter returns whether the OTLP exporter should be used in test mode.
+func (d Monitoring) IsTestExporter() bool {
+	return d.TestExporterCfg
 }

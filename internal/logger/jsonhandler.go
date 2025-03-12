@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package logger // import "github.com/FlyrInc/flyr-lib-go/internal/logger"
+package logger // import "github.com/FLYR-Open-Source/flyr-lib-go/internal/logger"
 
 import (
 	"log/slog"

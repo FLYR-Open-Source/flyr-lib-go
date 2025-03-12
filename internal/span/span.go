@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package span // import "github.com/FlyrInc/flyr-lib-go/internal/span"
+package span // import "github.com/FLYR-Open-Source/flyr-lib-go/internal/span"
 
 import (
 	otelcodes "go.opentelemetry.io/otel/codes"

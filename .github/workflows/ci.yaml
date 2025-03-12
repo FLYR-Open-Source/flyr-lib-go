@@ -126,43 +126,43 @@ jobs:
           path: |
             unit-test-results.json
             coverage.out
-  sonar-cloud:
-    name: Run SonarCloud Code Analysis
-    runs-on: ubuntu-latest
-    needs: [unit-tests, trivy]
-    if:  ${{ github.actor != 'dependabot[bot]' }} && (success() || failure())
-    steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-    - name: Download Artifacts
-      uses: actions/download-artifact@v4
-      with:
-        pattern: sonar-reports-*
-        merge-multiple: true
-        path: sonar-reports
-    - name: Get Version
-      id: version
-      run: echo "version=$(git describe --tags --abbrev=0)" >> "$GITHUB_OUTPUT"
-    - name: Get Reports
-      id: get-reports
-      run: |
-        SARIF_FILES=""
-        for file in $(find sonar-reports -name '*.sarif'); do
-          if [ -z "$SARIF_FILES" ]; then
-            SARIF_FILES="$file"
-          else
-            SARIF_FILES="$SARIF_FILES,$file"
-          fi
-        done
-        echo "sarif_files=$SARIF_FILES" >> "$GITHUB_OUTPUT"
-    - name: SonarQube Scan
-      uses: SonarSource/sonarqube-scan-action@v5.0.0
-      env:
-        SONAR_TOKEN: ${{ secrets.SONARCLOUD_TOKEN }}
-      with:
-        args: >
-          -Dsonar.go.coverage.reportPaths=sonar-reports/coverage.out
-          -Dsonar.go.tests.reportPaths=sonar-reports/unit-test-results.json
-          -Dsonar.sarifReportPaths=${{ steps.get-reports.outputs.sarif_files }}
-          -Dsonar.projectVersion=${{ steps.version.outputs.version }}
+  # sonar-cloud:
+  #   name: Run SonarCloud Code Analysis
+  #   runs-on: ubuntu-latest
+  #   needs: [unit-tests, trivy]
+  #   if:  ${{ github.actor != 'dependabot[bot]' }} && (success() || failure())
+  #   steps:
+  #   - uses: actions/checkout@v4
+  #     with:
+  #       fetch-depth: 0
+  #   - name: Download Artifacts
+  #     uses: actions/download-artifact@v4
+  #     with:
+  #       pattern: sonar-reports-*
+  #       merge-multiple: true
+  #       path: sonar-reports
+  #   - name: Get Version
+  #     id: version
+  #     run: echo "version=$(git describe --tags --abbrev=0)" >> "$GITHUB_OUTPUT"
+  #   - name: Get Reports
+  #     id: get-reports
+  #     run: |
+  #       SARIF_FILES=""
+  #       for file in $(find sonar-reports -name '*.sarif'); do
+  #         if [ -z "$SARIF_FILES" ]; then
+  #           SARIF_FILES="$file"
+  #         else
+  #           SARIF_FILES="$SARIF_FILES,$file"
+  #         fi
+  #       done
+  #       echo "sarif_files=$SARIF_FILES" >> "$GITHUB_OUTPUT"
+  #   - name: SonarQube Scan
+  #     uses: SonarSource/sonarqube-scan-action@v5.0.0
+  #     env:
+  #       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  #     with:
+  #       args: >
+  #         -Dsonar.go.coverage.reportPaths=sonar-reports/coverage.out
+  #         -Dsonar.go.tests.reportPaths=sonar-reports/unit-test-results.json
+  #         -Dsonar.sarifReportPaths=${{ steps.get-reports.outputs.sarif_files }}
+  #         -Dsonar.projectVersion=${{ steps.version.outputs.version }}

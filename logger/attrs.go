@@ -20,14 +20,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package logger // import "github.com/FlyrInc/flyr-lib-go/logger"
+package logger // import "github.com/FLYR-Open-Source/flyr-lib-go/logger"
 
 import (
 	"context"
 	"log/slog"
 
-	"github.com/FlyrInc/flyr-lib-go/internal/config"
-	internalUtils "github.com/FlyrInc/flyr-lib-go/internal/utils"
+	"github.com/FLYR-Open-Source/flyr-lib-go/internal/config"
+	internalUtils "github.com/FLYR-Open-Source/flyr-lib-go/internal/utils"
 )
 
 const (
