@@ -1,11 +1,15 @@
 name: Release Validation
 
 on:
-  pull_request_target:
+  pull_request:
+    branches:
+      - main
+      - release/*
     types:
       - opened
-      - edited
       - synchronize
+      - reopened
+      - edited
 
 permissions:
   contents: read # to fetch code (actions/checkout)
@@ -20,32 +24,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   check-release: # make sure commits are valid for a target branch
-    name: Check valid release version
-    runs-on: ubuntu-latest
+    name: Check Valid Release Version
+    uses: ./.github/workflows/semantic-release.yaml
     permissions:
-      contents: write # needed since semantic release checks this permission even in dry-run mode
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          ref: ${{ github.event.pull_request.base.ref }}
-      - name: setup node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-      - name: install semantic release
-        run: npm install -g semantic-release@24.0.0 conventional-changelog-conventionalcommits@8.0.0
-      - name: temporarily merge PR branch
-        run: |
-          git config --global user.name github-actions
-          git config --global user.email github-actions@github.com
-          git merge --no-ff origin/${{ github.event.pull_request.head.ref }} --message "${{ github.event.pull_request.title }}"
-      - name: semantic release dry run
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          unset GITHUB_EVENT_PATH
-          unset GITHUB_ACTIONS
-          unset GITHUB_EVENT_NAME
-          semantic-release --dry-run --ci false --semantic-version 24.0.0
+      contents: write
+      id-token: write
+      issues: read
+      pull-requests: read
+    with:
+      dryRun: true

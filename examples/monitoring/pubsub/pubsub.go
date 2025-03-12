@@ -26,11 +26,12 @@ import (
 	"context"
 	"os"
 
-	"github.com/FlyrInc/flyr-lib-go/logger"
-	"github.com/FlyrInc/flyr-lib-go/monitoring/rabbitmq"
-	"github.com/FlyrInc/flyr-lib-go/monitoring/tracer"
-	"go.opentelemetry.io/otel/attribute"
-	oteltrace "go.opentelemetry.io/otel/trace"
+	"cloud.google.com/go/pubsub"
+	"github.com/FLYR-Open-Source/flyr-lib-go/logger"
+	"github.com/FLYR-Open-Source/flyr-lib-go/monitoring/tracer"
+	"google.golang.org/api/option"
+
+	pubsubTrace "github.com/FLYR-Open-Source/flyr-lib-go/monitoring/pubsub"
 )
 
 const (
@@ -41,6 +42,8 @@ const (
 // You don't need this part since it's automated in Kubernetes
 func init() {
 	os.Setenv("OTEL_SERVICE_NAME", serviceName)
+	// this is a flag for exporting the traces in stdout
+	os.Setenv("OTEL_EXPORTER_OTLP_TEST", "true")
 	os.Setenv("OTEL_RESOURCE_ATTRIBUTES", "k8s.container.name={some-container},k8s.deployment.name={some-deployment},k8s.deployment.uid={some-uid},k8s.namespace.name={some-namespace},k8s.node.name={some-node},k8s.pod.name={some-pod},k8s.pod.uid={some-uid},k8s.replicaset.name={some-replicaset},k8s.replicaset.uid={some-uid},service.instance.id={some-namespace}.{some-pod}.{some-container},service.version={some-version}")
 }
 
@@ -61,24 +64,17 @@ func main() {
 		}
 	}()
 
-	publishMessage(ctx)
-	consumeMessage(ctx)
-}
+	projectID := "some-gcp-project-id"
+	config := &pubsub.ClientConfig{}                      // this also can be nil
+	options := []option.ClientOption{ /* any options */ } // options is optional, therefore they can be omitted
 
-func publishMessage(ctx context.Context) {
-	spanCtx, span := tracer.StartSpan(ctx, "publisher", oteltrace.SpanKindProducer)
-	defer span.End()
-	span.SetAttributes(attribute.String("queue", "some-queue"))
-	span.SetAttributes(attribute.String("exchange", "some-exchange"))
-	/* header */ _ = rabbitmq.InjectAMQPHeaders(spanCtx)
-	// pass the headers to the message and publish it
-	logger.Debug(spanCtx, "message published")
-}
+	client, err := pubsubTrace.NewClient(ctx, projectID, config, options...)
+	defer func() {
+		err := client.Close()
+		if err != nil {
+			// do something with the error
+		}
+	}()
 
-func consumeMessage(ctx context.Context) {
-	headers := map[string]interface{}{}
-	ctxWithHeaders := rabbitmq.ExtractAMQPHeaders(ctx, headers)
-	spanCtx, _ := tracer.StartSpan(ctxWithHeaders, "consumer", oteltrace.SpanKindConsumer)
-
-	logger.Debug(spanCtx, "message consumed")
+	// use the client
 }

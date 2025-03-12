@@ -24,14 +24,12 @@ package main
 
 import (
 	"context"
+	"net/http"
 	"os"
 
-	"cloud.google.com/go/pubsub"
-	"github.com/FlyrInc/flyr-lib-go/logger"
-	"github.com/FlyrInc/flyr-lib-go/monitoring/tracer"
-	"google.golang.org/api/option"
-
-	pubsubTrace "github.com/FlyrInc/flyr-lib-go/monitoring/pubsub"
+	"github.com/FLYR-Open-Source/flyr-lib-go/logger"
+	httpTrace "github.com/FLYR-Open-Source/flyr-lib-go/monitoring/http"
+	"github.com/FLYR-Open-Source/flyr-lib-go/monitoring/tracer"
 )
 
 const (
@@ -42,6 +40,8 @@ const (
 // You don't need this part since it's automated in Kubernetes
 func init() {
 	os.Setenv("OTEL_SERVICE_NAME", serviceName)
+	// this is a flag for exporting the traces in stdout
+	os.Setenv("OTEL_EXPORTER_OTLP_TEST", "true")
 	os.Setenv("OTEL_RESOURCE_ATTRIBUTES", "k8s.container.name={some-container},k8s.deployment.name={some-deployment},k8s.deployment.uid={some-uid},k8s.namespace.name={some-namespace},k8s.node.name={some-node},k8s.pod.name={some-pod},k8s.pod.uid={some-uid},k8s.replicaset.name={some-replicaset},k8s.replicaset.uid={some-uid},service.instance.id={some-namespace}.{some-pod}.{some-container},service.version={some-version}")
 }
 
@@ -62,15 +62,38 @@ func main() {
 		}
 	}()
 
-	projectID := "some-gcp-project-id"
-	config := &pubsub.ClientConfig{}                      // this also can be nil
-	options := []option.ClientOption{ /* any options */ } // options is optional, therefore they can be omitted
+	withNewClient()
 
-	client, err := pubsubTrace.NewClient(ctx, projectID, config, options...)
-	defer func() {
-		err := client.Close()
-		if err != nil {
-			// do something with the error
-		}
-	}()
+	withExistingClient()
+}
+
+func withNewClient() {
+	ctx := context.Background()
+	url := "https://flyr.com/"
+	client := httpTrace.NewHttpClient() // start new HTTP client with tracing
+	req, _ := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+
+	res, err := client.Do(req)
+	if err != nil {
+		logger.Error(ctx, "failed to make request", err)
+	}
+
+	defer res.Body.Close()
+}
+
+func withExistingClient() {
+	ctx := context.Background()
+	url := "https://flyr.com/"
+
+	client := http.Client{}
+	// add any setup to client
+
+	client = httpTrace.SetHttpTransport(client)
+	req, _ := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	res, err := client.Do(req)
+	if err != nil {
+		logger.Error(ctx, "failed to make request", err)
+	}
+
+	defer res.Body.Close()
 }

@@ -28,7 +28,7 @@ import (
 
 	"testing"
 
-	"github.com/FlyrInc/flyr-lib-go/internal/config"
+	"github.com/FLYR-Open-Source/flyr-lib-go/internal/config"
 	"github.com/stretchr/testify/assert"
 	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
 )

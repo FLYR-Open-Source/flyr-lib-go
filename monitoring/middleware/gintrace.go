@@ -3,7 +3,7 @@
 
 // Based on https://github.com/DataDog/dd-trace-go/blob/8fb554ff7cf694267f9077ae35e27ce4689ed8b6/contrib/gin-gonic/gin/gintrace.go
 
-package middleware // import "github.com/FlyrInc/flyr-lib-go/monitoring/middleware"
+package middleware // import "github.com/FLYR-Open-Source/flyr-lib-go/monitoring/middleware"
 
 import (
 	"fmt"
@@ -17,8 +17,8 @@ import (
 	semconv "go.opentelemetry.io/otel/semconv/v1.20.0"
 	oteltrace "go.opentelemetry.io/otel/trace"
 
-	internalConfig "github.com/FlyrInc/flyr-lib-go/internal/config"
-	"github.com/FlyrInc/flyr-lib-go/internal/utils"
+	internalConfig "github.com/FLYR-Open-Source/flyr-lib-go/internal/config"
+	"github.com/FLYR-Open-Source/flyr-lib-go/internal/utils"
 )
 
 // OtelGinMiddleware returns middleware that will trace incoming requests for the gin web framework.

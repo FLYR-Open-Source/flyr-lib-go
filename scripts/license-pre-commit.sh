@@ -18,5 +18,12 @@ if [[ -z "$FILES" ]]; then
     exit 0
 fi
 
+REPO_PATH=$(git rev-parse --show-toplevel)
+echo "Checking files in $REPO_PATH"
+if addlicense -check -l mit -f $REPO_PATH/LICENSE -c "FLYR, Inc" $(find $REPO_PATH -type f -name "*.go"); then
+    echo "License headers are present."
+    exit 0
+fi
+
 echo "License headers are missing. Please run 'make add-license' to apply."
 exit 1

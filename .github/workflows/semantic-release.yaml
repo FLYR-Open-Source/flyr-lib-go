@@ -1,0 +1,100 @@
+name: Semantic Release
+
+on:
+  workflow_call:
+    inputs:
+      dryRun:
+        description: 'Dry Run'
+        required: true
+        type: boolean
+        default: false
+      downloadArtifact:
+        description: 'Download Artifact'
+        type: string
+    outputs:
+      new_release_published:
+        description: 'Whether a new release was published'
+        value: ${{ jobs.semantic-release.outputs.new_release_published }}
+      new_release_version:
+        description: 'Version of the new release'
+        value: ${{ jobs.semantic-release.outputs.new_release_version }}
+      new_release_major_version:
+        description: 'Major version of the new release'
+        value: ${{ jobs.semantic-release.outputs.new_release_major_version }}
+      new_release_minor_version:
+        description: 'Minor version of the new release'
+        value: ${{ jobs.semantic-release.outputs.new_release_minor_version }}
+      new_release_patch_version:
+        description: 'Patch version of the new release'
+        value: ${{ jobs.semantic-release.outputs.new_release_patch_version }}
+      new_release_channel:
+        description: 'The distribution channel on which the last release was initially made available (undefined for the default distribution channel).'
+        value: ${{ jobs.semantic-release.outputs.new_release_channel }}
+      new_release_notes:
+        description: 'The release notes for the new release.'
+        value: ${{ jobs.semantic-release.outputs.new_release_notes }}
+      new_release_git_head:
+        description: 'The sha of the last commit being part of the new release.'
+        value: ${{ jobs.semantic-release.outputs.new_release_git_head }}
+      new_release_git_tag:
+        description: 'The Git tag associated with the new release.'
+        value: ${{ jobs.semantic-release.outputs.new_release_git_tag }}
+      last_release_version:
+        description: 'Version of the previous release, if there was one.'
+        value: ${{ jobs.semantic-release.outputs.last_release_version }}
+      last_release_git_head:
+        description: 'The sha of the last commit being part of the last release, if there was one.'
+        value: ${{ jobs.semantic-release.outputs.last_release_git_head }}
+      last_release_git_tag:
+        description: 'The Git tag associated with the last release, if there was one.'
+        value: ${{ jobs.semantic-release.outputs.last_release_git_tag }}
+
+jobs:
+  semantic-release:
+    name: Semantic Release
+    outputs:
+      new_release_published: ${{ steps.semantic_release.outputs.new_release_published }}
+      new_release_version: ${{ steps.semantic_release.outputs.new_release_version }}
+      new_release_major_version: ${{ steps.semantic_release.outputs.new_release_major_version }}
+      new_release_minor_version: ${{ steps.semantic_release.outputs.new_release_minor_version }}
+      new_release_patch_version: ${{ steps.semantic_release.outputs.new_release_patch_version }}
+      new_release_channel: ${{ steps.semantic_release.outputs.new_release_channel }}
+      new_release_notes: ${{ steps.semantic_release.outputs.new_release_notes }}
+      new_release_git_head: ${{ steps.semantic_release.outputs.new_release_git_head }}
+      new_release_git_tag: ${{ steps.semantic_release.outputs.new_release_git_tag }}
+      last_release_version: ${{ steps.semantic_release.outputs.last_release_version }}
+      last_release_git_head: ${{ steps.semantic_release.outputs.last_release_git_head }}
+      last_release_git_tag: ${{ steps.semantic_release.outputs.last_release_git_tag }}
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.ref || '' }}
+      - name: Temporarily merge PR branch
+        if: ${{ github.event_name == 'pull_request' }}
+        run: |
+          git config --global user.name github-actions
+          git config --global user.email github-actions@github.com
+          git merge --no-ff origin/${{ github.event.pull_request.head.ref }} --message "${{ github.event.pull_request.title }}"
+      - name: Download Release Artifact
+        uses: actions/download-artifact@v4
+        if: ${{ inputs.downloadArtifact != '' }}
+        with:
+          name: ${{ inputs.downloadArtifact }}
+          path: target/
+      - name: Semantic Release
+        uses: davidspek/semantic-release-action@main
+        id: semantic_release
+        with:
+          dry_run: ${{ github.event_name == 'pull_request' || inputs.dryRun }}
+          unset_gha_env: ${{ github.event_name == 'pull_request' }}
+          ci: ${{ github.event_name == 'pull_request' && false || '' }}
+          extra_plugins: |
+            @semantic-release/changelog
+            @semantic-release/git
+            conventional-changelog-conventionalcommits
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

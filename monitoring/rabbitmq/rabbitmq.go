@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package rabbitmq // import "github.com/FlyrInc/flyr-lib-go/monitoring/rabbitmq"
+package rabbitmq // import "github.com/FLYR-Open-Source/flyr-lib-go/monitoring/rabbitmq"
 
 import (
 	"context"
