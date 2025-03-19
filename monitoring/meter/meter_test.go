@@ -29,6 +29,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/otel/metric/noop"
 )
 
@@ -58,7 +59,7 @@ func TestStartDefaultMeter(t *testing.T) {
 		meter, err := StartDefaultMeter(ctx)
 
 		// Assertions
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		assert.NotNil(t, meter)
 		assert.Equal(t, defaultMeter, meter)
 	})
@@ -74,7 +75,7 @@ func TestStartDefaultMeter(t *testing.T) {
 		meter, err := StartDefaultMeter(ctx)
 
 		// Assertions
-		assert.Error(t, err)
+		require.Error(t, err)
 		assert.Equal(t, noop.Meter{}, meter)
 		assert.Nil(t, defaultMeter)
 	})
