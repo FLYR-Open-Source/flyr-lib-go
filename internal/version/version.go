@@ -22,20 +22,6 @@
 
 package version // import "github.com/FLYR-Open-Source/flyr-lib-go/internal/version"
 
-import "runtime/debug" // Version returns the installed version of the library.
-
 func Version() string {
-	info, ok := debug.ReadBuildInfo()
-	if !ok {
-		return "unknown" // No build info available
-	}
-
-	// Iterate through the dependencies to find this library
-	for _, dep := range info.Deps {
-		if dep.Path == "github.com/FLYR-Open-Source/flyr-lib-go" {
-			return dep.Version
-		}
-	}
-
-	return "unknown" // Library not found in dependencies
+	return "v1.0.0" // Hardcoded for now
 }
