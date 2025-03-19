@@ -66,7 +66,7 @@ var (
 func getExporter(ctx context.Context, cfg config.MonitoringConfig) (sdktrace.SpanExporter, error) {
 	// If the the test flag is enabled, return a new stdout exporter
 	if cfg.IsTestExporter() {
-		return stdouttrace.New()
+		return stdouttrace.New(stdouttrace.WithPrettyPrint())
 	}
 
 	switch cfg.ExporterTracesProtocol() {
