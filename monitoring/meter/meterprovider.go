@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package metrics
+package meter // import "github.com/FLYR-Open-Source/flyr-lib-go/monitoring/meter"
 
 import (
 	"context"
@@ -60,7 +60,7 @@ var (
 func getExporter(ctx context.Context, cfg config.MonitoringConfig) (sdkmetric.Exporter, error) {
 	// If the the test flag is enabled, return a new stdout exporter
 	if cfg.IsTestExporter() {
-		return stdoutmetric.New()
+		return stdoutmetric.New(stdoutmetric.WithPrettyPrint())
 	}
 
 	switch cfg.ExporterTracesProtocol() {
@@ -97,7 +97,6 @@ func initializeMeterProvider(ctx context.Context, cfg config.MonitoringConfig, i
 		resource.WithTelemetrySDK(),
 		resource.WithContainer(),
 		resource.WithHost(),
-		// TODO: verify if we need it
 		resource.WithAttributes(
 			attribute.String(config.EXPORTER_PROTOCOL, cfg.ExporterMetricsProtocol()),
 		),

@@ -20,23 +20,25 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package metrics
+package meter // import "github.com/FLYR-Open-Source/flyr-lib-go/monitoring/meter"
 
 import (
 	"context"
 	"time"
 
 	"github.com/FLYR-Open-Source/flyr-lib-go/internal/config"
+	"github.com/FLYR-Open-Source/flyr-lib-go/internal/version"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/metric/noop"
 )
 
-var (
-	meter metric.Meter
-)
+// defaultMeter is the default meter used by the application.
+//
+// The default meter is initialized by the meter.StartDefaultMeter(...) function.
+var defaultMeter metric.Meter
 
-// GetDefaultMeter initializes and starts the default OpenTelemetry Meter.
+// StartDefaultMeter initializes and starts the default OpenTelemetry Meter.
 //
 // This function checks if custom metrics are enabled in the provided configuration. If they are enabled,
 // it creates a new Meter by using the default MeterProvider. It also validates that the
@@ -46,27 +48,22 @@ var (
 // The function also sets the global default Meter to be used for custom metrics in the
 // application. If custom metrics are not enabled, it returns a noop Meter.
 //
-// It returns the created Meter and an error if any occurred.
+// It returns the created Meter.
 //
 // For learning more about the Otel Metrics Data Model, please reference to https://opentelemetry.io/docs/specs/otel/metrics/data-model
 func StartDefaultMeter(ctx context.Context) (metric.Meter, error) {
-	if meter != nil {
-		return meter, nil
-	}
-
 	cfg := config.NewMonitoringConfig()
-
-	if cfg.Service() == "" {
-		meter = noop.Meter{}
-	}
 
 	err := initializeMeterProvider(ctx, cfg, 60*time.Second) // send metrics every 60 seconds
 	if err != nil {
-		meter = noop.Meter{}
-	} else {
-		mt := otel.GetMeterProvider()
-		meter = mt.Meter(cfg.Service())
+		return noop.Meter{}, err
 	}
 
-	return meter, nil
+	mt := otel.GetMeterProvider()
+	defaultMeter = mt.Meter(
+		cfg.Service(),
+		metric.WithInstrumentationVersion(version.Version()),
+	)
+
+	return defaultMeter, nil
 }

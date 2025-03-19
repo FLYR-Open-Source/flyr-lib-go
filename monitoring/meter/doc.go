@@ -20,42 +20,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package metrics
-
-type Unit string
-
-const (
-	// Time
-	Days         Unit = "d"
-	Hours        Unit = "h"
-	Minutes      Unit = "min"
-	Seconds      Unit = "s"
-	Milliseconds Unit = "ms"
-	Microseconds Unit = "us"
-	Nanoseconds  Unit = "ns"
-
-	// Bytes
-	Bytes     Unit = "By"
-	Kibibytes Unit = "KiBy"
-	Mebibytes Unit = "MiBy"
-	Gibibytes Unit = "GiBy"
-	Tebibytes Unit = "TiBy"
-	Kilobytes Unit = "KBy"
-	Megabytes Unit = "MBy"
-	Gigabytes Unit = "GBy"
-	Terabytes Unit = "TBy"
-
-	// SI Units
-	Meters  Unit = "m"
-	Volts   Unit = "V"
-	Amperes Unit = "A"
-	Joules  Unit = "J"
-	Watts   Unit = "W"
-	Grams   Unit = "g"
-
-	// Misc
-	Celsius Unit = "Cel"
-	Hertz   Unit = "Hz"
-	Ratio   Unit = "1"
-	Percent Unit = "%"
-)
+// Package meter provides a simple way to create a new Otel Meter provider.
+// The package also provides an easy way to publish metrics to the Otel collector.
+package meter

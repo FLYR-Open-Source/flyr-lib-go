@@ -20,6 +20,5 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// Package metrics provides a simple way to create a new Otel Meter provider.
-// The package also provides an easy way to publish metrics to the Otel collector.
-package metrics
+// Package units provides a set of predefined units that can be used in the custom metrics.
+package units
