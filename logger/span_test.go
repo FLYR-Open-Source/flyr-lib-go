@@ -107,7 +107,7 @@ func TestValueToJSONString(t *testing.T) {
 	}
 }
 
-func TestconvertToOtelNestedTags(t *testing.T) {
+func TestConvertToOtelNestedTags(t *testing.T) {
 	type myStruct struct {
 		Name string
 		Age  int
