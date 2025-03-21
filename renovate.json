@@ -23,8 +23,8 @@
         "go"
       ],
       "groupSlug": "otel",
-      "matchPackagePatterns": [
-        "go.opentelemetry.io/.*"
+      "matchPackageNames": [
+        "go.opentelemetry.io/**"
       ],
       "semanticCommitScope": "{{otel-deps}}",
       "semanticCommitType": "{{#if isPatch}}fix{{else}}feat{{/if}}"
