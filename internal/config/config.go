@@ -22,7 +22,7 @@
 
 package config // import "github.com/FLYR-Open-Source/flyr-lib-go/internal/config"
 
-import "github.com/caarlos0/env/v10"
+import "github.com/caarlos0/env/v11"
 
 // withEnvironment allows for passing in a map of environment variables
 // to be used instead of the actual environment. This is mostly for testing.
