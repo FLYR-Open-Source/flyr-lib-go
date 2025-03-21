@@ -4,7 +4,6 @@ go 1.23.7
 
 require (
 	cloud.google.com/go/pubsub v1.48.0
-	github.com/caarlos0/env/v10 v10.0.0
 	github.com/caarlos0/env/v11 v11.3.1
 	github.com/gin-gonic/gin v1.10.0
 	github.com/go-chi/chi/v5 v5.2.1
