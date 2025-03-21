@@ -66,5 +66,6 @@
   "labels": [
     "dependencies"
   ],
+  "ignorePresets": [":ignoreModulesAndTests"],
   "separateMinorPatch": true
 }
