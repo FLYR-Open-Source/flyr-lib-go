@@ -1,6 +1,6 @@
 module github.com/FLYR-Open-Source/flyr-lib-go
 
-go 1.23.0
+go 1.23.7
 
 require (
 	cloud.google.com/go/pubsub v1.48.0
