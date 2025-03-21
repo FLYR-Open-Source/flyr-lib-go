@@ -26,7 +26,7 @@
       "matchPackageNames": [
         "go.opentelemetry.io/otel/**"
       ],
-      "semanticCommitScope": "{{otel-deps}}",
+      "semanticCommitScope": "otel-deps",
       "semanticCommitType": "{{#if isPatch}}fix{{else}}feat{{/if}}"
     },
     {
@@ -38,7 +38,7 @@
       "matchPackageNames": [
         "go.opentelemetry.io/contrib/**"
       ],
-      "semanticCommitScope": "{{otel-deps}}",
+      "semanticCommitScope": "otel-deps",
       "semanticCommitType": "{{#if isPatch}}fix{{else}}feat{{/if}}"
     }
   ],
