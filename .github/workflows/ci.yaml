@@ -22,146 +22,183 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: "Setup Golang"
-        uses: actions/setup-go@v5
-        with:
-          check-latest: false
-          cache: false
-          go-version-file: './go.mod'
-          cache-dependency-path: './go.sum'
-      - name: golangci-lint
-        uses: golangci/golangci-lint-action@v6
-        with:
-          version: v1.60.1
-          args: "--timeout 5m --enable gofmt,testifylint,misspell -v"
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: Setup Go
+      uses: actions/setup-go@v5
+      with:
+        go-version-file: go.mod
+        cache-dependency-path: go.sum
+    - name: Go Mod Download
+      run: go mod download
+    - name: golangci-lint
+      uses: golangci/golangci-lint-action@v6
+      with:
+        version: v1.64.4
+        args: "--timeout 5m --enable gofmt,testifylint,misspell -v"
+
   check-license:
     name: Check License
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: "Setup Golang"
-        uses: actions/setup-go@v5
-        with:
-          check-latest: false
-          cache: false
-          go-version-file: './go.mod'
-          cache-dependency-path: './go.sum'
-      - name: Install addlicense
-        run: go install github.com/google/addlicense@latest
-      - name: Check license headers
-        run: |
-          addlicense -check -l mit -f ./LICENSE -c "FLYR, Inc" $(find . -type f -name "*.go")
-  gosec:
-    name: Security Scan
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: Setup Go
+      uses: actions/setup-go@v5
+      with:
+        go-version-file: go.mod
+        cache-dependency-path: go.sum
+    - name: Go Mod Download
+      run: go mod download
+    - name: Install addlicense
+      run: go install github.com/google/addlicense@latest
+    - name: Check license headers
+      run: |
+        addlicense -check -l mit -f ./LICENSE -c "FLYR, Inc" $(find . -type f -name "*.go")
+
+  go-sec:
+    name: GoSec
     runs-on: ubuntu-latest
-    env:
-      GO111MODULE: on
+    permissions:
+      security-events: write
     steps:
-      - name: Checkout Source
-        uses: actions/checkout@v4
-      - name: Run Gosec Security Scanner
-        uses: securego/gosec@master
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: Setup Go
+      uses: actions/setup-go@v5
+      with:
+        go-version-file: go.mod
+        cache-dependency-path: go.sum
+    - name: Go Mod Download
+      run: go mod download
+    - name: Run Gosec Security Scanner
+      uses: securego/gosec@master
+      with:
+        args: '-no-fail -fmt sarif -out gosec-results.sarif ./...'
+    - name: Upload GoSec scan to GitHub Security
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: trivy-results-fs.sarif
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      id: upload-artifact
+      with:
+        name: sonar-reports-gosec
+        path: gosec-results.sarif
+
   trivy:
-      name: Trivy Scan
-      runs-on: ubuntu-latest
-      if: ${{ github.event.action != 'labeled' }}
-      steps:
-      - uses: actions/checkout@v4
-      - name: Run Trivy vulnerability scanner filesystem
-        uses: aquasecurity/trivy-action@master
-        with:
-          scan-type: "fs"
-          scan-ref: '.'
-          hide-progress: false
-          format: "sarif"
-          output: "trivy-results-fs.sarif"
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
-        id: upload-artifact
-        with:
-          name: sonar-reports-trivy-fs
-          path: trivy-results-fs.sarif
+    name: Trivy Scan
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+    steps:
+    - uses: actions/checkout@v4
+    - name: Run Trivy vulnerability scanner filesystem
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: fs
+        scan-ref: '.'
+        hide-progress: false
+        format: "sarif"
+        output: "trivy-results-fs.sarif"
+    - name: Upload Trivy scan to GitHub Security
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: trivy-results-fs.sarif
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      id: upload-artifact
+      with:
+        name: sonar-reports-trivy-fs
+        path: trivy-results-fs.sarif
+
   unit-tests:
     name: Unit Tests
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: "Setup Golang"
-        uses: actions/setup-go@v5
-        with:
-          check-latest: false
-          cache: false
-          go-version-file: './go.mod'
-          cache-dependency-path: './go.sum'
-      - name: Cache Local Bin
-        id: cache-bin-restore
-        uses: actions/cache/restore@v4
-        with:
-          path: bin
-          key: ${{ runner.os }}-bin-${{ hashFiles('Makefile') }}
-      - name: Run Tests
-        continue-on-error: true
-        run: |
-          make test-coverage
-      - uses: robherley/go-test-action@v0
-        with:
-          fromJSONFile: unit-test-results.json
-      - name: Save Local Bin
-        id: cache-bin-save
-        uses: actions/cache/save@v4
-        with:
-          path: bin
-          key: ${{ steps.cache-bin-restore.outputs.cache-primary-key }}
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
-        if: always()
-        id: upload-test-results
-        with:
-          name: sonar-reports-test-results
-          path: |
-            unit-test-results.json
-            coverage.out
-  # sonar-cloud:
-  #   name: Run SonarCloud Code Analysis
-  #   runs-on: ubuntu-latest
-  #   needs: [unit-tests, trivy]
-  #   if:  ${{ github.actor != 'dependabot[bot]' }} && (success() || failure())
-  #   steps:
-  #   - uses: actions/checkout@v4
-  #     with:
-  #       fetch-depth: 0
-  #   - name: Download Artifacts
-  #     uses: actions/download-artifact@v4
-  #     with:
-  #       pattern: sonar-reports-*
-  #       merge-multiple: true
-  #       path: sonar-reports
-  #   - name: Get Version
-  #     id: version
-  #     run: echo "version=$(git describe --tags --abbrev=0)" >> "$GITHUB_OUTPUT"
-  #   - name: Get Reports
-  #     id: get-reports
-  #     run: |
-  #       SARIF_FILES=""
-  #       for file in $(find sonar-reports -name '*.sarif'); do
-  #         if [ -z "$SARIF_FILES" ]; then
-  #           SARIF_FILES="$file"
-  #         else
-  #           SARIF_FILES="$SARIF_FILES,$file"
-  #         fi
-  #       done
-  #       echo "sarif_files=$SARIF_FILES" >> "$GITHUB_OUTPUT"
-  #   - name: SonarQube Scan
-  #     uses: SonarSource/sonarqube-scan-action@v5.0.0
-  #     env:
-  #       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-  #     with:
-  #       args: >
-  #         -Dsonar.go.coverage.reportPaths=sonar-reports/coverage.out
-  #         -Dsonar.go.tests.reportPaths=sonar-reports/unit-test-results.json
-  #         -Dsonar.sarifReportPaths=${{ steps.get-reports.outputs.sarif_files }}
-  #         -Dsonar.projectVersion=${{ steps.version.outputs.version }}
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: Setup Go
+      uses: actions/setup-go@v5
+      with:
+        go-version-file: go.mod
+        cache-dependency-path: go.sum
+    - name: Go Mod Download
+      run: go mod download
+    - name: Run Unit Tests
+      continue-on-error: true
+      env:
+        SPANNER_EMULATOR_HOST: localhost:9010
+        PUBSUB_EMULATOR_HOST: localhost:8681
+      run: |
+        go run gotest.tools/gotestsum@latest --junitfile report.xml --jsonfile test-results.json -- -coverprofile coverage.cover ./...
+    - name: Convert Unit Tests
+      continue-on-error: true
+      run: |
+        go run github.com/ctrf-io/go-ctrf-json-reporter/cmd/go-ctrf-json-reporter@latest -output ctrf-report.json < test-results.json
+    - name: Upload Test Results Artifact
+      uses: actions/upload-artifact@v4
+      id: upload-test-results
+      with:
+        name: sonar-reports-test-results
+        path: |
+          test-results.json
+          report.xml
+    - name: Upload Coverage Artifact
+      uses: actions/upload-artifact@v4
+      id: upload-coverage
+      with:
+        name: sonar-reports-coverage
+        path: coverage.cover
+    - name: Publish Test Report
+      uses: ctrf-io/github-test-reporter@v1
+      with:
+        report-path: ctrf-report.json
+        group-by: suite
+        summary-report: true
+        failed-report: true
+        flaky-report: true
+        skipped-report: true
+        suite-folded-report: true
+        exit-on-fail: true
+
+  sonar-cloud:
+    name: Run SonarCloud Code Analysis
+    runs-on: ubuntu-latest
+    needs: [unit-tests, trivy, go-sec]
+    if:  ${{ github.actor != 'dependabot[bot]' }} && (success() || failure())
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: Download Artifacts
+      uses: actions/download-artifact@v4
+      with:
+        pattern: sonar-reports-*
+        merge-multiple: true
+        path: sonar-reports
+    - name: Get Version
+      id: version
+      run: echo "version=$(git describe --tags --abbrev=0)" >> "$GITHUB_OUTPUT"
+    - name: Get Reports
+      id: get-reports
+      run: |
+        SARIF_FILES=""
+        for file in $(find sonar-reports -name '*.sarif'); do
+          if [ -z "$SARIF_FILES" ]; then
+            SARIF_FILES="$file"
+          else
+            SARIF_FILES="$SARIF_FILES,$file"
+          fi
+        done
+        echo "sarif_files=$SARIF_FILES" >> "$GITHUB_OUTPUT"
+    - name: SonarQube Scan
+      uses: SonarSource/sonarqube-scan-action@v5.0.0
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      with:
+        args: >
+          -Dsonar.go.coverage.reportPaths=sonar-reports/coverage.out
+          -Dsonar.go.tests.reportPaths=sonar-reports/unit-test-results.json
+          -Dsonar.sarifReportPaths=${{ steps.get-reports.outputs.sarif_files }}
+          -Dsonar.projectVersion=${{ steps.version.outputs.version }}
