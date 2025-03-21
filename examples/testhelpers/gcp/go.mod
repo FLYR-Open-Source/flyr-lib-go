@@ -1,6 +1,6 @@
 module github.com/FLYR-Open-Source/flyr-lib-go/examples/testhelpers/gcp
 
-go 1.23.4
+go 1.23.7
 
 require (
 	cloud.google.com/go/pubsub v1.48.0
