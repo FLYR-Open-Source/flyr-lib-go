@@ -23,16 +23,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
     - name: Setup Go
-      uses: actions/setup-go@v5
+      uses: actions/setup-go@0aaccfd150d50ccaeb58ebd88d36e91967a5f35b # v5
       with:
         go-version-file: go.mod
         cache-dependency-path: go.sum
     - name: Go Mod Download
       run: go mod download
     - name: golangci-lint
-      uses: golangci/golangci-lint-action@v6
+      uses: golangci/golangci-lint-action@55c2c1448f86e01eaae002a5a3a9624417608d84 # v6
       with:
         version: v1.64.4
         args: "--timeout 5m --enable gofmt,testifylint,misspell -v"
@@ -42,9 +42,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
     - name: Setup Go
-      uses: actions/setup-go@v5
+      uses: actions/setup-go@0aaccfd150d50ccaeb58ebd88d36e91967a5f35b # v5
       with:
         go-version-file: go.mod
         cache-dependency-path: go.sum
@@ -63,9 +63,9 @@ jobs:
       security-events: write
     steps:
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
     - name: Setup Go
-      uses: actions/setup-go@v5
+      uses: actions/setup-go@0aaccfd150d50ccaeb58ebd88d36e91967a5f35b # v5
       with:
         go-version-file: go.mod
         cache-dependency-path: go.sum
@@ -76,11 +76,11 @@ jobs:
       with:
         args: '-no-fail -fmt sarif -out gosec-results.sarif ./...'
     - name: Upload GoSec scan to GitHub Security
-      uses: github/codeql-action/upload-sarif@v3
+      uses: github/codeql-action/upload-sarif@5f8171a638ada777af81d42b55959a643bb29017 # v3
       with:
         sarif_file: gosec-results.sarif
     - name: Upload Artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
       id: upload-artifact
       with:
         name: sonar-reports-gosec
@@ -92,7 +92,7 @@ jobs:
     permissions:
       security-events: write
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
     - name: Run Trivy vulnerability scanner filesystem
       uses: aquasecurity/trivy-action@master
       with:
@@ -102,11 +102,11 @@ jobs:
         format: "sarif"
         output: "trivy-results-fs.sarif"
     - name: Upload Trivy scan to GitHub Security
-      uses: github/codeql-action/upload-sarif@v3
+      uses: github/codeql-action/upload-sarif@5f8171a638ada777af81d42b55959a643bb29017 # v3
       with:
         sarif_file: trivy-results-fs.sarif
     - name: Upload Artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
       id: upload-artifact
       with:
         name: sonar-reports-trivy-fs
@@ -117,9 +117,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
     - name: Setup Go
-      uses: actions/setup-go@v5
+      uses: actions/setup-go@0aaccfd150d50ccaeb58ebd88d36e91967a5f35b # v5
       with:
         go-version-file: go.mod
         cache-dependency-path: go.sum
@@ -137,7 +137,7 @@ jobs:
       run: |
         go run github.com/ctrf-io/go-ctrf-json-reporter/cmd/go-ctrf-json-reporter@latest -output ctrf-report.json < test-results.json
     - name: Upload Test Results Artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
       id: upload-test-results
       with:
         name: sonar-reports-test-results
@@ -145,13 +145,13 @@ jobs:
           test-results.json
           report.xml
     - name: Upload Coverage Artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
       id: upload-coverage
       with:
         name: sonar-reports-coverage
         path: coverage.out
     - name: Publish Test Report
-      uses: ctrf-io/github-test-reporter@v1
+      uses: ctrf-io/github-test-reporter@d1e394283c0ca33d34c9b6d8983aaef6945b52ec # v1
       with:
         report-path: ctrf-report.json
         group-by: suite
@@ -168,11 +168,11 @@ jobs:
     needs: [unit-tests, trivy, go-sec]
     if:  ${{ github.actor != 'dependabot[bot]' }} && (success() || failure())
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
       with:
         fetch-depth: 0
     - name: Download Artifacts
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4
       with:
         pattern: sonar-reports-*
         merge-multiple: true
@@ -193,7 +193,7 @@ jobs:
         done
         echo "sarif_files=$SARIF_FILES" >> "$GITHUB_OUTPUT"
     - name: SonarQube Scan
-      uses: SonarSource/sonarqube-scan-action@v5.0.0
+      uses: SonarSource/sonarqube-scan-action@0303d6b62e310685c0e34d0b9cde218036885c4d # v5.0.0
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       with:
