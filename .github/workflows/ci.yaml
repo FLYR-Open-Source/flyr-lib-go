@@ -131,7 +131,7 @@ jobs:
         SPANNER_EMULATOR_HOST: localhost:9010
         PUBSUB_EMULATOR_HOST: localhost:8681
       run: |
-        go run gotest.tools/gotestsum@latest --junitfile report.xml --jsonfile test-results.json -- -coverprofile coverage.cover ./...
+        go run gotest.tools/gotestsum@latest --junitfile report.xml --jsonfile test-results.json -- -coverprofile coverage.out ./...
     - name: Convert Unit Tests
       continue-on-error: true
       run: |
@@ -149,7 +149,7 @@ jobs:
       id: upload-coverage
       with:
         name: sonar-reports-coverage
-        path: coverage.cover
+        path: coverage.out
     - name: Publish Test Report
       uses: ctrf-io/github-test-reporter@v1
       with:
