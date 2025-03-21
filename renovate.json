@@ -16,6 +16,30 @@
         "major"
       ],
       "enabled": true
+    },
+    {
+      "groupName": "otel",
+      "matchDatasources": [
+        "go"
+      ],
+      "groupSlug": "otel",
+      "matchPackageNames": [
+        "go.opentelemetry.io/otel/**"
+      ],
+      "semanticCommitScope": "{{otel-deps}}",
+      "semanticCommitType": "{{#if isPatch}}fix{{else}}feat{{/if}}"
+    },
+    {
+      "groupName": "otel-contrib",
+      "matchDatasources": [
+        "go"
+      ],
+      "groupSlug": "otel-contrib",
+      "matchPackageNames": [
+        "go.opentelemetry.io/contrib/**"
+      ],
+      "semanticCommitScope": "{{otel-deps}}",
+      "semanticCommitType": "{{#if isPatch}}fix{{else}}feat{{/if}}"
     }
   ],
   "labels": [
