@@ -5,7 +5,8 @@
     ":dependencyDashboard",
     ":prHourlyLimit4",
     ":semanticCommits",
-    ":prConcurrentLimit10"
+    ":prConcurrentLimit10",
+    "helpers:pinGitHubActionDigests"
   ],
   "packageRules": [
     {
@@ -16,6 +17,18 @@
         "major"
       ],
       "enabled": true
+    },
+    {
+      "matchManagers": ["gomod"],
+      "matchDepNames": ["go"],
+      "matchDepTypes": ["golang"],
+      "rangeStrategy": "bump"
+    },
+    {
+      "matchManagers": ["gomod"],
+      "postUpdateOptions": [
+        "gomodTidy"
+      ]
     },
     {
       "groupName": "otel",
