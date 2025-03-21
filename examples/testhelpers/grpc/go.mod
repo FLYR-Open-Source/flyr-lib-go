@@ -6,7 +6,7 @@ replace github.com/FLYR-Open-Source/flyr-lib-go => ../../..
 
 require (
 	cloud.google.com/go/logging v1.13.0
-	github.com/FLYR-Open-Source/flyr-lib-go v0.0.0-00010101000000-000000000000
+	github.com/FLYR-Open-Source/flyr-lib-go v1.1.1
 	google.golang.org/api v0.227.0
 	google.golang.org/genproto v0.0.0-20250311190419-81fb87f6b8bf
 	google.golang.org/grpc v1.71.0
