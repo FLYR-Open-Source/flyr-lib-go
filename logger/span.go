@@ -61,14 +61,14 @@ func injectAttrsToSpan(ctx context.Context, attr slog.Attr) {
 	}
 
 	attributesResult := make(map[string]string)
-	convertToDatadogTags(attr.Key, value, attributesResult)
+	convertToOtelNestedTags(attr.Key, value, attributesResult)
 	for k, v := range attributesResult {
 		span.SetAttributes(attribute.String(k, v))
 	}
 }
 
-// convertToDatadogTags converts a JSON string to a map of key-value pairs.
-func convertToDatadogTags(prefix string, jsonString string, result map[string]string) {
+// convertToOtelNestedTags converts a JSON string to a map of key-value pairs.
+func convertToOtelNestedTags(prefix string, jsonString string, result map[string]string) {
 	var data map[string]interface{}
 	if err := json.Unmarshal([]byte(jsonString), &data); err != nil {
 		return // if it's null just ignore it and swallow the error

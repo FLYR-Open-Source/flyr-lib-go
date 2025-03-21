@@ -66,7 +66,7 @@ var (
 func getExporter(ctx context.Context, cfg config.MonitoringConfig) (sdktrace.SpanExporter, error) {
 	// If the the test flag is enabled, return a new stdout exporter
 	if cfg.IsTestExporter() {
-		return stdouttrace.New()
+		return stdouttrace.New(stdouttrace.WithPrettyPrint())
 	}
 
 	switch cfg.ExporterTracesProtocol() {
@@ -85,13 +85,12 @@ func getExporter(ctx context.Context, cfg config.MonitoringConfig) (sdktrace.Spa
 //
 // This function initializes a TracerProvider with the specified configuration,
 // including a resource that describes the service, version, environment, and tenant.
-// It also sets up the exporter for exporting trace data. If the defaultProvider flag
 // This TracerProvider is also set as the global tracer provider for OpenTelemetry.
 //
 // Furthermore, it configures a composite text map propagator for trace context and baggage
 // propagation, which is essential for distributed tracing.
 //
-// It returns the initialized TracerProvider and an error if any occurred.
+// It returns an error if any occurred.
 func initializeTracerProvider(ctx context.Context, cfg config.MonitoringConfig) error {
 	if cfg.Service() == "" {
 		otel.SetTracerProvider(noop.NewTracerProvider())

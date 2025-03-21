@@ -33,7 +33,6 @@ import (
 )
 
 const (
-	// You can pass the `OBSERVABILITY_SERVICE` environment variable to set the service name
 	serviceName = "some-service"
 )
 

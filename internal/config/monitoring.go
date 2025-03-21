@@ -25,14 +25,16 @@ package config // import "github.com/FLYR-Open-Source/flyr-lib-go/internal/confi
 type MonitoringConfig interface {
 	Service() string
 	ExporterTracesProtocol() string
+	ExporterMetricsProtocol() string
 	IsTestExporter() bool
 }
 
 type Monitoring struct {
-	ServiceCfg               string `env:"OTEL_SERVICE_NAME"`
-	ExporterProtocolCfg      string `env:"OTEL_EXPORTER_OTLP_PROTOCOL"`        // Specifies the OTLP transport protocol to be used for all telemetry data.
-	ExporterTraceProtocolCfg string `env:"OTEL_EXPORTER_OTLP_TRACES_PROTOCOL"` // Specifies the OTLP transport protocol to be used for trace data.
-	TestExporterCfg          bool   `env:"OTEL_EXPORTER_OTLP_TEST"`            // Specifies whether the OTLP exporter should be used in test mode.
+	ServiceCfg                 string `env:"OTEL_SERVICE_NAME"`
+	ExporterProtocolCfg        string `env:"OTEL_EXPORTER_OTLP_PROTOCOL"`         // Specifies the OTLP transport protocol to be used for all telemetry data.
+	ExporterTraceProtocolCfg   string `env:"OTEL_EXPORTER_OTLP_TRACES_PROTOCOL"`  // Specifies the OTLP transport protocol to be used for trace data.
+	ExporterMetricsProtocolCfg string `env:"OTEL_EXPORTER_OTLP_METRICS_PROTOCOL"` // Specifies the OTLP transport protocol to be used for metric data.
+	TestExporterCfg            bool   `env:"OTEL_EXPORTER_OTLP_TEST"`             // Specifies whether the OTLP exporter should be used in test mode.
 }
 
 func NewMonitoringConfig(opts ...Option) Monitoring {
@@ -55,6 +57,16 @@ func (d Monitoring) ExporterTracesProtocol() string {
 	}
 
 	// if the trace protocol is not set, use the general exporter protocol
+	return d.ExporterProtocolCfg
+}
+
+// ExporterMetricsProtocol returns the protocol used by the OTLP Metrics exporter.
+func (d Monitoring) ExporterMetricsProtocol() string {
+	if d.ExporterMetricsProtocolCfg != "" {
+		return d.ExporterMetricsProtocolCfg
+	}
+
+	// if the metrics protocol is not set, use the general exporter protocol
 	return d.ExporterProtocolCfg
 }
 

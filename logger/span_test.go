@@ -107,7 +107,7 @@ func TestValueToJSONString(t *testing.T) {
 	}
 }
 
-func TestConvertToDatadogTags(t *testing.T) {
+func TestConvertToOtelNestedTags(t *testing.T) {
 	type myStruct struct {
 		Name string
 		Age  int
@@ -126,7 +126,7 @@ func TestConvertToDatadogTags(t *testing.T) {
 	require.NoError(t, err)
 
 	attributesResult := make(map[string]string)
-	convertToDatadogTags(group.Key, value, attributesResult)
+	convertToOtelNestedTags(group.Key, value, attributesResult)
 
 	v, ok := attributesResult["my_items.response_body.Name"]
 	assert.True(t, ok)
