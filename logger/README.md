@@ -1,6 +1,6 @@
 # Logger
 
-The Logger package provides a custom JSON logger with built-in observability features. It extends [log/slog](https://pkg.go.dev/log/slog), a high-performance structured, and leveled logging that is build-in to Go standard library.
+The Logger package provides a custom JSON logger with built-in observability features. It extends [log/slog](https://pkg.go.dev/log/slog), a high-performance structured, that is part of the Go standard library.
 
 The Logger follows the [Open Telemetry Semantic Conventions](https://opentelemetry.io/docs/concepts/semantic-conventions/), to ensure compatibility with observability standards.
 

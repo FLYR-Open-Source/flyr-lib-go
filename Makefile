@@ -5,11 +5,6 @@ TEST_FILES=$(shell go list ./... | grep -v ./examples | grep -v ./pkg)
 tidy:
 	go mod tidy
 
-.PHONY: docs
-docs:
-	$(GOBIN)/godoc -http=:6060
-	# Visit: http://localhost:6060/pkg/github.com/FLYR-Open-Source/flyr-lib-go/
-
 .PHONY: lint
 lint:
 	golangci-lint run  --timeout 5m --enable gofmt,testifylint,misspell -v

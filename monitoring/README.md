@@ -4,9 +4,10 @@ The monitoring package is built on [OpenTelemetry](https://opentelemetry.io/) an
 
 1. [Traces](#traces)
     - [Use of the Tracer](#use-of-the-tracer)
+    - [Distributed Tracing](#distributed-tracing)
 2. [Spans](#spans)
     - [Automatic Correlation](#automatic-correlation)
-3. [Distributed Tracing](#distributed-tracing)
+3. [Trace Propagation](#trace-proagation)
     - [HTTP Tracing](#http-tracing)
     - [PubSub Tracing](#pubsub-tracing)
     - [RabbitMQ Tracing](#rabbitmq-tracing)
@@ -22,6 +23,10 @@ The monitoring package is built on [OpenTelemetry](https://opentelemetry.io/) an
 The path of a request through your application.
 
 **Traces** give us the big picture of what happens when a request is made to an application. Whether your application is a monolith with a single database or a sophisticated mesh of services, traces are essential to understanding the full “path” a request takes in your application.
+
+### Distributed Tracing
+
+**Distributed Tracing** provides visibility into the flow of requests as they traverse through various services in a distributed system. This capability is essential for understanding the interactions between microservices, identifying performance bottlenecks, and diagnosing issues. Each trace captures the entire lifecycle of a request, recording its journey across different services and components. By analyzing traces, you can visualize how requests propagate through your system and identify areas for optimization. This library supports distributed tracing by leveraging OpenTelemetry, ensuring consistent trace propagation and context management across different services and frameworks.
 
 ### Use of the Tracer
 
@@ -49,7 +54,7 @@ Spans follow the [Open Telemetry Semantic Conventions](https://opentelemetry.io/
 
 The naming conversions can be found in [internal/config/commontags.go](../internal/config/commontags.go).
 
-Creating a Span it requires a Tracer. The library provides a simple way to create Spans. Furthermore, exposing the Span interface you can easily add Attributes, Events, Links, Status and Record Errors in your Spans.
+Creating a Span requires a Tracer. The library provides a simple way to create Spans. Furthermore, the exposed Span interface allows you to easily add a Status, Attributes, Events, Links to a Span and Record Errors in a Span.
 
 On top of the Span interface from Otel, the library also exposes two more methods on the Span, `EndWithError` and `EndSuccessfully`.
 
@@ -67,7 +72,7 @@ When you create a new Span, it returns back a new `context.Context` value. This 
 
 When logging inside a block of code that is wrapped in a Span, it is recommended to pass to the Logger the new context that includes the Span information. That won't only inluce the Trace and Span IDs into the log, but also will automatically include into the Spans the attributes that are being passed to the Logger.
 
-That ensures useful information for debugging will be present at the same time in both the logs and the spans.
+That ensures useful information for debugging will be present in both the logs and the spans.
 
 > [!IMPORTANT]
 > Debug logs do not contain the Trace and Span ID and also do not attach any given metadata to the Span. That is useful because including the debug logs to the spans can flood them with unnecessary information, making them harder to interpret.
@@ -75,11 +80,9 @@ That ensures useful information for debugging will be present at the same time i
 > [!WARNING]
 > When you add an error log, the span will be flaged as errored and will also include the error into the Span Events (as it must be based on Otel).
 
-## Distributed Tracing
+## Trace Propagation
 
-**Distributed Tracing** provides visibility into the flow of requests as they traverse through various services in a distributed system. This capability is essential for understanding the interactions between microservices, identifying performance bottlenecks, and diagnosing issues. Each trace captures the entire lifecycle of a request, recording its journey across different services and components. By analyzing traces, you can visualize how requests propagate through your system and identify areas for optimization. This library supports distributed tracing by leveraging OpenTelemetry, ensuring consistent trace propagation and context management across different services and frameworks.
-
-The below sections provide examples to enable Distributed Tracing for various different communication protocols.
+For tracing to be useful, it is essential that a trace is propagated between the different components and services of a system. The following section describe how to propagate a trace using various communication protocols.
 
 ### HTTP Tracing
 
@@ -130,8 +133,7 @@ Also, you can find examples of the Metrics in the [examples](#examples).
 
 ### Use of the Metrics
 
-The library let's you initialise a Meter. This initialised Meter will be used internally from the library to help you send custom metrics. This library provides wrappers
-for all the available Metric Types. This is done because we want to "force" the developers to always include description and Unit on the custom metrics, so they are self explanatory.
+The library let's you initialise a Meter. This initialised Meter will be used internally by the library to help you send custom metrics. This library provides wrappers for all the available Metric Types. This is done because we want to "force" the developers to always include description and Unit on the custom metrics, so they are self explanatory.
 
 ## Environment Variables
 
