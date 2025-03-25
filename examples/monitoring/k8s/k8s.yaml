@@ -1,0 +1,53 @@
+apiVersion: opentelemetry.io/v1alpha1
+kind: Instrumentation
+metadata:
+  name: demo-instrumentation
+spec:
+  defaults:
+    useLabelsForResourceAttributes: true
+  resource:
+    addK8sUIDAttributes: true
+  exporter:
+    endpoint: http://demo-collector:4318 # this is the address of the collector
+  env:
+      ## This value is optional. If not set, the default value is "cumulative".
+      ## This environment variable is not available for all the programming languages: https://github.com/open-telemetry/opentelemetry-specification/blob/main/spec-compliance-matrix.md#environment-variables
+      ## More here: https://opentelemetry.io/docs/specs/otel/metrics/sdk_exporters/otlp/#general
+    - name: OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE
+      value: "delta"
+  propagators:
+  - tracecontext
+  - baggage
+  - b3
+  sampler:
+    type: parentbased_traceidratio
+    argument: "1"
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-deployment
+  labels:
+    app.kubernetes.io/version: v1.0.0
+    app.kubernetes.io/name: demo
+    app.kubernetes.io/component: otel-setup-demo
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: demo
+      app.kubernetes.io/component: otel-setup-demo
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/version: v1.0.0
+        app.kubernetes.io/name: demo
+        app.kubernetes.io/component: otel-setup-demo
+      annotations:
+        instrumentation.opentelemetry.io/inject-sdk: demo-instrumentation # this is the name of the instrumentation above
+        resource.opentelemetry.io/deployment.environment: dev # This value must differ between environments
+    spec:
+      containers:
+      - name: main
+        image: my-image:latest
