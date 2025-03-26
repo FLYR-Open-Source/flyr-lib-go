@@ -28,6 +28,25 @@
         }
       }
     ],
+    [
+      "semantic-release-slack-bot",
+      {
+        "notifyOnSuccess": false,
+        "notifyOnFail": false,
+        "branchesConfig": [
+          {
+            "pattern": "release/+([0-9])?(.{+([0-9]),x}).x",
+            "notifyOnFail": true,
+            "notifyOnSuccess": false
+          },
+          {
+            "pattern": "main",
+            "notifyOnSuccess": true,
+            "notifyOnFail": false
+          }
+        ]
+      }
+    ],
     "@semantic-release/github"
   ]
 }
