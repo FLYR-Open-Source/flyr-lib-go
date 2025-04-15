@@ -22,3 +22,75 @@ updates:
       minor:
         patterns: ["*"]
         update-types: [ "minor", "patch" ]
+  - directory: "examples/logging"
+    package-ecosystem: "gomod"
+    schedule:
+      interval: "monthly"
+    rebase-strategy: "disabled"
+    groups:
+      minor:
+        patterns: ["*"]
+        update-types: [ "minor", "patch" ]
+  - directory: "examples/monitoring/http"
+    package-ecosystem: "gomod"
+    schedule:
+      interval: "monthly"
+    rebase-strategy: "disabled"
+    groups:
+      minor:
+        patterns: ["*"]
+        update-types: [ "minor", "patch" ]
+  - directory: "examples/monitoring/metrics"
+    package-ecosystem: "gomod"
+    schedule:
+      interval: "monthly"
+    rebase-strategy: "disabled"
+    groups:
+      minor:
+        patterns: ["*"]
+        update-types: [ "minor", "patch" ]
+  - directory: "examples/monitoring/pubsub"
+    package-ecosystem: "gomod"
+    schedule:
+      interval: "monthly"
+    rebase-strategy: "disabled"
+    groups:
+      minor:
+        patterns: ["*"]
+        update-types: [ "minor", "patch" ]
+  - directory: "examples/monitoring/rabbitmq"
+    package-ecosystem: "gomod"
+    schedule:
+      interval: "monthly"
+    rebase-strategy: "disabled"
+    groups:
+      minor:
+        patterns: ["*"]
+        update-types: [ "minor", "patch" ]
+  - directory: "examples/monitoring/spans"
+    package-ecosystem: "gomod"
+    schedule:
+      interval: "monthly"
+    rebase-strategy: "disabled"
+    groups:
+      minor:
+        patterns: ["*"]
+        update-types: [ "minor", "patch" ]
+  - directory: "examples/testhelpers/gcp"
+    package-ecosystem: "gomod"
+    schedule:
+      interval: "monthly"
+    rebase-strategy: "disabled"
+    groups:
+      minor:
+        patterns: ["*"]
+        update-types: [ "minor", "patch" ]
+  - directory: "examples/testhelpers/grpc"
+    package-ecosystem: "gomod"
+    schedule:
+      interval: "monthly"
+    rebase-strategy: "disabled"
+    groups:
+      minor:
+        patterns: ["*"]
+        update-types: [ "minor", "patch" ]
