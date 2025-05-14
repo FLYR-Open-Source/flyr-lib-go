@@ -9,7 +9,7 @@ require (
 	github.com/FLYR-Open-Source/flyr-lib-go v1.1.1
 	google.golang.org/api v0.227.0
 	google.golang.org/genproto v0.0.0-20250313205543-e70fdf4c4cb4
-	google.golang.org/grpc v1.71.0
+	google.golang.org/grpc v1.71.2
 	google.golang.org/protobuf v1.36.5
 )
 
