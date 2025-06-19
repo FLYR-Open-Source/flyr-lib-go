@@ -22,78 +22,78 @@
 
 package main
 
-import (
-	"context"
-	"errors"
-	"log/slog"
-	"net/http"
-	"time"
+// import (
+// 	"context"
+// 	"errors"
+// 	"log/slog"
+// 	"net/http"
+// 	"time"
 
-	"github.com/FLYR-Open-Source/flyr-lib-go/logger"
-	"github.com/FLYR-Open-Source/flyr-lib-go/monitoring/middleware"
-	"github.com/FLYR-Open-Source/flyr-lib-go/monitoring/tracer"
-	"github.com/gin-gonic/gin"
-	"go.opentelemetry.io/otel/trace"
-)
+// 	"github.com/FLYR-Open-Source/flyr-lib-go/logger"
+// 	"github.com/FLYR-Open-Source/flyr-lib-go/monitoring/middleware"
+// 	"github.com/FLYR-Open-Source/flyr-lib-go/monitoring/tracer"
+// 	"github.com/gin-gonic/gin"
+// 	"go.opentelemetry.io/otel/trace"
+// )
 
-func main() {
-	ctx := context.Background()
+// func main() {
+// 	ctx := context.Background()
 
-	logger.InitLogger()
+// 	logger.InitLogger()
 
-	err := tracer.StartDefaultTracer(ctx)
-	if err != nil {
-		logger.Error(ctx, "failed to start the tracer", err)
-		return
-	}
-	defer func() {
-		tracer.ShutdownTracerProvider(ctx)
-	}()
+// 	err := tracer.StartDefaultTracer(ctx)
+// 	if err != nil {
+// 		logger.Error(ctx, "failed to start the tracer", err)
+// 		return
+// 	}
+// 	defer func() {
+// 		tracer.ShutdownTracerProvider(ctx)
+// 	}()
 
-	gin.SetMode(gin.ReleaseMode)
-	r := gin.New()
-	r.Use(gin.Recovery())
-	// Add the Otel middleware to the Gin route
-	r.Use(middleware.OtelGinMiddleware())
+// 	gin.SetMode(gin.ReleaseMode)
+// 	r := gin.New()
+// 	r.Use(gin.Recovery())
+// 	// Add the Otel middleware to the Gin route
+// 	r.Use(middleware.OtelGinMiddleware())
 
-	r.GET("/ping", Ping)
+// 	r.GET("/ping", Ping)
 
-	r.Run()
-}
+// 	r.Run()
+// }
 
-func Ping(c *gin.Context) {
-	reqCtx := c.Request.Context()
-	logger.Info(reqCtx, "start!")
+// func Ping(c *gin.Context) {
+// 	reqCtx := c.Request.Context()
+// 	logger.Info(reqCtx, "start!")
 
-	DoSomething(reqCtx)
+// 	DoSomething(reqCtx)
 
-	FetchFromDB(reqCtx)
+// 	FetchFromDB(reqCtx)
 
-	resp := gin.H{
-		"message": "pong from Go!",
-	}
+// 	resp := gin.H{
+// 		"message": "pong from Go!",
+// 	}
 
-	logger.Info(
-		reqCtx,
-		"end!",
-		slog.Any("response_body", resp),
-		slog.Int64("id", 10),
-		slog.String("name", "test"),
-		slog.Bool("is_active", true),
-		slog.Duration("duration", 10*time.Second),
-		slog.Float64("amount", 10.5),
-	)
+// 	logger.Info(
+// 		reqCtx,
+// 		"end!",
+// 		slog.Any("response_body", resp),
+// 		slog.Int64("id", 10),
+// 		slog.String("name", "test"),
+// 		slog.Bool("is_active", true),
+// 		slog.Duration("duration", 10*time.Second),
+// 		slog.Float64("amount", 10.5),
+// 	)
 
-	c.JSON(http.StatusInternalServerError, resp)
-}
+// 	c.JSON(http.StatusInternalServerError, resp)
+// }
 
-func DoSomething(ctx context.Context) {
-	spanCtx, span := tracer.StartSpan(ctx, "DoSomething", trace.SpanKindInternal)
-	defer span.End()
-	logger.Error(spanCtx, "some error", errors.New("oops"))
-}
+// func DoSomething(ctx context.Context) {
+// 	spanCtx, span := tracer.StartSpan(ctx, "DoSomething", trace.SpanKindInternal)
+// 	defer span.End()
+// 	logger.Error(spanCtx, "some error", errors.New("oops"))
+// }
 
-func FetchFromDB(ctx context.Context) {
-	_, span := tracer.StartSpan(ctx, "FetchFromDB", trace.SpanKindInternal)
-	span.End()
-}
+// func FetchFromDB(ctx context.Context) {
+// 	_, span := tracer.StartSpan(ctx, "FetchFromDB", trace.SpanKindInternal)
+// 	span.End()
+// }

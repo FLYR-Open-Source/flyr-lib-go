@@ -58,10 +58,10 @@ func main() {
 
 	defer meter.ShutdownMeterProvider(ctx)
 
-	counterMetrics(ctx)
-	gaugeMetrics(ctx)
+	// counterMetrics(ctx)
+	// gaugeMetrics(ctx)
 	histogramMetrics(ctx)
-	updownCounters(ctx)
+	// updownCounters(ctx)
 }
 
 func counterMetrics(ctx context.Context) {
