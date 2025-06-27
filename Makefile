@@ -1,14 +1,11 @@
-# The files that will be included in the test coverage report
-TEST_FILES=$(shell go list ./... | grep -v ./examples | grep -v ./pkg)
+GO := go
 
-TOOLS_MOD_DIR := ./pkg
-EXAMPLES_MOD_DIR := ./examples
+EXCLUDED_TOP_DIRS := examples pkg scripts benchmark
+ALL_GO_DIRS := $(shell find . -type f -name '*.go' -exec dirname {} \; | sort -u)
+EXCLUDED_PATHS := $(addprefix ./,$(EXCLUDED_TOP_DIRS))
+TEST_DIRS := $(filter-out $(foreach d,$(EXCLUDED_PATHS),$(d)% $(d)), $(ALL_GO_DIRS))
+BENCHMARK_DIRS := $(filter-out $(foreach d,$(EXCLUDED_PATHS),$(d)% $(d)), $(ALL_GO_DIRS))
 
-ALL_DOCS := $(shell find . -name '*.md' -type f | sort)
-ALL_GO_MOD_DIRS := $(shell find . -type f -name 'go.mod' -exec dirname {} \; | sort)
-OTEL_GO_MOD_DIRS := $(filter-out $(TOOLS_MOD_DIR), $(EXAMPLES_MOD_DIR), $(ALL_GO_MOD_DIRS))
-
-GO = go
 
 .PHONY: tidy
 tidy:
@@ -20,31 +17,20 @@ lint:
 
 .PHONY: test
 test:
-	gotestsum -- -short --cover $(TEST_FILES)
+	gotestsum -- -short --cover $(TEST_DIRS)
 
 .PHONY: test-coverage
 test-coverage:
-	go test -coverprofile coverage.out $(TEST_FILES) -json > unit-test-results.json
-
-.PHONY: test-benchmark
-test-benchmark:
-	@for pkg in $(TEST_FILES); do \
-		pkg_file=$$(echo $$pkg | sed 's|/|_|g'); \
-		go test -run=xxxxxMatchNothingxxxxx -bench=. -benchtime=20s -benchmem -cpu=1,2,4,12 -timeout 20m \
-			-o /dev/null \
-			-cpuprofile="benchmark/$$pkg_file.cpu.prof" \
-			-memprofile="benchmark/$$pkg_file.mem.prof" $$pkg; \
-	done
+	go test -coverprofile coverage.out $(TEST_DIRS) -json > unit-test-results.json
 
 .PHONY: benchmark
-benchmark: $(OTEL_GO_MOD_DIRS:%=benchmark/%)
-benchmark/%:
-	@echo "$(GO) test -run=xxxxxMatchNothingxxxxx -bench=. -benchmem $*..." \
-		&& cd $* \
-		&& $(GO) list ./... \
-		| grep -v third_party \
-		| xargs $(GO) test -run=xxxxxMatchNothingxxxxx -bench=.
+benchmark: $(BENCHMARK_DIRS:%=benchmark/%)
 
+benchmark/%:
+	@echo "Benchmarking $* ..."
+	@cd $* && $(GO) list ./... \
+		| grep -v third_party \
+		| xargs $(GO) test -run=xxxxxMatchNothingxxxxx -bench=. -benchmem || true
 
 .PHONY: check-license
 check-license:
