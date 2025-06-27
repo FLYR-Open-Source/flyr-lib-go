@@ -92,12 +92,16 @@ func FloatHistogram(name string, input HistogramMetricInput) (metric.Float64Hist
 	unit := input.getUnit(units.Milliseconds)
 	description := input.getDescription()
 
-	return defaultMeter.Float64Histogram(
-		name,
+	options := []metric.Float64HistogramOption{
 		metric.WithDescription(description),
 		metric.WithUnit(unit.String()),
-		metric.WithExplicitBucketBoundaries(input.ExplicitBucketBoundaries...),
-	)
+	}
+
+	if len(input.ExplicitBucketBoundaries) > 0 {
+		options = append(options, metric.WithExplicitBucketBoundaries(input.ExplicitBucketBoundaries...))
+	}
+
+	return defaultMeter.Float64Histogram(name, options...)
 }
 
 // IntHistogram returns a new go.opentelemetry.io/otel/metric.Int64Histogram instrument identified by
@@ -130,10 +134,14 @@ func IntHistogram(name string, input HistogramMetricInput) (metric.Int64Histogra
 	unit := input.getUnit(units.Milliseconds)
 	description := input.getDescription()
 
-	return defaultMeter.Int64Histogram(
-		name,
+	options := []metric.Int64HistogramOption{
 		metric.WithDescription(description),
 		metric.WithUnit(unit.String()),
-		metric.WithExplicitBucketBoundaries(input.ExplicitBucketBoundaries...),
-	)
+	}
+
+	if len(input.ExplicitBucketBoundaries) > 0 {
+		options = append(options, metric.WithExplicitBucketBoundaries(input.ExplicitBucketBoundaries...))
+	}
+
+	return defaultMeter.Int64Histogram(name, options...)
 }

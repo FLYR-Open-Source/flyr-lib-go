@@ -25,7 +25,6 @@ package meter // import "github.com/FLYR-Open-Source/flyr-lib-go/monitoring/mete
 import (
 	"context"
 	"errors"
-	"time"
 
 	"github.com/FLYR-Open-Source/flyr-lib-go/internal/config"
 	"go.opentelemetry.io/otel"
@@ -45,10 +44,6 @@ var ErrMetricsProviderNotInitialized = errors.New("metrics provider not initiali
 // ErrExporterProtocolNotSupported is returned when the exporter protocol is not supported
 var ErrExporterProtocolNotSupported = errors.New("exporter protocol not supported")
 
-var (
-	meterProvider *sdkmetric.MeterProvider
-)
-
 // getExporter returns an OTLP exporter based on the exporter protocol.
 // If the exporter protocol is not supported, it returns nil.
 //
@@ -63,7 +58,7 @@ func getExporter(ctx context.Context, cfg config.MonitoringConfig) (sdkmetric.Ex
 		return stdoutmetric.New(stdoutmetric.WithPrettyPrint())
 	}
 
-	switch cfg.ExporterTracesProtocol() {
+	switch cfg.ExporterMetricsProtocol() {
 	case "grpc":
 		return otlpmetricgrpc.New(ctx)
 	case "http/protobuf":
@@ -73,14 +68,14 @@ func getExporter(ctx context.Context, cfg config.MonitoringConfig) (sdkmetric.Ex
 	}
 }
 
-// initializeMetricsProvider creates and configures a new OpenTelemetry MeterProvider.
+// initializeMeterProvider creates and configures a new OpenTelemetry MeterProvider.
 //
 // This function initializes a MeterProvider with the specified configuration,
 // including a resource that describes the service, version, environment, and tenant.
 // This MeterProvider is also set as the global meter provider for OpenTelemetry.
 //
 // It returns an error if any occurred.
-func initializeMeterProvider(ctx context.Context, cfg config.MonitoringConfig, interval time.Duration) error {
+func initializeMeterProvider(ctx context.Context, cfg config.Monitoring) error {
 	if cfg.Service() == "" {
 		otel.SetMeterProvider(noop.NewMeterProvider())
 		return nil
@@ -88,6 +83,7 @@ func initializeMeterProvider(ctx context.Context, cfg config.MonitoringConfig, i
 
 	exporter, err := getExporter(ctx, cfg)
 	if err != nil {
+		otel.SetMeterProvider(noop.NewMeterProvider())
 		return err
 	}
 
@@ -102,23 +98,34 @@ func initializeMeterProvider(ctx context.Context, cfg config.MonitoringConfig, i
 		),
 	)
 	if err != nil {
+		otel.SetMeterProvider(noop.NewMeterProvider())
 		return err
 	}
 
-	meterProvider = sdkmetric.NewMeterProvider(
+	interval := cfg.MetricsInterval()
+
+	mt := sdkmetric.NewMeterProvider(
 		sdkmetric.WithReader(sdkmetric.NewPeriodicReader(exporter, sdkmetric.WithInterval(interval))),
 		sdkmetric.WithResource(resourceInfo),
 	)
 
-	otel.SetMeterProvider(meterProvider)
+	otel.SetMeterProvider(mt)
 
 	return nil
 }
 
 // ShutdownMeterProvider gracefully shuts down the global MeterProvider.
 func ShutdownMeterProvider(ctx context.Context) error {
-	if meterProvider == nil {
+	mt := otel.GetMeterProvider()
+
+	if mt == nil {
 		return ErrMetricsProviderNotInitialized
 	}
-	return meterProvider.Shutdown(ctx)
+
+	mp, ok := mt.(*sdkmetric.MeterProvider)
+	if !ok {
+		return nil
+	}
+
+	return mp.Shutdown(ctx)
 }

@@ -7,7 +7,7 @@ The monitoring package is built on [OpenTelemetry](https://opentelemetry.io/) an
     - [Distributed Tracing](#distributed-tracing)
 2. [Spans](#spans)
     - [Automatic Correlation](#automatic-correlation)
-3. [Trace Propagation](#trace-proagation)
+3. [Trace Propagation](#trace-propagation)
     - [HTTP Tracing](#http-tracing)
     - [PubSub Tracing](#pubsub-tracing)
     - [RabbitMQ Tracing](#rabbitmq-tracing)
@@ -146,6 +146,7 @@ The monitoring package accepts a config that reads values from Environment Varia
 | `OTEL_EXPORTER_OTLP_TRACES_PROTOCOL` | Specifies the OTLP transport protocol to be used for trace data.                                                       |
 | `OTEL_EXPORTER_OTLP_METRICS_PROTOCOL`| Specifies the OTLP transport protocol to be used for metric data.                                                      |
 | `OTEL_EXPORTER_OTLP_TEST`            | Specifies whether the OTLP exporter should be used in test mode. Usefull for debugging traces and metrics. Setting this value to true, will send the traces and metrics in the stdout.|
+| `OTEL_METRICS_INTERVAL_SECONDS`            | Specifies the interval at which metrics are exported in the Periodic Reader. The default value is `60s`.|
 
 ## Kubernetes Setup
 

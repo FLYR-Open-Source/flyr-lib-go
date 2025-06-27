@@ -24,7 +24,6 @@ package meter // import "github.com/FLYR-Open-Source/flyr-lib-go/monitoring/mete
 
 import (
 	"context"
-	"time"
 
 	"github.com/FLYR-Open-Source/flyr-lib-go/internal/config"
 	"github.com/FLYR-Open-Source/flyr-lib-go/internal/version"
@@ -54,7 +53,7 @@ var defaultMeter metric.Meter
 func StartDefaultMeter(ctx context.Context) (metric.Meter, error) {
 	cfg := config.NewMonitoringConfig()
 
-	err := initializeMeterProvider(ctx, cfg, 60*time.Second) // send metrics every 60 seconds
+	err := initializeMeterProvider(ctx, cfg)
 	if err != nil {
 		return noop.Meter{}, err
 	}

@@ -24,6 +24,7 @@ package config
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -109,12 +110,69 @@ func TestMonitoringConfig(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			// Reset the singleton state before each test
+			ResetMonitoringConfig()
+
 			cfg := NewMonitoringConfig(withEnvironment(tt.variables))
 
 			assert.Equalf(t, tt.expectedService, cfg.Service(), "Service() return value is not correct")
 			assert.Equalf(t, tt.expectedTraceExporter, cfg.ExporterTracesProtocol(), "ExporterTracesProtocol() return value is not correct")
 			assert.Equalf(t, tt.expectedMetricsExporter, cfg.ExporterMetricsProtocol(), "ExporterMetricsProtocol() return value is not correct")
 			assert.Equalf(t, tt.expectedTestExporter, cfg.IsTestExporter(), "IsTestExporter() return value is not correct")
+		})
+	}
+}
+
+func TestMetricsInterval(t *testing.T) {
+	tests := []struct {
+		name             string
+		variables        map[string]string
+		expectedInterval time.Duration
+	}{
+		{
+			name: "with default interval",
+			variables: map[string]string{
+				"OTEL_METRICS_INTERVAL_SECONDS": "0",
+			},
+			expectedInterval: 60 * time.Second,
+		},
+		{
+			name: "with default interval",
+			variables: map[string]string{
+				"OTEL_METRICS_INTERVAL_SECONDS": "60",
+			},
+			expectedInterval: 60 * time.Second,
+		},
+		{
+			name: "with custom interval",
+			variables: map[string]string{
+				"OTEL_METRICS_INTERVAL_SECONDS": "10",
+			},
+			expectedInterval: 10 * time.Second,
+		},
+		{
+			name: "with negative interval",
+			variables: map[string]string{
+				"OTEL_METRICS_INTERVAL_SECONDS": "-1",
+			},
+			expectedInterval: 60 * time.Second,
+		},
+		{
+			name: "with zero interval",
+			variables: map[string]string{
+				"OTEL_METRICS_INTERVAL_SECONDS": "0.1",
+			},
+			expectedInterval: 100 * time.Millisecond,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Reset the singleton state before each test
+			ResetMonitoringConfig()
+
+			cfg := NewMonitoringConfig(withEnvironment(tt.variables))
+			assert.Equalf(t, tt.expectedInterval, cfg.MetricsInterval(), "MetricsInterval() return value is not correct")
 		})
 	}
 }

@@ -49,10 +49,6 @@ var ErrTracerProviderAlreadyInitialized = errors.New("tracer provider already in
 // ErrExporterClientNotSupported is returned when the exporter client is not supported
 var ErrExporterClientNotSupported = errors.New("exporter client not supported")
 
-var (
-	tracerProvider *sdktrace.TracerProvider
-)
-
 // getExporter returns an OTLP exporter based on the exporter protocol.
 // If the exporter protocol is not supported, it returns nil.
 //
@@ -116,11 +112,11 @@ func initializeTracerProvider(ctx context.Context, cfg config.MonitoringConfig) 
 		return err
 	}
 
-	tracerProvider = sdktrace.NewTracerProvider(
+	tp := sdktrace.NewTracerProvider(
 		sdktrace.WithBatcher(exporter),
 		sdktrace.WithResource(resourceInfo),
 	)
-	otel.SetTracerProvider(tracerProvider)
+	otel.SetTracerProvider(tp)
 
 	otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(
 		propagation.TraceContext{}, propagation.Baggage{}))
@@ -130,8 +126,16 @@ func initializeTracerProvider(ctx context.Context, cfg config.MonitoringConfig) 
 
 // ShutdownTracerProvider gracefully shuts down the global TracerProvider.
 func ShutdownTracerProvider(ctx context.Context) error {
-	if tracerProvider == nil {
+	tp := otel.GetTracerProvider()
+
+	if tp == nil {
 		return ErrTracerProviderNotInitialized
 	}
-	return tracerProvider.Shutdown(ctx)
+
+	tc, ok := tp.(*sdktrace.TracerProvider)
+	if !ok {
+		return nil
+	}
+
+	return tc.Shutdown(ctx)
 }

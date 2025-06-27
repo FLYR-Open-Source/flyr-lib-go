@@ -83,35 +83,23 @@ func TestNewTraceProvider(t *testing.T) {
 	ctx := context.Background()
 	cfg := getMonitoringConfig()
 
-	t.Run("SetsTracerProviderAsGlobal", func(t *testing.T) {
+	t.Run("ReturnsNoError", func(t *testing.T) {
 		err := initializeTracerProvider(ctx, cfg)
-		defer func() {
-			tracerProvider = nil
-		}()
 		require.NoError(t, err)
-
-		// Check if the global provider is set
-		require.Equal(t, tracerProvider, otel.GetTracerProvider())
 	})
 
 	t.Run("SetsCorrectResourceAttributes", func(t *testing.T) {
 		err := initializeTracerProvider(ctx, cfg)
-		defer func() {
-			tracerProvider = nil
-		}()
 		require.NoError(t, err)
 
 		// Ensure tracerProvider is still usable
-		tracer := tracerProvider.Tracer("test-tracer")
+		tracer := otel.GetTracerProvider().Tracer("test-tracer")
 		_, span := tracer.Start(ctx, "test-span")
 		defer span.End()
 	})
 
 	t.Run("ConfiguresTextMapPropagator", func(t *testing.T) {
 		err := initializeTracerProvider(ctx, cfg)
-		defer func() {
-			tracerProvider = nil
-		}()
 		require.NoError(t, err)
 
 		// Retrieve the global TextMapPropagator and confirm it’s a composite propagator.

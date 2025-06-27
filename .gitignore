@@ -5,3 +5,7 @@
 cover/*
 coverage.out
 unit-test-results.json
+
+# Benchmark
+*.cpu.prof
+*.mem.prof

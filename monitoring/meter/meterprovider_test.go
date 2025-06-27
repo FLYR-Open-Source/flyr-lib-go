@@ -25,7 +25,6 @@ package meter
 import (
 	"context"
 	"testing"
-	"time"
 
 	"github.com/FLYR-Open-Source/flyr-lib-go/internal/config"
 	"github.com/stretchr/testify/require"
@@ -78,36 +77,24 @@ func TestNewMeterProvider(t *testing.T) {
 	cfg.ServiceCfg = "test-service"
 	cfg.ExporterProtocolCfg = "grpc"
 
-	t.Run("SetsTracerProviderAsGlobal", func(t *testing.T) {
-		err := initializeMeterProvider(ctx, cfg, 60*time.Second)
-		defer func() {
-			meterProvider = nil
-		}()
+	t.Run("ReturnsNoError", func(t *testing.T) {
+		err := initializeMeterProvider(ctx, cfg)
 		require.NoError(t, err)
-
-		// Check if the global provider is set
-		require.Equal(t, meterProvider, otel.GetMeterProvider())
 	})
 
 	t.Run("SetsCorrectResourceAttributes", func(t *testing.T) {
-		err := initializeMeterProvider(ctx, cfg, 60*time.Second)
-		defer func() {
-			meterProvider = nil
-		}()
+		err := initializeMeterProvider(ctx, cfg)
 		require.NoError(t, err)
 
 		// Ensure tracerProvider is still usable
-		meter := meterProvider.Meter("test-meter")
+		meter := otel.GetMeterProvider().Meter("test-meter")
 		c, err := meter.Float64Counter("test-counter")
 		require.NoError(t, err)
 		c.Add(ctx, 1)
 	})
 
 	t.Run("ConfiguresTextMapPropagator", func(t *testing.T) {
-		err := initializeMeterProvider(ctx, cfg, 60*time.Second)
-		defer func() {
-			meterProvider = nil
-		}()
+		err := initializeMeterProvider(ctx, cfg)
 		require.NoError(t, err)
 
 		// Retrieve the global TextMapPropagator and confirm it’s a composite propagator.

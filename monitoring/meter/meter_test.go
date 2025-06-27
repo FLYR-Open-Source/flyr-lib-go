@@ -28,6 +28,7 @@ import (
 	"strconv"
 	"testing"
 
+	"github.com/FLYR-Open-Source/flyr-lib-go/internal/config"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/otel/metric/noop"
@@ -51,6 +52,7 @@ func TestStartDefaultMeter(t *testing.T) {
 
 	t.Run("successful initialization", func(t *testing.T) {
 		setOsEnvironments(true, "grpc")
+		defer config.ResetMonitoringConfig()
 		defer deleteOsEnvironments()
 		// Reset the global defaultMeter
 		defaultMeter = nil
@@ -66,6 +68,7 @@ func TestStartDefaultMeter(t *testing.T) {
 
 	t.Run("initializeMeterProvider fails", func(t *testing.T) {
 		setOsEnvironments(false, "invalid")
+		defer config.ResetMonitoringConfig()
 		defer deleteOsEnvironments()
 
 		// Reset the global defaultMeter
