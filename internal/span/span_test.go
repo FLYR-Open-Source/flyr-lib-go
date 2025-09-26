@@ -71,3 +71,13 @@ func TestEndSuccessfully(t *testing.T) {
 	assert.Equal(t, codes.Ok, fakeSpan.FakeStatus.Code)
 	assert.Equal(t, "", fakeSpan.FakeStatus.Description)
 }
+
+func TestEndingZeroSpanDoesntPanic(t *testing.T) {
+	defer func() {
+		require.Nil(t, recover())
+	}()
+
+	s := Span{}
+	s.EndSuccessfully()
+	s.EndWithError(nil)
+}

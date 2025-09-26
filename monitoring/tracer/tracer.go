@@ -48,7 +48,9 @@ type Tracer struct {
 // defaultTracer is the default tracer used by the application.
 //
 // The default tracer is initialized by the tracer.StartDefaultTracer(...) function.
-var defaultTracer *Tracer
+var defaultTracer *Tracer = &Tracer{
+	tracer: noop.Tracer{},
+}
 
 // StartDefaultTracer initializes and starts the default OpenTelemetry Tracer.
 //
