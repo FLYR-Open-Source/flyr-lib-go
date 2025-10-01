@@ -193,7 +193,7 @@ jobs:
         done
         echo "sarif_files=$SARIF_FILES" >> "$GITHUB_OUTPUT"
     - name: SonarQube Scan
-      uses: SonarSource/sonarqube-scan-action@aa494459d7c39c106cc77b166de8b4250a32bb97 # v5.1.0
+      uses: SonarSource/sonarqube-scan-action@fd88b7d7ccbaefd23d8f36f73b59db7a3d246602 # v6.0.0
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       with:
