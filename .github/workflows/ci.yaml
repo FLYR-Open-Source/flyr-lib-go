@@ -151,7 +151,7 @@ jobs:
         name: sonar-reports-coverage
         path: coverage.out
     - name: Publish Test Report
-      uses: ctrf-io/github-test-reporter@1e3af226163c3d3426b97bc475386d6fefe356f0 # v1
+      uses: ctrf-io/github-test-reporter@646f98cfc16c6f7a0e1f6100cabe2deb95dd2eef # v1
       with:
         report-path: ctrf-report.json
         group-by: suite
