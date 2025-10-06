@@ -23,5 +23,5 @@
 package version // import "github.com/FLYR-Open-Source/flyr-lib-go/internal/version"
 
 func Version() string {
-	return "v1.1.1" // Hardcoded for now
+	return "v1.2.0" // Hardcoded for now
 }

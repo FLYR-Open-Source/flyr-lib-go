@@ -43,10 +43,6 @@ type KeyValue = attribute.KeyValue
 //
 // It returns the new context and the new span
 func StartSpan(ctx context.Context, name string, kind SpanKind) (context.Context, span.Span) {
-	if defaultTracer == nil {
-		return ctx, span.Span{}
-	}
-
 	return defaultTracer.StartSpan(ctx, name, kind)
 }
 
