@@ -87,6 +87,13 @@ func StartDefaultTracer(ctx context.Context) error {
 	return nil
 }
 
+// StarCustomTracer only needed for testing purposes
+func StarCustomTracer(customTracer oteltrace.Tracer) {
+	var tracer Tracer
+	tracer.tracer = customTracer
+	defaultTracer = &tracer
+}
+
 // StartSpan begins a new span for tracing with the specified name and kind.
 //
 // This method takes a context, a span name, and a span kind as arguments. It checks

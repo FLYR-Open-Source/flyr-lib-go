@@ -20,40 +20,55 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package tracer
+package tracer_test
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
-	testhelpers "github.com/FLYR-Open-Source/flyr-lib-go/pkg/testhelpers/monitoring"
 	"github.com/stretchr/testify/assert"
-	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
+	"github.com/stretchr/testify/require"
+	"go.opentelemetry.io/otel/attribute"
+	sdktrace "go.opentelemetry.io/otel/sdk/trace"
+	"go.opentelemetry.io/otel/sdk/trace/tracetest"
 	oteltrace "go.opentelemetry.io/otel/trace"
+
+	"github.com/FLYR-Open-Source/flyr-lib-go/monitoring/tracer"
 )
 
 // if that test fails, it means the depth of the caller is different,
 // therefore the caller information is not being retrieved correctly
 func TestStartSpan(t *testing.T) {
-	pc, fakeTracer := testhelpers.GetFakeTracer()
+	ctx := context.Background()
+
+	sr := tracetest.NewSpanRecorder()
+	tp := sdktrace.NewTracerProvider(sdktrace.WithSpanProcessor(sr))
+	tracer.StarCustomTracer(tp.Tracer("test-tracer"))
+
 	//nolint:errcheck
-	defer pc.Shutdown(context.Background())
+	defer tp.Shutdown(ctx)
 
-	tracer := Tracer{tracer: fakeTracer}
+	_, span := tracer.StartSpan(ctx, "test-span", oteltrace.SpanKindInternal)
+	span.SetAttributes(
+		attribute.String("key1", "value1"),
+	)
+	span.End()
 
-	_, span := tracer.StartSpan(context.Background(), "test-span", oteltrace.SpanKindInternal)
-	defer span.End()
+	ended := sr.Ended()
+	require.Len(t, ended, 1)
+	spanRec := ended[0]
 
-	testSpan := span.Span.(*testhelpers.FakeSpan)
-	assert.Equal(t, string(semconv.CodeFilepathKey), string(testSpan.FakeAttributes[0].Key))
-	assert.Contains(t, testSpan.FakeAttributes[0].Value.AsString(), "src/testing/testing.go")
+	got := attrsToMap(spanRec.Attributes())
+	assert.Equal(t, "test-span", spanRec.Name())
+	assert.Equal(t, oteltrace.SpanKindInternal, spanRec.SpanKind())
+	assert.Equal(t, "value1", got["key1"])
+}
 
-	assert.Equal(t, string(semconv.CodeLineNumberKey), string(testSpan.FakeAttributes[1].Key))
-	assert.Positive(t, testSpan.FakeAttributes[1].Value.AsInt64())
-
-	assert.Equal(t, string(semconv.CodeFunctionKey), string(testSpan.FakeAttributes[2].Key))
-	assert.Contains(t, testSpan.FakeAttributes[2].Value.AsString(), "tRunner")
-
-	assert.Equal(t, string(semconv.CodeNamespaceKey), string(testSpan.FakeAttributes[3].Key))
-	assert.Contains(t, testSpan.FakeAttributes[3].Value.AsString(), "testing")
+func attrsToMap(attrs []attribute.KeyValue) map[string]string {
+	m := make(map[string]string, len(attrs))
+	for _, kv := range attrs {
+		m[string(kv.Key)] = fmt.Sprint(kv.Value.AsInterface())
+	}
+	return m
 }
