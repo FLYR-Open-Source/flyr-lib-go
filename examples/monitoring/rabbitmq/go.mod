@@ -3,7 +3,7 @@ module github.com/FLYR-Open-Source/flyr-lib-go/examples/monitoring/rabbitmq
 go 1.26.0
 
 require (
-	github.com/FLYR-Open-Source/flyr-lib-go v1.1.1
+	github.com/FLYR-Open-Source/flyr-lib-go v1.3.0
 	go.opentelemetry.io/otel v1.40.0
 	go.opentelemetry.io/otel/trace v1.40.0
 )
