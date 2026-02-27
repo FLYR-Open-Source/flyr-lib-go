@@ -73,7 +73,7 @@ jobs:
       with:
         args: '-no-fail -fmt sarif -out gosec-results.sarif ./...'
     - name: Upload GoSec scan to GitHub Security
-      uses: github/codeql-action/upload-sarif@45580472a5bb82c4681c4ac726cfdb60060c2ee1 # v3
+      uses: github/codeql-action/upload-sarif@89a39a4e59826350b863aa6b6252a07ad50cf83e # v4
       with:
         sarif_file: gosec-results.sarif
     - name: Upload Artifact
@@ -99,7 +99,7 @@ jobs:
         format: "sarif"
         output: "trivy-results-fs.sarif"
     - name: Upload Trivy scan to GitHub Security
-      uses: github/codeql-action/upload-sarif@45580472a5bb82c4681c4ac726cfdb60060c2ee1 # v3
+      uses: github/codeql-action/upload-sarif@89a39a4e59826350b863aa6b6252a07ad50cf83e # v4
       with:
         sarif_file: trivy-results-fs.sarif
     - name: Upload Artifact
