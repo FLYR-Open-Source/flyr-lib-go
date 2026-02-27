@@ -6,7 +6,7 @@ require (
 	cloud.google.com/go/pubsub v1.50.1
 	cloud.google.com/go/pubsub/v2 v2.0.0
 	github.com/caarlos0/env/v11 v11.3.1
-	github.com/gin-gonic/gin v1.10.0
+	github.com/gin-gonic/gin v1.10.1
 	github.com/go-chi/chi/v5 v5.2.2
 	github.com/samber/slog-multi v1.4.0
 	github.com/stretchr/testify v1.11.1
