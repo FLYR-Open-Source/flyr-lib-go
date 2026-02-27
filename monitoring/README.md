@@ -100,7 +100,7 @@ Also, you can find examples: [examples](#examples).
 
 The **PubSub Tracing** enables tracking and monitoring of messages as they are published and consumed within a Pub/Sub system, providing visibility into the lifecycle and performance of message-driven workflows.
 
-The library does not expose any functions that can be used, because the ["cloud.google.com/go/pubsub"]("cloud.google.com/go/pubsub") module already supports Open Telemetry!
+The library does not expose any functions that can be used, because the ["cloud.google.com/go/pubsub/v2"]("cloud.google.com/go/pubsub/v2") module already supports Open Telemetry!
 
 Link: [https://cloud.google.com/pubsub/docs/open-telemetry-tracing](https://cloud.google.com/pubsub/docs/open-telemetry-tracing)
 

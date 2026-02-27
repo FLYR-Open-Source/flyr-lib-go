@@ -27,7 +27,7 @@ import (
 	"testing"
 	"time"
 
-	"cloud.google.com/go/pubsub"
+	"cloud.google.com/go/pubsub/v2"
 
 	testhelpers "github.com/FLYR-Open-Source/flyr-lib-go/pkg/testhelpers/gcp/pubsub"
 )
