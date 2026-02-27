@@ -2,7 +2,7 @@ module github.com/FLYR-Open-Source/flyr-lib-go/examples/logging
 
 go 1.26.0
 
-require github.com/FLYR-Open-Source/flyr-lib-go v1.1.1
+require github.com/FLYR-Open-Source/flyr-lib-go v1.3.0
 
 require (
 	github.com/caarlos0/env/v11 v11.4.0 // indirect
