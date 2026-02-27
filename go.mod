@@ -9,7 +9,7 @@ require (
 	github.com/go-chi/chi/v5 v5.2.5
 	github.com/samber/slog-multi v1.7.1
 	github.com/stretchr/testify v1.11.1
-	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.61.0
+	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.65.0
 	go.opentelemetry.io/otel v1.40.0
 	go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc v1.40.0
 	go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetrichttp v1.40.0
