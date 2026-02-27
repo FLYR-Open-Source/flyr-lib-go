@@ -4,7 +4,7 @@ go 1.26.0
 
 require (
 	cloud.google.com/go/pubsub/v2 v2.4.0
-	github.com/FLYR-Open-Source/flyr-lib-go v1.3.0
+	github.com/FLYR-Open-Source/flyr-lib-go v1.4.0
 	google.golang.org/api v0.269.0
 )
 
@@ -31,7 +31,7 @@ require (
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.63.0 // indirect
-	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.61.0 // indirect
+	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.65.0 // indirect
 	go.opentelemetry.io/otel v1.40.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.40.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.40.0 // indirect
