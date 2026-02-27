@@ -91,7 +91,7 @@ jobs:
     steps:
     - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
     - name: Run Trivy vulnerability scanner filesystem
-      uses: aquasecurity/trivy-action@c1824fd6edce30d7ab345a9989de00bbd46ef284
+      uses: aquasecurity/trivy-action@1bd062560b422f5944df1de50abd05162bea079e
       with:
         scan-type: fs
         scan-ref: '.'
