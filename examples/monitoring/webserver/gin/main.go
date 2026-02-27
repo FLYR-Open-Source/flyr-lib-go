@@ -47,7 +47,10 @@ func main() {
 		return
 	}
 	defer func() {
-		tracer.ShutdownTracerProvider(ctx)
+		err := tracer.ShutdownTracerProvider(ctx)
+		if err != nil {
+			logger.Error(ctx, "failed to shutdown the tracer provider", err)
+		}
 	}()
 
 	gin.SetMode(gin.ReleaseMode)
@@ -58,7 +61,10 @@ func main() {
 
 	r.GET("/ping", Ping)
 
-	r.Run()
+	err = r.Run()
+	if err != nil {
+		logger.Error(ctx, "failed to run the server", err)
+	}
 }
 
 func Ping(c *gin.Context) {

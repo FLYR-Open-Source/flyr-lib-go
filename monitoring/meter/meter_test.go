@@ -35,15 +35,15 @@ import (
 )
 
 func setOsEnvironments(testExporter bool, protocol string) {
-	os.Setenv("OTEL_SERVICE_NAME", "test-service")
-	os.Setenv("OTEL_EXPORTER_OTLP_TEST", strconv.FormatBool(testExporter))
-	os.Setenv("OTEL_EXPORTER_OTLP_PROTOCOL", protocol)
+	_ = os.Setenv("OTEL_SERVICE_NAME", "test-service")
+	_ = os.Setenv("OTEL_EXPORTER_OTLP_TEST", strconv.FormatBool(testExporter))
+	_ = os.Setenv("OTEL_EXPORTER_OTLP_PROTOCOL", protocol)
 }
 
 func deleteOsEnvironments() {
-	os.Unsetenv("OTEL_SERVICE_NAME")
-	os.Unsetenv("OTEL_EXPORTER_OTLP_TEST")
-	os.Unsetenv("OTEL_EXPORTER_OTLP_PROTOCOL")
+	_ = os.Unsetenv("OTEL_SERVICE_NAME")
+	_ = os.Unsetenv("OTEL_EXPORTER_OTLP_TEST")
+	_ = os.Unsetenv("OTEL_EXPORTER_OTLP_PROTOCOL")
 }
 
 // TestStartDefaultMeter tests the StartDefaultMeter function.
