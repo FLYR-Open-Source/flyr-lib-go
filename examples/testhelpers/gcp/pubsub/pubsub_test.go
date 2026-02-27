@@ -24,10 +24,12 @@ package grpc_test
 
 import (
 	"context"
+	"fmt"
 	"testing"
 	"time"
 
-	"cloud.google.com/go/pubsub"
+	"cloud.google.com/go/pubsub/v2"
+	pubsubpb "cloud.google.com/go/pubsub/v2/apiv1/pubsubpb"
 
 	testhelpers "github.com/FLYR-Open-Source/flyr-lib-go/pkg/testhelpers/gcp/pubsub"
 )
@@ -36,19 +38,23 @@ func TestTopic(t *testing.T) {
 	// Setup
 	ctx := context.Background()
 	topicID := "my-topic-id"
+	projectID := "test-project"
 	expectedMessageID := "m0"
 
 	svc, client, err := testhelpers.NewClient(ctx)
 	if err != nil {
-		t.Fatalf("pubsub.NewPublisherClient: %v", err)
+		t.Fatalf("pubsub.NewClient: %v", err)
 		return
 	}
 	defer svc.Close()
 	defer client.Close()
 
-	topic, err := client.CreateTopic(ctx, topicID)
+	topicName := fmt.Sprintf("projects/%s/topics/%s", projectID, topicID)
+	topic, err := client.TopicAdminClient.CreateTopic(ctx, &pubsubpb.Topic{
+		Name: topicName,
+	})
 	if err != nil {
-		t.Fatalf("client.CreateTopic: %v", err)
+		t.Fatalf("TopicAdminClient.CreateTopic: %v", err)
 		return
 	}
 
@@ -59,7 +65,10 @@ func TestTopic(t *testing.T) {
 			Data: []byte("hello"),
 		}
 
-		publishResult := topic.Publish(ctx, msg)
+		publisher := client.Publisher(topic.GetName())
+		defer publisher.Stop()
+
+		publishResult := publisher.Publish(ctx, msg)
 		res, err := publishResult.Get(ctx)
 		if err != nil {
 			t.Fatalf("topic.Publish: %v", err)
@@ -76,26 +85,32 @@ func TestSubscription(t *testing.T) {
 	ctx := context.Background()
 	subscriptionID := "my-subscription-id"
 	topicID := "my-topic-id"
+	projectID := "test-project"
 
 	svc, client, err := testhelpers.NewClient(ctx)
 	if err != nil {
-		t.Fatalf("pubsub.NewPublisherClient: %v", err)
+		t.Fatalf("pubsub.NewClient: %v", err)
 		return
 	}
 	defer svc.Close()
 	defer client.Close()
 
-	topic, err := client.CreateTopic(ctx, topicID)
+	topicName := fmt.Sprintf("projects/%s/topics/%s", projectID, topicID)
+	topic, err := client.TopicAdminClient.CreateTopic(ctx, &pubsubpb.Topic{
+		Name: topicName,
+	})
 	if err != nil {
-		t.Fatalf("client.CreateTopic: %v", err)
+		t.Fatalf("TopicAdminClient.CreateTopic: %v", err)
 		return
 	}
 
-	sub, err := client.CreateSubscription(ctx, subscriptionID, pubsub.SubscriptionConfig{
-		Topic: topic,
+	subscriptionName := fmt.Sprintf("projects/%s/subscriptions/%s", projectID, subscriptionID)
+	sub, err := client.SubscriptionAdminClient.CreateSubscription(ctx, &pubsubpb.Subscription{
+		Name:  subscriptionName,
+		Topic: topic.GetName(),
 	})
 	if err != nil {
-		t.Fatalf("client.CreateSubscription: %v", err)
+		t.Fatalf("SubscriptionAdminClient.CreateSubscription: %v", err)
 	}
 
 	// Publish a message
@@ -103,13 +118,17 @@ func TestSubscription(t *testing.T) {
 		Data: []byte("hello"),
 	}
 
-	topic.Publish(ctx, msg)
+	publisher := client.Publisher(topic.GetName())
+	defer publisher.Stop()
+
+	publisher.Publish(ctx, msg)
 
 	// Receive messages
 	cctx, cancel := context.WithTimeout(ctx, 1*time.Millisecond) // add a small timeout to avoid blocking
 	defer cancel()
 
-	err = sub.Receive(cctx, func(ctx context.Context, msg *pubsub.Message) {
+	subscriber := client.Subscriber(sub.GetName())
+	err = subscriber.Receive(cctx, func(ctx context.Context, msg *pubsub.Message) {
 		msg.Ack() // Acknowledge the message
 
 		if string(msg.Data) != "hello" {

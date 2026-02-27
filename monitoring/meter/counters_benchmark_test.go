@@ -35,8 +35,8 @@ import (
 
 func BenchmarkFloatCounter(b *testing.B) {
 	config.ResetMonitoringConfig()
-	os.Setenv("OTEL_SERVICE_NAME", "test-service")
-	os.Setenv("OTEL_EXPORTER_OTLP_PROTOCOL", "grpc")
+	_ = os.Setenv("OTEL_SERVICE_NAME", "test-service")
+	_ = os.Setenv("OTEL_EXPORTER_OTLP_PROTOCOL", "grpc")
 
 	mockLogServer := &fakemonitoring.MockOtelMetricsServer{}
 	_, options, err := fakemonitoring.NewOtelMetricsGrpcServer(mockLogServer)
@@ -47,7 +47,7 @@ func BenchmarkFloatCounter(b *testing.B) {
 
 	otlpEndpoint := fmt.Sprintf("http://%v", options[0])
 
-	os.Setenv("OTEL_EXPORTER_OTLP_ENDPOINT", otlpEndpoint)
+	_ = os.Setenv("OTEL_EXPORTER_OTLP_ENDPOINT", otlpEndpoint)
 
 	b.ResetTimer()
 	ctx := b.Context()
@@ -72,8 +72,8 @@ func BenchmarkFloatCounter(b *testing.B) {
 
 func BenchmarkIntCounter(b *testing.B) {
 	config.ResetMonitoringConfig()
-	os.Setenv("OTEL_SERVICE_NAME", "test-service")
-	os.Setenv("OTEL_EXPORTER_OTLP_PROTOCOL", "grpc")
+	_ = os.Setenv("OTEL_SERVICE_NAME", "test-service")
+	_ = os.Setenv("OTEL_EXPORTER_OTLP_PROTOCOL", "grpc")
 
 	mockLogServer := &fakemonitoring.MockOtelMetricsServer{}
 	_, options, err := fakemonitoring.NewOtelMetricsGrpcServer(mockLogServer)
@@ -84,7 +84,7 @@ func BenchmarkIntCounter(b *testing.B) {
 
 	otlpEndpoint := fmt.Sprintf("http://%v", options[0])
 
-	os.Setenv("OTEL_EXPORTER_OTLP_ENDPOINT", otlpEndpoint)
+	_ = os.Setenv("OTEL_EXPORTER_OTLP_ENDPOINT", otlpEndpoint)
 
 	b.ResetTimer()
 	ctx := b.Context()
