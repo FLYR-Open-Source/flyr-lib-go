@@ -9,7 +9,7 @@ BENCHMARK_DIRS := $(filter-out $(foreach d,$(EXCLUDED_PATHS),$(d)% $(d)), $(ALL_
 
 .PHONY: tidy
 tidy:
-	go mod tidy
+	@find . -name go.mod -execdir go mod tidy \;
 
 .PHONY: lint
 lint:
