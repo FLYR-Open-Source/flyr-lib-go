@@ -3,7 +3,6 @@ module github.com/FLYR-Open-Source/flyr-lib-go
 go 1.26.0
 
 require (
-	cloud.google.com/go/pubsub v1.50.1
 	cloud.google.com/go/pubsub/v2 v2.0.0
 	github.com/caarlos0/env/v11 v11.3.1
 	github.com/gin-gonic/gin v1.11.0
