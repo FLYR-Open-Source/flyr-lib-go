@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+      uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
     - name: Setup Go
       uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
       with:
@@ -39,7 +39,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+      uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
     - name: Setup Go
       uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
       with:
@@ -60,7 +60,7 @@ jobs:
       security-events: write
     steps:
     - name: Checkout
-      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+      uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
     - name: Setup Go
       uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
       with:
@@ -69,7 +69,7 @@ jobs:
     - name: Go Mod Download
       run: go mod download
     - name: Run Gosec Security Scanner
-      uses: securego/gosec@398ad549bbf1a51dc978fd966169f660c59774de
+      uses: securego/gosec@271492bcd930ef72dfb9d00e5bb9544b3b407fb5
       with:
         args: '-no-fail -fmt sarif -out gosec-results.sarif ./...'
     - name: Upload GoSec scan to GitHub Security
@@ -89,9 +89,9 @@ jobs:
     permissions:
       security-events: write
     steps:
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+    - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
     - name: Run Trivy vulnerability scanner filesystem
-      uses: aquasecurity/trivy-action@c1824fd6edce30d7ab345a9989de00bbd46ef284
+      uses: aquasecurity/trivy-action@1bd062560b422f5944df1de50abd05162bea079e
       with:
         scan-type: fs
         scan-ref: '.'
@@ -114,7 +114,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+      uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
     - name: Setup Go
       uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
       with:
@@ -165,7 +165,7 @@ jobs:
     needs: [unit-tests, trivy, go-sec]
     if:  ${{ github.actor != 'dependabot[bot]' }} && (success() || failure())
     steps:
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+    - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
       with:
         fetch-depth: 0
     - name: Download Artifacts
