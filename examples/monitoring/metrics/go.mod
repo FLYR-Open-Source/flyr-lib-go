@@ -1,6 +1,6 @@
 module github.com/FLYR-Open-Source/flyr-lib-go/examples/monitoring/metrics
 
-go 1.26.0
+go 1.26.1
 
 replace github.com/FLYR-Open-Source/flyr-lib-go => ../../..
 
