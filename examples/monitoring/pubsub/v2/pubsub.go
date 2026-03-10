@@ -26,12 +26,10 @@ import (
 	"context"
 	"os"
 
-	"cloud.google.com/go/pubsub/v2"
 	"github.com/FLYR-Open-Source/flyr-lib-go/logger"
 	"github.com/FLYR-Open-Source/flyr-lib-go/monitoring/tracer"
-	"google.golang.org/api/option"
 
-	pubsubTrace "github.com/FLYR-Open-Source/flyr-lib-go/monitoring/pubsub"
+	pubsubTrace "github.com/FLYR-Open-Source/flyr-lib-go/monitoring/pubsub/v2"
 )
 
 const (
@@ -64,10 +62,15 @@ func main() {
 	}()
 
 	projectID := "some-gcp-project-id"
-	config := &pubsub.ClientConfig{}                      // this also can be nil
-	options := []option.ClientOption{ /* any options */ } // options is optional, therefore they can be omitted
 
-	client, err := pubsubTrace.NewClient(ctx, projectID, config, options...)
+	client, err := pubsubTrace.NewClient(ctx, projectID,
+		pubsubTrace.WithConfig(nil),          // optional: pass a custom *pubsub.ClientConfig
+		pubsubTrace.WithClientOptions(),      // optional: pass google API client options
+		// pubsubTrace.WithDisabledGrpcTracing(), // optional: disable gRPC-level telemetry
+	)
+	if err != nil {
+		panic(err)
+	}
 	defer func() {
 		err := client.Close()
 		if err != nil {

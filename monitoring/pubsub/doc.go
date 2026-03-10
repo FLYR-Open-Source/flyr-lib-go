@@ -22,4 +22,7 @@
 
 // Package pubsub provides helpers for configuring Pubsub clients
 // with OpenTelemetry tracing (for both producers and consumers).
+//
+// Deprecated: Use github.com/FLYR-Open-Source/flyr-lib-go/monitoring/pubsub/v2 instead,
+// which provides a functional options API for NewClient.
 package pubsub
