@@ -33,7 +33,6 @@ import (
 type Option func(*options)
 
 type options struct {
-	noTracing  bool
 	clientOpts []option.ClientOption
 	psCfg      *pubsub.ClientConfig
 }
@@ -53,21 +52,20 @@ func WithClientOptions(opts ...option.ClientOption) Option {
 	}
 }
 
-// WithNoTracing disables OpenTelemetry tracing on the PubSub client.
-// By default, tracing is enabled when no config is provided via WithConfig.
-// When a config is provided via WithConfig, WithNoTracing takes precedence and
-// overrides the EnableOpenTelemetryTracing field in that config.
-func WithNoTracing() Option {
+// WithDisabledGrpcTracing disables gRPC-level telemetry on the PubSub client by
+// appending [option.WithTelemetryDisabled] to the client options. This operates at
+// the transport layer and is independent of the EnableOpenTelemetryTracing field in
+// [pubsub.ClientConfig], which controls OTel tracing at the pubsub library level.
+func WithDisabledGrpcTracing() Option {
 	return func(o *options) {
-		o.noTracing = true
+		o.clientOpts = append(o.clientOpts, option.WithTelemetryDisabled())
 	}
 }
 
 // WithConfig sets a custom [pubsub.ClientConfig] on the client.
 // When provided, the caller controls all fields in the config, including
-// EnableOpenTelemetryTracing. However, if WithNoTracing is also specified,
-// it takes precedence and disables tracing regardless of the config value.
-// Passing nil resets to the default behaviour: an empty config with tracing enabled.
+// EnableOpenTelemetryTracing. Passing nil resets to the default behaviour:
+// an empty config with EnableOpenTelemetryTracing set to true.
 func WithConfig(cfg *pubsub.ClientConfig) Option {
 	return func(o *options) {
 		o.psCfg = cfg
@@ -76,12 +74,11 @@ func WithConfig(cfg *pubsub.ClientConfig) Option {
 
 // NewClient initializes a new GCP PubSub client.
 //
-// By default, OpenTelemetry tracing is enabled automatically. This behaviour can be
-// changed in two ways:
-//   - Pass WithNoTracing() to disable tracing entirely.
-//   - Pass WithConfig with a custom [pubsub.ClientConfig] to take full control over
-//     the config, including the EnableOpenTelemetryTracing field. WithNoTracing still
-//     takes precedence over the config if both are provided.
+// By default, OpenTelemetry tracing is enabled at the pubsub library level. This
+// behaviour can be changed in two independent ways:
+//   - Pass [WithConfig] with a custom [pubsub.ClientConfig] to take full control,
+//     including setting EnableOpenTelemetryTracing to false.
+//   - Pass [WithDisabledGrpcTracing] to disable telemetry at the gRPC transport layer.
 //
 // Returns a new *pubsub.Client and an error if the client could not be created.
 func NewClient(ctx context.Context, projectID string, opts ...Option) (*pubsub.Client, error) {
@@ -93,10 +90,6 @@ func NewClient(ctx context.Context, projectID string, opts ...Option) (*pubsub.C
 
 	if cfg.psCfg == nil {
 		cfg.psCfg = &pubsub.ClientConfig{EnableOpenTelemetryTracing: true}
-	}
-
-	if cfg.noTracing {
-		cfg.psCfg.EnableOpenTelemetryTracing = false
 	}
 
 	return pubsub.NewClientWithConfig(ctx, projectID, cfg.psCfg, cfg.clientOpts...)

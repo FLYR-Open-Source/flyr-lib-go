@@ -66,7 +66,7 @@ func main() {
 	client, err := pubsubTrace.NewClient(ctx, projectID,
 		pubsubTrace.WithConfig(nil),          // optional: pass a custom *pubsub.ClientConfig
 		pubsubTrace.WithClientOptions(),      // optional: pass google API client options
-		// pubsubTrace.WithNoTracing(),        // optional: disable OTel tracing
+		// pubsubTrace.WithDisabledGrpcTracing(), // optional: disable gRPC-level telemetry
 	)
 	if err != nil {
 		panic(err)
