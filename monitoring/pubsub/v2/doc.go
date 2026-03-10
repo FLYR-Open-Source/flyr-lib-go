@@ -20,29 +20,16 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package pubsub // import "github.com/FLYR-Open-Source/flyr-lib-go/monitoring/pubsub"
-
-import (
-	"context"
-
-	"cloud.google.com/go/pubsub/v2"
-	"google.golang.org/api/option"
-)
-
-// NewClient initializes a new GCP PubSub client with OpenTelemetry tracing enabled.
+// Package pubsub provides helpers for configuring PubSub clients
+// with OpenTelemetry tracing (for both producers and consumers).
 //
-// This function creates and returns a *pubsub.Client configured to enable the OpenTelemetry
-// feature for both publishing and subscribing to PubSub messages. When enabled, the client
-// will automatically trace all PubSub operations using OpenTelemetry.
+// This is v2 of the package, which replaces the positional config and client
+// options arguments with a functional options pattern for a more ergonomic and
+// extensible API. Migrate from v1 by replacing:
 //
-// Deprecated: Use github.com/FLYR-Open-Source/flyr-lib-go/monitoring/pubsub/v2.NewClient instead.
+//	pubsub.NewClient(ctx, projectID, config, opts...)
 //
-// Returns a new *pubsub.Client with OpenTelemetry tracing configured and an error if any.
-func NewClient(ctx context.Context, projectID string, config *pubsub.ClientConfig, opts ...option.ClientOption) (*pubsub.Client, error) {
-	if config == nil {
-		config = &pubsub.ClientConfig{}
-	}
-
-	config.EnableOpenTelemetryTracing = true
-	return pubsub.NewClientWithConfig(ctx, projectID, config, opts...)
-}
+// with:
+//
+//	pubsubv2.NewClient(ctx, projectID, pubsubv2.WithConfig(config), pubsubv2.WithClientOptions(opts...))
+package pubsub
