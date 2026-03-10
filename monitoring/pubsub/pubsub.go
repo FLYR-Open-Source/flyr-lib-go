@@ -35,6 +35,8 @@ import (
 // feature for both publishing and subscribing to PubSub messages. When enabled, the client
 // will automatically trace all PubSub operations using OpenTelemetry.
 //
+// Deprecated: Use github.com/FLYR-Open-Source/flyr-lib-go/monitoring/pubsub/v2.NewClient instead.
+//
 // Returns a new *pubsub.Client with OpenTelemetry tracing configured and an error if any.
 func NewClient(ctx context.Context, projectID string, config *pubsub.ClientConfig, opts ...option.ClientOption) (*pubsub.Client, error) {
 	if config == nil {
