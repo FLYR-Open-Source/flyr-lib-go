@@ -80,7 +80,7 @@ jobs:
           git config --global user.email github-actions@github.com
           git merge --no-ff origin/${{ github.event.pull_request.head.ref }} --message "${{ github.event.pull_request.title }}"
       - name: Download Release Artifact
-        uses: actions/download-artifact@70fc10c6e5e1ce46ad2ea6f2b72d43f7d47b13c3 # v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         if: ${{ inputs.downloadArtifact != '' }}
         with:
           name: ${{ inputs.downloadArtifact }}
