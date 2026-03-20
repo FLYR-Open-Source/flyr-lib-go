@@ -69,7 +69,7 @@ jobs:
     - name: Go Mod Download
       run: go mod download
     - name: Run Gosec Security Scanner
-      uses: securego/gosec@befce8de5da965121ad143b3c1eba58b0c3941bb
+      uses: securego/gosec@6d41a7978e42f611fe2def453e1db63b65b7dab7
       with:
         args: '-no-fail -fmt sarif -out gosec-results.sarif ./...'
     - name: Upload GoSec scan to GitHub Security
