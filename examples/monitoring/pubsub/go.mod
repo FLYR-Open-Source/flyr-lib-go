@@ -4,7 +4,7 @@ go 1.26.1
 
 require (
 	cloud.google.com/go/pubsub/v2 v2.5.0
-	github.com/FLYR-Open-Source/flyr-lib-go v1.5.0
+	github.com/FLYR-Open-Source/flyr-lib-go v1.5.1
 	google.golang.org/api v0.272.0
 )
 
