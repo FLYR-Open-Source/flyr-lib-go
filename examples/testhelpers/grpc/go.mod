@@ -8,8 +8,8 @@ require (
 	cloud.google.com/go/logging v1.13.2
 	github.com/FLYR-Open-Source/flyr-lib-go v1.5.0
 	google.golang.org/api v0.271.0
-	google.golang.org/genproto v0.0.0-20260311181403-84a4fc48630c
-	google.golang.org/grpc v1.79.2
+	google.golang.org/genproto v0.0.0-20260319201613-d00831a3d3e7
+	google.golang.org/grpc v1.79.3
 	google.golang.org/protobuf v1.36.11
 )
 
@@ -40,6 +40,6 @@ require (
 	golang.org/x/sys v0.41.0 // indirect
 	golang.org/x/text v0.34.0 // indirect
 	golang.org/x/time v0.15.0 // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20260226221140-a57be14db171 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20260226221140-a57be14db171 // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20260316172706-e463d84ca32d // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20260311181403-84a4fc48630c // indirect
 )
