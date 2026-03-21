@@ -22,6 +22,41 @@
 
 package version // import "github.com/FLYR-Open-Source/flyr-lib-go/internal/version"
 
+import (
+	"runtime/debug"
+	"sync"
+)
+
+const modulePath = "github.com/FLYR-Open-Source/flyr-lib-go"
+
+var (
+	resolvedVersion = "unknown"
+	once            sync.Once
+)
+
+// Version returns the version of the flyr-lib-go module.
+// It is resolved once at runtime using debug.ReadBuildInfo().
+// When the library is consumed as a dependency, the version is read from the
+// module's build info. When running tests or binaries within this repo, it
+// returns "unknown" because the main module version is "(devel)".
 func Version() string {
-	return "v1.5.0" // Hardcoded for now
+	once.Do(func() {
+		bi, ok := debug.ReadBuildInfo()
+		if !ok {
+			return
+		}
+
+		for _, dep := range bi.Deps {
+			if dep.Path == modulePath {
+				resolvedVersion = dep.Version
+				return
+			}
+		}
+
+		if bi.Main.Path == modulePath && bi.Main.Version != "" && bi.Main.Version != "(devel)" {
+			resolvedVersion = bi.Main.Version
+		}
+	})
+
+	return resolvedVersion
 }
