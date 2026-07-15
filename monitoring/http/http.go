@@ -23,8 +23,12 @@
 package http // import "github.com/FLYR-Open-Source/flyr-lib-go/monitoring/http"
 
 import (
+	"context"
 	"net/http"
+	"net/http/httptrace"
 
+	"github.com/FLYR-Open-Source/flyr-lib-go/internal/config"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )
 
@@ -37,7 +41,16 @@ import (
 //
 // Returns the configured http.Client with the OpenTelemetry transport set.
 func SetHttpTransport(client http.Client) http.Client {
-	client.Transport = otelhttp.NewTransport(http.DefaultTransport)
+	opts := make([]otelhttp.Option, 0)
+
+	cfg := config.NewMonitoringConfig()
+	if cfg.EnableHttpClientTraces() {
+		opts = append(opts, otelhttp.WithClientTrace(func(ctx context.Context) *httptrace.ClientTrace {
+			return otelhttptrace.NewClientTrace(ctx)
+		}))
+	}
+
+	client.Transport = otelhttp.NewTransport(http.DefaultTransport, opts...)
 	return client
 }
 
@@ -50,7 +63,6 @@ func SetHttpTransport(client http.Client) http.Client {
 //
 // Returns a new http.Client with OpenTelemetry tracing configured.
 func NewHttpClient() http.Client {
-	return http.Client{
-		Transport: otelhttp.NewTransport(http.DefaultTransport),
-	}
+	client := http.Client{}
+	return SetHttpTransport(client)
 }
