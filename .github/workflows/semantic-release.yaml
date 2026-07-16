@@ -86,7 +86,7 @@ jobs:
           name: ${{ inputs.downloadArtifact }}
           path: target/
       - name: Semantic Release
-        uses: davidspek/semantic-release-action@main
+        uses: davidspek/semantic-release-action@e03fa181e172824c9fea3d99850909c3b0d6ac8e # main
         id: semantic_release
         with:
           dry_run: ${{ github.event_name == 'pull_request' || inputs.dryRun }}
