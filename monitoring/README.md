@@ -160,6 +160,9 @@ The monitoring package accepts a config that reads values from Environment Varia
 | `http.send`    | Writing the request (headers/body) to the wire       |
 | `http.receive` | Waiting for/reading the response headers             |
 
+> [!IMPORTANT]
+> These spans are useful only for live investigations. Since they will cause huge volume of spans on the Traces, we recommend to enable them only when you want to investigate an incident.
+
 ## Kubernetes Setup
 
 Before using the Tracer and Meter, you need to ensure you can the correct setup in your Kubernetes deployment.
