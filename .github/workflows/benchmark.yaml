@@ -14,23 +14,23 @@ jobs:
         runs-on: ubuntu-latest
         steps:
         - name: Checkout
-          uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+          uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         - name: Setup Go
-          uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6
+          uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
           with:
             go-version-file: go.mod
             cache-dependency-path: go.sum
         - name: Run benchmarks
           run: make benchmark | tee output.txt
         - name: Download previous benchmark data
-          uses: actions/cache/restore@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+          uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
           with:
             path: ./benchmarks
             # `github.event.before` means the commit before the push (i.e. the previous commit).
             # So we can fetch the exact benchmark data from the previous commit.
             key: ${{ runner.os }}-benchmark-${{ github.event.before }}
         - name: Store benchmarks result
-          uses: benchmark-action/github-action-benchmark@a7bc2366eda11037936ea57d811a43b3418d3073 # v1.21.0
+          uses: benchmark-action/github-action-benchmark@52576c92bccf6ac60c8223ec7eb2565637cae9ba # v1.22.1
           with:
             name: Benchmarks
             tool: 'go'
@@ -43,7 +43,7 @@ jobs:
             # Add benchmark summary to GitHub workflow run report
             summary-always: true
         - name: Save benchmark data
-          uses: actions/cache/save@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+          uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
           # The cache will be saved even if a step fails.
           if: always()
           with:
