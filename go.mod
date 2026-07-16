@@ -4,7 +4,7 @@ go 1.26.5
 
 require (
 	cloud.google.com/go/pubsub/v2 v2.5.1
-	github.com/caarlos0/env/v11 v11.4.0
+	github.com/caarlos0/env/v11 v11.4.1
 	github.com/gin-gonic/gin v1.12.0
 	github.com/go-chi/chi/v5 v5.2.5
 	github.com/samber/slog-multi v1.8.0
