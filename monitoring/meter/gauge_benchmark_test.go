@@ -37,6 +37,7 @@ func BenchmarkFloatGauge(b *testing.B) {
 	config.ResetMonitoringConfig()
 	_ = os.Setenv("OTEL_SERVICE_NAME", "test-service")
 	_ = os.Setenv("OTEL_EXPORTER_OTLP_PROTOCOL", "grpc")
+	b.Cleanup(config.ResetMonitoringConfig)
 
 	mockLogServer := &fakemonitoring.MockOtelMetricsServer{}
 	_, options, err := fakemonitoring.NewOtelMetricsGrpcServer(mockLogServer)
@@ -74,6 +75,7 @@ func BenchmarkIntGauge(b *testing.B) {
 	config.ResetMonitoringConfig()
 	_ = os.Setenv("OTEL_SERVICE_NAME", "test-service")
 	_ = os.Setenv("OTEL_EXPORTER_OTLP_PROTOCOL", "grpc")
+	b.Cleanup(config.ResetMonitoringConfig)
 
 	mockLogServer := &fakemonitoring.MockOtelMetricsServer{}
 	_, options, err := fakemonitoring.NewOtelMetricsGrpcServer(mockLogServer)

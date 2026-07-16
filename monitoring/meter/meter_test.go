@@ -51,9 +51,12 @@ func TestStartDefaultMeter(t *testing.T) {
 	ctx := context.Background()
 
 	t.Run("successful initialization", func(t *testing.T) {
+		t.Cleanup(func() {
+			config.ResetMonitoringConfig()
+			deleteOsEnvironments()
+		})
+
 		setOsEnvironments(true, "grpc")
-		defer config.ResetMonitoringConfig()
-		defer deleteOsEnvironments()
 		// Reset the global defaultMeter
 		defaultMeter = nil
 
@@ -68,8 +71,10 @@ func TestStartDefaultMeter(t *testing.T) {
 
 	t.Run("initializeMeterProvider fails", func(t *testing.T) {
 		setOsEnvironments(false, "invalid")
-		defer config.ResetMonitoringConfig()
-		defer deleteOsEnvironments()
+		t.Cleanup(func() {
+			config.ResetMonitoringConfig()
+			deleteOsEnvironments()
+		})
 
 		// Reset the global defaultMeter
 		defaultMeter = nil
