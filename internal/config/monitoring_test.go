@@ -31,12 +31,13 @@ import (
 
 func TestMonitoringConfig(t *testing.T) {
 	tests := []struct {
-		name                    string
-		variables               map[string]string
-		expectedService         string
-		expectedTraceExporter   string
-		expectedMetricsExporter string
-		expectedTestExporter    bool
+		name                           string
+		variables                      map[string]string
+		expectedService                string
+		expectedTraceExporter          string
+		expectedMetricsExporter        string
+		expectedTestExporter           bool
+		expectedEnableHttpClientTraces bool
 	}{
 		{
 			name:                  "with empty values",
@@ -106,6 +107,13 @@ func TestMonitoringConfig(t *testing.T) {
 			},
 			expectedTestExporter: false,
 		},
+		{
+			name: "http client traces are enabled",
+			variables: map[string]string{
+				"OTEL_ENABLE_HTTP_CLIENT_TRACES": "true",
+			},
+			expectedEnableHttpClientTraces: true,
+		},
 	}
 
 	for _, tt := range tests {
@@ -119,6 +127,7 @@ func TestMonitoringConfig(t *testing.T) {
 			assert.Equalf(t, tt.expectedTraceExporter, cfg.ExporterTracesProtocol(), "ExporterTracesProtocol() return value is not correct")
 			assert.Equalf(t, tt.expectedMetricsExporter, cfg.ExporterMetricsProtocol(), "ExporterMetricsProtocol() return value is not correct")
 			assert.Equalf(t, tt.expectedTestExporter, cfg.IsTestExporter(), "IsTestExporter() return value is not correct")
+			assert.Equalf(t, tt.expectedEnableHttpClientTraces, cfg.EnableHttpClientTraces(), "EnableHttpClientTraces() return value is not correct")
 		})
 	}
 }

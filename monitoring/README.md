@@ -147,6 +147,21 @@ The monitoring package accepts a config that reads values from Environment Varia
 | `OTEL_EXPORTER_OTLP_METRICS_PROTOCOL`| Specifies the OTLP transport protocol to be used for metric data.                                                      |
 | `OTEL_EXPORTER_OTLP_TEST`            | Specifies whether the OTLP exporter should be used in test mode. Usefull for debugging traces and metrics. Setting this value to true, will send the traces and metrics in the stdout.|
 | `OTEL_METRICS_INTERVAL_SECONDS`            | Specifies the interval at which metrics are exported in the Periodic Reader. The default value is `60s`.|
+| `OTEL_ENABLE_HTTP_CLIENT_TRACES`     | Enables sub-spans on HTTP client requests made with `monitoring/http`. See [below](#otel_enable_http_client_traces-spans) for the spans it produces. |
+
+### OTEL_ENABLE_HTTP_CLIENT_TRACES spans
+
+| Span name      | What it captures                                     |
+|----------------|------------------------------------------------------|
+| `http.getconn` | Time spent acquiring a connection (from pool or new) |
+| `http.dns`     | DNS resolution (start/done)                          |
+| `http.connect` | TCP dial to the remote host                          |
+| `http.tls`     | TLS handshake (if HTTPS)                             |
+| `http.send`    | Writing the request (headers/body) to the wire       |
+| `http.receive` | Waiting for/reading the response headers             |
+
+> [!IMPORTANT]
+> These spans are useful only for live investigations. Since they will cause huge volume of spans on the Traces, we recommend to enable them only when you want to investigate an incident.
 
 ## Kubernetes Setup
 

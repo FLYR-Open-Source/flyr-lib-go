@@ -26,10 +26,22 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/FLYR-Open-Source/flyr-lib-go/internal/config"
 	"github.com/stretchr/testify/require"
 )
 
 func TestSetHttpTransport(t *testing.T) {
+	client := http.Client{}
+	client = SetHttpTransport(client)
+
+	require.NotNil(t, client.Transport)
+}
+
+func TestSetHttpTransport_WithHttpClientTracesEnabled(t *testing.T) {
+	t.Setenv("OTEL_ENABLE_HTTP_CLIENT_TRACES", "true")
+	config.ResetMonitoringConfig()
+	t.Cleanup(config.ResetMonitoringConfig)
+
 	client := http.Client{}
 	client = SetHttpTransport(client)
 

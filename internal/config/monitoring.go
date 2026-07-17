@@ -50,6 +50,7 @@ type MonitoringConfig interface {
 	IsTestExporter() bool
 	// Traces configuration
 	ExporterTracesProtocol() string
+	EnableHttpClientTraces() bool
 	// Metrics configuration
 	ExporterMetricsProtocol() string
 	MetricsInterval() time.Duration
@@ -62,12 +63,19 @@ type Monitoring struct {
 	// Exporter configuration
 	ExporterProtocolCfg string `env:"OTEL_EXPORTER_OTLP_PROTOCOL"` // Specifies the OTLP transport protocol to be used for all telemetry data.
 	// Traces configuration
-	ExporterTraceProtocolCfg string `env:"OTEL_EXPORTER_OTLP_TRACES_PROTOCOL"` // Specifies the OTLP transport protocol to be used for trace data.
+	ExporterTraceProtocolCfg  string `env:"OTEL_EXPORTER_OTLP_TRACES_PROTOCOL"` // Specifies the OTLP transport protocol to be used for trace data.
+	EnableHttpClientTracesCfg bool   `env:"OTEL_ENABLE_HTTP_CLIENT_TRACES"`     // Enables the DNS, connect, TLS, and get-connection traces in the "net/http.Client{}"
 	// Metrics configuration
 	ExporterMetricsProtocolCfg string  `env:"OTEL_EXPORTER_OTLP_METRICS_PROTOCOL"` // Specifies the OTLP transport protocol to be used for metric data.
 	MetricsIntervalCfg         float64 `env:"OTEL_METRICS_INTERVAL_SECONDS"`       // Specifies the interval at which metrics are exported.
 }
 
+// NewMonitoringConfig returns a singleton instance of the Monitoring configuration.
+//
+// This function initializes the Monitoring configuration by reading environment variables and applying any provided options.
+// It ensures that the configuration is only initialized once, even if called multiple times.
+//
+// Returns the singleton instance of the Monitoring configuration.
 func NewMonitoringConfig(opts ...Option) Monitoring {
 	monitoringConfigOnce.Do(func() {
 		cfg := Monitoring{}
@@ -90,6 +98,7 @@ func (d Monitoring) IsTestExporter() bool {
 }
 
 // ExporterTracesProtocol returns the protocol used by the OTLP Trace exporter.
+//
 // If both `OTEL_EXPORTER_OTLP_PROTOCOL` and `OTEL_EXPORTER_OTLP_TRACES_PROTOCOL` are present,
 // `OTEL_EXPORTER_OTLP_TRACES_PROTOCOL` takes higher precedence.
 func (d Monitoring) ExporterTracesProtocol() string {
@@ -102,6 +111,7 @@ func (d Monitoring) ExporterTracesProtocol() string {
 }
 
 // ExporterMetricsProtocol returns the protocol used by the OTLP Metrics exporter.
+//
 // If both `OTEL_EXPORTER_OTLP_PROTOCOL` and `OTEL_EXPORTER_OTLP_METRICS_PROTOCOL` are present,
 // `OTEL_EXPORTER_OTLP_METRICS_PROTOCOL` takes higher precedence.
 func (d Monitoring) ExporterMetricsProtocol() string {
@@ -114,6 +124,7 @@ func (d Monitoring) ExporterMetricsProtocol() string {
 }
 
 // MetricsInterval returns the interval at which metrics are exported.
+//
 // If the metrics interval is not set, it returns the default metrics interval.
 // If the metrics interval is set to a negative value, it returns the default metrics interval.
 func (d Monitoring) MetricsInterval() time.Duration {
@@ -123,4 +134,9 @@ func (d Monitoring) MetricsInterval() time.Duration {
 	}
 
 	return time.Duration(interval * float64(time.Second))
+}
+
+// EnableHttpClientTraces enables DNS, connect, TLS, and get-connection traces in the "net/http.Client{}"
+func (d Monitoring) EnableHttpClientTraces() bool {
+	return d.EnableHttpClientTracesCfg
 }
