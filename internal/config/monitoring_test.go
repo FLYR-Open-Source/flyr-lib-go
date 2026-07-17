@@ -31,13 +31,15 @@ import (
 
 func TestMonitoringConfig(t *testing.T) {
 	tests := []struct {
-		name                           string
-		variables                      map[string]string
-		expectedService                string
-		expectedTraceExporter          string
-		expectedMetricsExporter        string
-		expectedTestExporter           bool
-		expectedEnableHttpClientTraces bool
+		name                                   string
+		variables                              map[string]string
+		expectedService                        string
+		expectedTraceExporter                  string
+		expectedMetricsExporter                string
+		expectedTestExporter                   bool
+		expectedEnableHttpClientTraces         bool
+		expectedEnableHttpClientMetrics        bool
+		expectedEnableHttpClientSpanAttributes bool
 	}{
 		{
 			name:                  "with empty values",
@@ -114,6 +116,20 @@ func TestMonitoringConfig(t *testing.T) {
 			},
 			expectedEnableHttpClientTraces: true,
 		},
+		{
+			name: "http client metrics are enabled",
+			variables: map[string]string{
+				"OTEL_ENABLE_HTTP_CLIENT_METRICS": "true",
+			},
+			expectedEnableHttpClientMetrics: true,
+		},
+		{
+			name: "http client span attributes are enabled",
+			variables: map[string]string{
+				"OTEL_ENABLE_HTTP_CLIENT_SPAN_ATTRIBUTES": "true",
+			},
+			expectedEnableHttpClientSpanAttributes: true,
+		},
 	}
 
 	for _, tt := range tests {
@@ -128,6 +144,8 @@ func TestMonitoringConfig(t *testing.T) {
 			assert.Equalf(t, tt.expectedMetricsExporter, cfg.ExporterMetricsProtocol(), "ExporterMetricsProtocol() return value is not correct")
 			assert.Equalf(t, tt.expectedTestExporter, cfg.IsTestExporter(), "IsTestExporter() return value is not correct")
 			assert.Equalf(t, tt.expectedEnableHttpClientTraces, cfg.EnableHttpClientTraces(), "EnableHttpClientTraces() return value is not correct")
+			assert.Equalf(t, tt.expectedEnableHttpClientMetrics, cfg.EnableHttpClientMetrics(), "EnableHttpClientMetrics() return value is not correct")
+			assert.Equalf(t, tt.expectedEnableHttpClientSpanAttributes, cfg.EnableHttpClientSpanAttributes(), "EnableHttpClientSpanAttributes() return value is not correct")
 		})
 	}
 }

@@ -31,6 +31,7 @@ import (
 	"github.com/FLYR-Open-Source/flyr-lib-go/logger"
 	httpTrace "github.com/FLYR-Open-Source/flyr-lib-go/monitoring/http"
 	"github.com/FLYR-Open-Source/flyr-lib-go/monitoring/tracer"
+	"go.opentelemetry.io/otel"
 )
 
 const (
@@ -71,6 +72,10 @@ func main() {
 	withExistingClient()
 
 	WithHttpClientTracing()
+
+	WithHttpClientMetrics()
+
+	WithHttpClientSpanAttributes()
 }
 
 func withNewClient() {
@@ -112,6 +117,56 @@ func WithHttpClientTracing() {
 	ctx := context.Background()
 	url := "https://flyr.com/"
 	client := httpTrace.NewHttpClient() // start new HTTP client with tracing
+	req, _ := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+
+	res, err := client.Do(req)
+	if err != nil {
+		logger.Error(ctx, "failed to make request", err)
+	}
+
+	defer res.Body.Close()
+}
+
+// WithHttpClientMetrics enables the connection-lifecycle metrics (DNS, connect, TLS,
+// get-connection, TTFB, PutIdleConn errors) that otelhttp.NewTransport does not provide
+// out of the box. This is independent of OTEL_ENABLE_HTTP_CLIENT_TRACES: either, both, or
+// neither can be enabled.
+func WithHttpClientMetrics() {
+	internalConfig.ResetMonitoringConfig()
+	setupEnv()
+	_ = os.Setenv("OTEL_ENABLE_HTTP_CLIENT_METRICS", "true")
+
+	ctx := context.Background()
+	url := "https://flyr.com/"
+
+	// WithMeterProvider is optional: if omitted, both otelhttp's own request metrics and
+	// the connection-lifecycle metrics use the globally registered OpenTelemetry
+	// MeterProvider (otel.GetMeterProvider()).
+	client := httpTrace.NewHttpClient(httpTrace.WithMeterProvider(otel.GetMeterProvider()))
+	req, _ := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+
+	res, err := client.Do(req)
+	if err != nil {
+		logger.Error(ctx, "failed to make request", err)
+	}
+
+	defer res.Body.Close()
+}
+
+// WithHttpClientSpanAttributes enables the same connection-lifecycle data as
+// WithHttpClientMetrics, but as attributes on the request's own span (e.g.
+// http.client.getconn.acquired=false surfaces a connection that was requested but never
+// obtained) instead of separate metric instruments. This is independent of
+// OTEL_ENABLE_HTTP_CLIENT_TRACES and OTEL_ENABLE_HTTP_CLIENT_METRICS: any combination can be
+// enabled.
+func WithHttpClientSpanAttributes() {
+	internalConfig.ResetMonitoringConfig()
+	setupEnv()
+	_ = os.Setenv("OTEL_ENABLE_HTTP_CLIENT_SPAN_ATTRIBUTES", "true")
+
+	ctx := context.Background()
+	url := "https://flyr.com/"
+	client := httpTrace.NewHttpClient()
 	req, _ := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 
 	res, err := client.Do(req)

@@ -94,6 +94,14 @@ The package [monitoring/http](./http/) exposes two different functions.
 The `NewHttpClient()` can be used to create a new `http.Client` with Distributed Tracing enabled.
 If you have a client already, you can use the function `SetHttpTransport(client http.Client)` that enables Distributed Tracing for the given client. The same client is returned back.
 
+Both functions wrap the client's transport with [`otelhttp.NewTransport`](https://pkg.go.dev/go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp), which records `http.client.request.duration` and `http.client.request.body.size` for every request. Setting `OTEL_ENABLE_HTTP_CLIENT_METRICS=true` additionally records connection-lifecycle metrics that `otelhttp` does not provide out of the box: `http.client.getconn.duration` (time spent acquiring a connection from the pool, tagged with `reused`/`was_idle`), `http.client.dns.duration`, `http.client.connect.duration`, `http.client.tls.duration` (DNS/connect/TLS handshake time for new connections), `http.client.ttfb.duration` (time to first response byte), `http.client.putidleconn.errors` (connections that couldn't be returned to the idle pool, a signal of pool churn), and `http.client.getconn.unacquired` (a connection was requested but never obtained before the request ended — e.g. blocking pool exhaustion, or the request was canceled/timed out while waiting for a connection). This is independent of `OTEL_ENABLE_HTTP_CLIENT_TRACES` — either, both, or neither can be enabled.
+
+Setting `OTEL_ENABLE_HTTP_CLIENT_SPAN_ATTRIBUTES=true` records that same connection-lifecycle data as attributes on the request's own span (`http.client.getconn.acquired`, `.duration`, `.reused`, `.was_idle`, `.idle_time`, `http.client.dns.duration`, `http.client.connect.duration`, `http.client.tls.duration`, `http.client.ttfb.duration`) instead of — or alongside — separate metric instruments. This is useful for seeing exactly where one specific, individual request spent its time, which an aggregated metric cannot show; `http.client.getconn.acquired=false` in particular surfaces a connection that was requested but never obtained, directly on the span for that request. This toggle is also independent of the other two — any combination of `OTEL_ENABLE_HTTP_CLIENT_TRACES`, `OTEL_ENABLE_HTTP_CLIENT_METRICS`, and `OTEL_ENABLE_HTTP_CLIENT_SPAN_ATTRIBUTES` can be enabled together.
+
+By default both `otelhttp`'s own metrics and this package's connection-lifecycle metrics use the globally registered OpenTelemetry `MeterProvider`. Pass `WithMeterProvider(provider)` to `NewHttpClient`/`SetHttpTransport` to use a specific one instead; the same provider is used for both.
+
+By default the transport wraps `http.DefaultTransport`. Pass `WithBaseTransport(transport)` to use a differently configured `*http.Transport` instead — e.g. to set `MaxConnsPerHost`, `MaxIdleConnsPerHost`, or `IdleConnTimeout` — rather than sharing the process-wide default.
+
 Also, you can find examples: [examples](#examples).
 
 ### PubSub Tracing
@@ -148,6 +156,8 @@ The monitoring package accepts a config that reads values from Environment Varia
 | `OTEL_EXPORTER_OTLP_TEST`            | Specifies whether the OTLP exporter should be used in test mode. Usefull for debugging traces and metrics. Setting this value to true, will send the traces and metrics in the stdout.|
 | `OTEL_METRICS_INTERVAL_SECONDS`            | Specifies the interval at which metrics are exported in the Periodic Reader. The default value is `60s`.|
 | `OTEL_ENABLE_HTTP_CLIENT_TRACES`     | Enables sub-spans on HTTP client requests made with `monitoring/http`. See [below](#otel_enable_http_client_traces-spans) for the spans it produces. |
+| `OTEL_ENABLE_HTTP_CLIENT_METRICS`    | Enables connection-lifecycle metrics (`http.client.getconn.duration`, `http.client.getconn.unacquired`, `http.client.dns.duration`, `http.client.connect.duration`, `http.client.tls.duration`, `http.client.ttfb.duration`, `http.client.putidleconn.errors`) on HTTP client requests made with `monitoring/http`.|
+| `OTEL_ENABLE_HTTP_CLIENT_SPAN_ATTRIBUTES` | Enables the same connection-lifecycle data as attributes (`http.client.getconn.acquired`, `.duration`, `.reused`, `.was_idle`, `.idle_time`, `http.client.dns.duration`, `http.client.connect.duration`, `http.client.tls.duration`, `http.client.ttfb.duration`) on the request's own span, on HTTP client requests made with `monitoring/http`.|
 
 ### OTEL_ENABLE_HTTP_CLIENT_TRACES spans
 
