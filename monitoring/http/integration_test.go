@@ -137,7 +137,7 @@ func TestIntegration_ConcurrentRequests(t *testing.T) {
 		okMu     sync.Mutex
 	)
 
-	for i := 0; i < totalRequests; i++ {
+	for range totalRequests {
 		wg.Add(1)
 		sem <- struct{}{}
 		go func() {

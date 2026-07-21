@@ -69,80 +69,84 @@ const (
 func spanAttributeTrace(ctx context.Context, next *httptrace.ClientTrace) *httptrace.ClientTrace {
 	span := tracer.GetSpanFromContext(ctx)
 
-	var (
+	// All per-request timestamps live in one struct so the hook closures share a single
+	// captured variable (one heap cell) instead of five.
+	var at struct {
 		dnsStart, connectStart, tlsStart, getConnStart, gotConnAt time.Time
-	)
+	}
 
 	return &httptrace.ClientTrace{
 		GetConn: func(hostPort string) {
-			getConnStart = time.Now()
+			at.getConnStart = time.Now()
 			span.SetAttributes(attribute.Bool(attrGetConnAcquired, false))
 			if next != nil && next.GetConn != nil {
 				next.GetConn(hostPort)
 			}
 		},
 		DNSStart: func(info httptrace.DNSStartInfo) {
-			dnsStart = time.Now()
+			at.dnsStart = time.Now()
 			if next != nil && next.DNSStart != nil {
 				next.DNSStart(info)
 			}
 		},
 		DNSDone: func(info httptrace.DNSDoneInfo) {
-			if !dnsStart.IsZero() {
-				span.SetAttributes(attribute.Float64(attrDNSDuration, time.Since(dnsStart).Seconds()))
+			if !at.dnsStart.IsZero() {
+				span.SetAttributes(attribute.Float64(attrDNSDuration, time.Since(at.dnsStart).Seconds()))
 			}
 			if next != nil && next.DNSDone != nil {
 				next.DNSDone(info)
 			}
 		},
 		ConnectStart: func(network, addr string) {
-			connectStart = time.Now()
+			at.connectStart = time.Now()
 			if next != nil && next.ConnectStart != nil {
 				next.ConnectStart(network, addr)
 			}
 		},
 		ConnectDone: func(network, addr string, err error) {
-			if !connectStart.IsZero() {
-				span.SetAttributes(attribute.Float64(attrConnectDuration, time.Since(connectStart).Seconds()))
+			if !at.connectStart.IsZero() {
+				span.SetAttributes(attribute.Float64(attrConnectDuration, time.Since(at.connectStart).Seconds()))
 			}
 			if next != nil && next.ConnectDone != nil {
 				next.ConnectDone(network, addr, err)
 			}
 		},
 		TLSHandshakeStart: func() {
-			tlsStart = time.Now()
+			at.tlsStart = time.Now()
 			if next != nil && next.TLSHandshakeStart != nil {
 				next.TLSHandshakeStart()
 			}
 		},
 		TLSHandshakeDone: func(cs tls.ConnectionState, err error) {
-			if !tlsStart.IsZero() {
-				span.SetAttributes(attribute.Float64(attrTLSDuration, time.Since(tlsStart).Seconds()))
+			if !at.tlsStart.IsZero() {
+				span.SetAttributes(attribute.Float64(attrTLSDuration, time.Since(at.tlsStart).Seconds()))
 			}
 			if next != nil && next.TLSHandshakeDone != nil {
 				next.TLSHandshakeDone(cs, err)
 			}
 		},
 		GotConn: func(info httptrace.GotConnInfo) {
-			gotConnAt = time.Now()
-			if !getConnStart.IsZero() {
-				span.SetAttributes(
+			at.gotConnAt = time.Now()
+			if !at.getConnStart.IsZero() {
+				attrs := make([]attribute.KeyValue, 0, 5)
+				attrs = append(attrs,
 					attribute.Bool(attrGetConnAcquired, true),
-					attribute.Float64(attrGetConnDuration, gotConnAt.Sub(getConnStart).Seconds()),
+					attribute.Float64(attrGetConnDuration, at.gotConnAt.Sub(at.getConnStart).Seconds()),
 					attribute.Bool(attrGetConnReused, info.Reused),
 					attribute.Bool(attrGetConnWasIdle, info.WasIdle),
 				)
 				if info.WasIdle {
-					span.SetAttributes(attribute.Float64(attrGetConnIdleTime, info.IdleTime.Seconds()))
+					attrs = append(attrs, attribute.Float64(attrGetConnIdleTime, info.IdleTime.Seconds()))
 				}
+				span.SetAttributes(attrs...)
 			}
 			if next != nil && next.GotConn != nil {
 				next.GotConn(info)
 			}
 		},
 		GotFirstResponseByte: func() {
-			if !gotConnAt.IsZero() {
-				span.SetAttributes(attribute.Float64(attrTTFBDuration, time.Since(gotConnAt).Seconds()))
+			if !at.gotConnAt.IsZero() {
+				span.SetAttributes(attribute.Float64(attrTTFBDuration, time.Since(at.gotConnAt).Seconds()))
 			}
 			if next != nil && next.GotFirstResponseByte != nil {
 				next.GotFirstResponseByte()

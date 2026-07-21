@@ -62,6 +62,21 @@ type clientMetrics struct {
 	tlsDuration       metric.Float64Histogram
 	ttfbDuration      metric.Float64Histogram
 	putIdleConnErrors metric.Int64Counter
+
+	// getConnAttrs holds the four possible attribute combinations for the
+	// http.client.getconn.duration histogram, indexed as [reused][wasIdle], precomputed once
+	// at instrument creation. GotConn fires on every request, and building the attribute set
+	// there with metric.WithAttributes would allocate per request; metric.WithAttributeSet
+	// over a precomputed set does not (it is the documented choice for hot paths).
+	getConnAttrs [2][2]metric.MeasurementOption
+}
+
+// boolIndex converts a bool to an index into the getConnAttrs table.
+func boolIndex(b bool) int {
+	if b {
+		return 1
+	}
+	return 0
 }
 
 // newClientMetrics creates the instruments for HTTP client connection-lifecycle metrics
@@ -120,6 +135,15 @@ func newClientMetrics(provider metric.MeterProvider) (*clientMetrics, error) {
 		metric.WithUnit("{error}"),
 	); err != nil {
 		return nil, err
+	}
+
+	for _, reused := range []bool{false, true} {
+		for _, wasIdle := range []bool{false, true} {
+			m.getConnAttrs[boolIndex(reused)][boolIndex(wasIdle)] = metric.WithAttributeSet(attribute.NewSet(
+				attribute.Bool("reused", reused),
+				attribute.Bool("was_idle", wasIdle),
+			))
+		}
 	}
 
 	return m, nil
@@ -265,10 +289,7 @@ func newClientMetricTrace(ctx context.Context, state *getConnState, m *clientMet
 			state.mu.Unlock()
 			if !getConnStart.IsZero() {
 				m.getConnDuration.Record(ctx, state.gotConnAt.Sub(getConnStart).Seconds(),
-					metric.WithAttributes(
-						attribute.Bool("reused", info.Reused),
-						attribute.Bool("was_idle", info.WasIdle),
-					),
+					m.getConnAttrs[boolIndex(info.Reused)][boolIndex(info.WasIdle)],
 				)
 			}
 			if next != nil && next.GotConn != nil {

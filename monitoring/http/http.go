@@ -120,10 +120,12 @@ func SetHttpTransport(client http.Client, opts ...Option) http.Client {
 
 	var metrics *clientMetrics
 	if enableMetrics {
+		// Instrument creation is best-effort: on failure the client still works, just
+		// without connection-lifecycle metrics.
+		// TODO: log the error to help diagnose why metrics aren't being emitted (logging
+		// in this package lands in a separate PR).
 		if m, err := newClientMetrics(tc.meterProvider); err == nil {
 			metrics = m
-		} else {
-			// TODO: log error if metrics creation fails? This is a non-fatal failure, but it may be worth logging to help diagnose why metrics aren't being emitted.
 		}
 	}
 
