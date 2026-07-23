@@ -2,7 +2,10 @@ module github.com/FLYR-Open-Source/flyr-lib-go/examples/monitoring/http
 
 go 1.26.5
 
-require github.com/FLYR-Open-Source/flyr-lib-go v1.5.1
+require (
+	github.com/FLYR-Open-Source/flyr-lib-go v1.5.1
+	go.opentelemetry.io/otel v1.44.0
+)
 
 require (
 	github.com/caarlos0/env/v11 v11.4.1 // indirect
@@ -19,7 +22,6 @@ require (
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace v0.69.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.69.0 // indirect
-	go.opentelemetry.io/otel v1.44.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.44.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.44.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp v1.44.0 // indirect

@@ -17,7 +17,7 @@ lint:
 
 .PHONY: test
 test:
-	gotestsum -- -short --cover $(TEST_DIRS)
+	gotestsum -- -short -race --cover $(TEST_DIRS)
 
 .PHONY: test-coverage
 test-coverage:

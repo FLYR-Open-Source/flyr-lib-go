@@ -34,6 +34,27 @@ jobs:
         version: v2.12.2
         args: "--timeout 5m -v"
 
+  tidy:
+    name: Go Mod Tidy
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'pull_request' }}
+    steps:
+    - name: Checkout
+      uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+    - name: Setup Go
+      uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+      with:
+        go-version-file: go.mod
+        cache-dependency-path: go.sum
+    - name: Run make tidy
+      run: make tidy
+    - name: Check for uncommitted changes
+      run: |
+        if ! git diff --exit-code; then
+          echo "::error::go.mod/go.sum are out of date. Run 'make tidy' and commit the changes."
+          exit 1
+        fi
+
   check-license:
     name: Check License
     runs-on: ubuntu-latest
@@ -128,7 +149,7 @@ jobs:
         SPANNER_EMULATOR_HOST: localhost:9010
         PUBSUB_EMULATOR_HOST: localhost:8681
       run: |
-        go run gotest.tools/gotestsum@latest --junitfile report.xml --jsonfile test-results.json -- -coverprofile coverage.out ./...
+        go run gotest.tools/gotestsum@latest --junitfile report.xml --jsonfile test-results.json -- -race -coverprofile coverage.out ./...
     - name: Convert Unit Tests
       continue-on-error: true
       run: |

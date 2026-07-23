@@ -54,6 +54,8 @@ type MonitoringConfig interface {
 	// Metrics configuration
 	ExporterMetricsProtocol() string
 	MetricsInterval() time.Duration
+	EnableHttpClientMetrics() bool
+	EnableHttpClientSpanAttributes() bool
 }
 
 type Monitoring struct {
@@ -66,8 +68,10 @@ type Monitoring struct {
 	ExporterTraceProtocolCfg  string `env:"OTEL_EXPORTER_OTLP_TRACES_PROTOCOL"` // Specifies the OTLP transport protocol to be used for trace data.
 	EnableHttpClientTracesCfg bool   `env:"OTEL_ENABLE_HTTP_CLIENT_TRACES"`     // Enables the DNS, connect, TLS, and get-connection traces in the "net/http.Client{}"
 	// Metrics configuration
-	ExporterMetricsProtocolCfg string  `env:"OTEL_EXPORTER_OTLP_METRICS_PROTOCOL"` // Specifies the OTLP transport protocol to be used for metric data.
-	MetricsIntervalCfg         float64 `env:"OTEL_METRICS_INTERVAL_SECONDS"`       // Specifies the interval at which metrics are exported.
+	ExporterMetricsProtocolCfg        string  `env:"OTEL_EXPORTER_OTLP_METRICS_PROTOCOL"`     // Specifies the OTLP transport protocol to be used for metric data.
+	MetricsIntervalCfg                float64 `env:"OTEL_METRICS_INTERVAL_SECONDS"`           // Specifies the interval at which metrics are exported.
+	EnableHttpClientMetricsCfg        bool    `env:"OTEL_ENABLE_HTTP_CLIENT_METRICS"`         // Enables connection-lifecycle metrics (DNS, connect, TLS, get-connection, TTFB, PutIdleConn errors) for the "net/http.Client{}"
+	EnableHttpClientSpanAttributesCfg bool    `env:"OTEL_ENABLE_HTTP_CLIENT_SPAN_ATTRIBUTES"` // Enables connection-lifecycle span attributes (DNS, connect, TLS, get-connection, TTFB) on the request span for the "net/http.Client{}"
 }
 
 // NewMonitoringConfig returns a singleton instance of the Monitoring configuration.
@@ -139,4 +143,16 @@ func (d Monitoring) MetricsInterval() time.Duration {
 // EnableHttpClientTraces enables DNS, connect, TLS, and get-connection traces in the "net/http.Client{}"
 func (d Monitoring) EnableHttpClientTraces() bool {
 	return d.EnableHttpClientTracesCfg
+}
+
+// EnableHttpClientMetrics enables connection-lifecycle metrics (DNS, connect, TLS,
+// get-connection, TTFB, PutIdleConn errors) in the "net/http.Client{}"
+func (d Monitoring) EnableHttpClientMetrics() bool {
+	return d.EnableHttpClientMetricsCfg
+}
+
+// EnableHttpClientSpanAttributes enables connection-lifecycle span attributes (DNS,
+// connect, TLS, get-connection, TTFB) on the request span in the "net/http.Client{}"
+func (d Monitoring) EnableHttpClientSpanAttributes() bool {
+	return d.EnableHttpClientSpanAttributesCfg
 }
