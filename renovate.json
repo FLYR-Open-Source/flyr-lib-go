@@ -54,6 +54,7 @@
       ],
       "groupSlug": "otel",
       "matchPackageNames": [
+        "go.opentelemetry.io/otel",
         "go.opentelemetry.io/otel/**"
       ],
       "semanticCommitScope": "otel-deps",
