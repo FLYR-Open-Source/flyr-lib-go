@@ -5,7 +5,7 @@ go 1.26.5
 replace github.com/FLYR-Open-Source/flyr-lib-go => ../../..
 
 require (
-	cloud.google.com/go/logging v1.19.0
+	cloud.google.com/go/logging v1.19.1
 	github.com/FLYR-Open-Source/flyr-lib-go v1.6.0
 	google.golang.org/api v0.292.0
 	google.golang.org/genproto v0.0.0-20260319201613-d00831a3d3e7
