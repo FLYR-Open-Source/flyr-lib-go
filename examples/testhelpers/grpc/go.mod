@@ -1,6 +1,6 @@
 module github.com/FLYR-Open-Source/flyr-lib-go/examples/testhelpers/grpc
 
-go 1.26.5
+go 1.27.0
 
 replace github.com/FLYR-Open-Source/flyr-lib-go => ../../..
 
