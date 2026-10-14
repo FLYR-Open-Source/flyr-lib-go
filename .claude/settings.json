@@ -16,5 +16,29 @@
       "Bash(ffprobe *)",
       "Bash(gws schema *)"
     ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "f=$(jq -r '.tool_input.file_path'); case \"$f\" in */go.sum|go.sum) echo 'go.sum is generated: run make tidy (go mod tidy) instead of editing it by hand.' >&2; exit 2;; esac"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "f=$(jq -r '.tool_input.file_path'); case \"$f\" in *.go) gofmt -w \"$f\";; esac"
+          }
+        ]
+      }
+    ]
   }
 }
