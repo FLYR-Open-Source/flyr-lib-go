@@ -86,9 +86,10 @@ jobs:
           name: ${{ inputs.downloadArtifact }}
           path: target/
       - name: Semantic Release
-        uses: davidspek/semantic-release-action@e03fa181e172824c9fea3d99850909c3b0d6ac8e # main
+        uses: cycjimmy/semantic-release-action@9e1f8a3ef91f1097285028e799a5fb8bb90e8899 # v8.1.0
         id: semantic_release
         with:
+          semantic_version: 24.2.9
           dry_run: ${{ github.event_name == 'pull_request' || inputs.dryRun }}
           unset_gha_env: ${{ github.event_name == 'pull_request' }}
           ci: ${{ github.event_name == 'pull_request' && false || '' }}
