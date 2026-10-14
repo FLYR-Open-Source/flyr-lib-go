@@ -3,7 +3,7 @@ module github.com/FLYR-Open-Source/flyr-lib-go/examples/monitoring/pubsub
 go 1.27.1
 
 require (
-	cloud.google.com/go/pubsub/v2 v2.6.2
+	cloud.google.com/go/pubsub/v2 v2.7.0
 	github.com/FLYR-Open-Source/flyr-lib-go v1.6.0
 	google.golang.org/api v0.293.0
 )
