@@ -75,10 +75,13 @@ jobs:
           ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.ref || '' }}
       - name: Temporarily merge PR branch
         if: ${{ github.event_name == 'pull_request' }}
+        env:
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
         run: |
           git config --global user.name github-actions
           git config --global user.email github-actions@github.com
-          git merge --no-ff origin/${{ github.event.pull_request.head.ref }} --message "${{ github.event.pull_request.title }}"
+          git merge --no-ff "origin/${HEAD_REF}" --message "${PR_TITLE}"
       - name: Download Release Artifact
         uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         if: ${{ inputs.downloadArtifact != '' }}
