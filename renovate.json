@@ -37,7 +37,11 @@
       "matchDepTypes": [
         "golang"
       ],
-      "rangeStrategy": "bump"
+      "rangeStrategy": "bump",
+      "description": "The go directive is a minimum Go version for library consumers: never auto-merge it, and type it feat so it releases as a minor version and appears in release notes",
+      "automerge": false,
+      "semanticCommitType": "feat",
+      "semanticCommitScope": "go"
     },
     {
       "matchManagers": [
@@ -48,28 +52,30 @@
       ]
     },
     {
+      "description": "Keep the whole OpenTelemetry family (otel, contrib, proto, auto) in one PR so versions never mix",
       "groupName": "otel",
+      "groupSlug": "otel",
       "matchDatasources": [
         "go"
       ],
-      "groupSlug": "otel",
       "matchPackageNames": [
-        "go.opentelemetry.io/otel/**"
+        "go.opentelemetry.io/**"
       ],
       "semanticCommitScope": "otel-deps",
       "semanticCommitType": "{{#if isPatch}}fix{{else}}feat{{/if}}"
     },
     {
-      "groupName": "otel-contrib",
+      "description": "Google client stack moves together (api, grpc, genproto, protobuf, cloud.google.com, googleapis) to avoid overlapping single-module PRs",
+      "groupName": "google-cloud",
+      "groupSlug": "google-cloud",
       "matchDatasources": [
         "go"
       ],
-      "groupSlug": "otel-contrib",
       "matchPackageNames": [
-        "go.opentelemetry.io/contrib/**"
-      ],
-      "semanticCommitScope": "otel-deps",
-      "semanticCommitType": "{{#if isPatch}}fix{{else}}feat{{/if}}"
+        "google.golang.org/**",
+        "cloud.google.com/go/**",
+        "github.com/googleapis/**"
+      ]
     }
   ],
   "labels": [
