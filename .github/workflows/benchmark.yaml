@@ -5,8 +5,9 @@ on:
       - main
   workflow_dispatch:
 
-# Declare default permissions as read only.
-permissions: read-all
+# Least privilege: the job only reads the repo (benchmark history is kept in the Actions cache).
+permissions:
+  contents: read
 
 jobs:
     benchmark:
