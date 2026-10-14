@@ -48,7 +48,7 @@ jobs:
     - name: Go Mod Download
       run: go mod download
     - name: Install addlicense
-      run: go install github.com/google/addlicense@v1.2.0
+      run: go install -mod=readonly github.com/google/addlicense@v1.2.0
     - name: Check license headers
       run: |
         addlicense -check -l mit -f ./LICENSE -c "FLYR, Inc" $(find . -type f -name "*.go")
