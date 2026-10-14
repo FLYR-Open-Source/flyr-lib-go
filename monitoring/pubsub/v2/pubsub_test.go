@@ -69,6 +69,12 @@ func installRecorder(t *testing.T) *tracetest.SpanRecorder {
 func localOptions(t *testing.T) []option.ClientOption {
 	t.Helper()
 
+	// When PUBSUB_EMULATOR_HOST is set, the SDK's emulator hook appends
+	// option.WithTelemetryDisabled(), which suppresses the gRPC (otelgrpc)
+	// spans these tests assert on. Clear it so results do not depend on the
+	// environment (e.g. CI).
+	t.Setenv("PUBSUB_EMULATOR_HOST", "")
+
 	srv := pstest.NewServer()
 	t.Cleanup(func() { _ = srv.Close() })
 
@@ -180,6 +186,35 @@ func TestNewClient_EmptyProjectID(t *testing.T) {
 	assert.Nil(t, client)
 }
 
+// publishAndCountSpans creates the test topic, publishes one message and
+// returns how many library ("<topic> create") and otelgrpc spans were recorded.
+func publishAndCountSpans(t *testing.T, ctx context.Context, client *pubsub.Client, recorder *tracetest.SpanRecorder) (libSpans, grpcSpans int) {
+	t.Helper()
+
+	topicName := "projects/" + testProject + "/topics/" + testTopic
+	_, err := client.TopicAdminClient.CreateTopic(ctx, &pubsubpb.Topic{Name: topicName})
+	require.NoError(t, err)
+
+	publisher := client.Publisher(topicName)
+	t.Cleanup(publisher.Stop)
+
+	_, err = publisher.Publish(ctx, &pubsub.Message{Data: []byte("hello")}).Get(ctx)
+	require.NoError(t, err)
+	publisher.Stop()
+
+	for _, s := range recorder.Ended() {
+		scope := s.InstrumentationScope().Name
+		switch {
+		case scope == pubsubScope && s.Name() == testTopic+" create":
+			libSpans++
+		case strings.Contains(scope, "otelgrpc"):
+			grpcSpans++
+		}
+	}
+
+	return libSpans, grpcSpans
+}
+
 func TestNewClient_Tracing(t *testing.T) {
 	tests := []struct {
 		name         string
@@ -243,27 +278,7 @@ func TestNewClient_Tracing(t *testing.T) {
 
 			assert.Equal(t, testProject, client.Project())
 
-			topicName := "projects/" + testProject + "/topics/" + testTopic
-			_, err = client.TopicAdminClient.CreateTopic(ctx, &pubsubpb.Topic{Name: topicName})
-			require.NoError(t, err)
-
-			publisher := client.Publisher(topicName)
-			t.Cleanup(publisher.Stop)
-
-			_, err = publisher.Publish(ctx, &pubsub.Message{Data: []byte("hello")}).Get(ctx)
-			require.NoError(t, err)
-			publisher.Stop()
-
-			var libSpans, grpcSpans int
-			for _, s := range recorder.Ended() {
-				scope := s.InstrumentationScope().Name
-				switch {
-				case scope == pubsubScope && s.Name() == testTopic+" create":
-					libSpans++
-				case strings.Contains(scope, "otelgrpc"):
-					grpcSpans++
-				}
-			}
+			libSpans, grpcSpans := publishAndCountSpans(t, ctx, client, recorder)
 
 			if tt.wantLibSpans {
 				assert.Equal(t, 1, libSpans)
@@ -280,4 +295,26 @@ func TestNewClient_Tracing(t *testing.T) {
 			}
 		})
 	}
+}
+
+// TestNewClient_EmulatorHostDisablesGrpcTracing documents SDK behaviour: with
+// PUBSUB_EMULATOR_HOST set, the SDK disables client telemetry, so even default
+// options yield no otelgrpc spans (the library span is unaffected). The
+// endpoint override from localOptions still wins, so traffic reaches pstest.
+func TestNewClient_EmulatorHostDisablesGrpcTracing(t *testing.T) {
+	recorder := installRecorder(t)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	t.Cleanup(cancel)
+
+	opts := localOptions(t)
+	t.Setenv("PUBSUB_EMULATOR_HOST", "localhost:1") // after localOptions, which clears it
+
+	client, err := NewClient(ctx, testProject, WithClientOptions(opts...))
+	require.NoError(t, err)
+	t.Cleanup(func() { _ = client.Close() })
+
+	libSpans, grpcSpans := publishAndCountSpans(t, ctx, client, recorder)
+
+	assert.Equal(t, 1, libSpans)
+	assert.Zero(t, grpcSpans)
 }
