@@ -89,7 +89,7 @@ jobs:
         uses: cycjimmy/semantic-release-action@9e1f8a3ef91f1097285028e799a5fb8bb90e8899 # v8.1.0
         id: semantic_release
         with:
-          semantic_version: 24.2.9
+          semantic_version: 25.0.9
           dry_run: ${{ github.event_name == 'pull_request' || inputs.dryRun }}
           unset_gha_env: ${{ github.event_name == 'pull_request' }}
           ci: ${{ github.event_name == 'pull_request' && false || '' }}
