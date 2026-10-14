@@ -1,6 +1,6 @@
 module github.com/FLYR-Open-Source/flyr-lib-go/examples/monitoring/spans
 
-go 1.26.8
+go 1.27.1
 
 require (
 	github.com/FLYR-Open-Source/flyr-lib-go v1.6.0
