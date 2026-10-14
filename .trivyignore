@@ -1,0 +1,8 @@
+# GO-2026-5932: golang.org/x/crypto/openpgp is unmaintained / unsafe by design.
+# Not applicable to flyr-lib-go: x/crypto is only an indirect dependency (grpc, oauth2,
+# Google API client) and the openpgp package is never imported — it is absent from
+# `go list -deps ./...` and govulncheck reports 0 vulnerabilities called.
+# The advisory covers every x/crypto version and has no fixed release, so it cannot be
+# resolved by upgrading. Re-evaluate when this entry expires.
+# Refs: CPE-3645, https://pkg.go.dev/vuln/GO-2026-5932
+GO-2026-5932 exp:2027-04-14
