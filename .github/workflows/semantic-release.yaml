@@ -93,8 +93,8 @@ jobs:
           unset_gha_env: ${{ github.event_name == 'pull_request' }}
           ci: ${{ github.event_name == 'pull_request' && false || '' }}
           extra_plugins: |
-            @semantic-release/changelog
-            @semantic-release/git
-            conventional-changelog-conventionalcommits
+            @semantic-release/changelog@7.0.0
+            @semantic-release/git@11.0.1
+            conventional-changelog-conventionalcommits@9.3.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
