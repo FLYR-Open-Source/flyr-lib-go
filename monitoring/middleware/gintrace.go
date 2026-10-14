@@ -77,17 +77,22 @@ func OtelGinMiddleware() gin.HandlerFunc {
 		// serve the request to the next middleware
 		c.Next()
 
-		status := c.Writer.Status()
-		code, descr := utils.HTTPServerStatus(status)
-		span.SetStatus(code, descr)
-		if status > 0 {
-			span.SetAttributes(semconv.HTTPStatusCode(status))
-		}
-		if status >= 500 && status < 600 {
-			span.SetAttributes(attribute.String("Error", fmt.Sprintf("%d: %s", status, http.StatusText(status))))
-		}
-		if len(c.Errors) > 0 {
-			span.SetAttributes(attribute.String("gin.errors", c.Errors.String()))
-		}
+		recordGinResponse(span, c)
+	}
+}
+
+// recordGinResponse sets the span status and response attributes once the request has been served.
+func recordGinResponse(span oteltrace.Span, c *gin.Context) {
+	status := c.Writer.Status()
+	code, descr := utils.HTTPServerStatus(status)
+	span.SetStatus(code, descr)
+	if status > 0 {
+		span.SetAttributes(semconv.HTTPStatusCode(status))
+	}
+	if status >= 500 && status < 600 {
+		span.SetAttributes(attribute.String("Error", fmt.Sprintf("%d: %s", status, http.StatusText(status))))
+	}
+	if len(c.Errors) > 0 {
+		span.SetAttributes(attribute.String("gin.errors", c.Errors.String()))
 	}
 }

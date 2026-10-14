@@ -25,6 +25,7 @@ package meter
 import (
 	"context"
 	"net"
+	"slices"
 	"sync"
 	"testing"
 
@@ -35,6 +36,7 @@ import (
 	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/metric/metricdata"
 	collector "go.opentelemetry.io/proto/otlp/collector/metrics/v1"
+	metricpb "go.opentelemetry.io/proto/otlp/metrics/v1"
 	"google.golang.org/grpc"
 
 	"github.com/FLYR-Open-Source/flyr-lib-go/internal/config"
@@ -189,6 +191,26 @@ func startFakeMetricsServer(t *testing.T) (*fakeMetricsServer, string) {
 	return fake, "http://" + lis.Addr().String()
 }
 
+// findExportedMetric returns the named metric (nil when absent), the resource attributes and
+// the scope names found in the exported requests.
+func findExportedMetric(requests []*collector.ExportMetricsServiceRequest, name string) (metric *metricpb.Metric, resourceAttrs map[string]string, scopeNames []string) {
+	resourceAttrs = map[string]string{}
+	for _, req := range requests {
+		for _, rm := range req.GetResourceMetrics() {
+			for _, kv := range rm.GetResource().GetAttributes() {
+				resourceAttrs[kv.GetKey()] = kv.GetValue().GetStringValue()
+			}
+			for _, sm := range rm.GetScopeMetrics() {
+				scopeNames = append(scopeNames, sm.GetScope().GetName())
+				if i := slices.IndexFunc(sm.GetMetrics(), func(m *metricpb.Metric) bool { return m.GetName() == name }); i >= 0 {
+					metric = sm.GetMetrics()[i]
+				}
+			}
+		}
+	}
+	return metric, resourceAttrs, scopeNames
+}
+
 func TestStartDefaultMeter_ExportsMetricsOnShutdown(t *testing.T) {
 	restoreGlobalMeterProvider(t)
 	config.ResetMonitoringConfig()
@@ -216,30 +238,16 @@ func TestStartDefaultMeter_ExportsMetricsOnShutdown(t *testing.T) {
 	requests := fake.requests()
 	require.NotEmpty(t, requests)
 
-	resourceAttrs := map[string]string{}
-	var found bool
-	for _, req := range requests {
-		for _, rm := range req.GetResourceMetrics() {
-			for _, kv := range rm.GetResource().GetAttributes() {
-				resourceAttrs[kv.GetKey()] = kv.GetValue().GetStringValue()
-			}
-			for _, sm := range rm.GetScopeMetrics() {
-				assert.Equal(t, "meter-e2e-service", sm.GetScope().GetName())
-				for _, metric := range sm.GetMetrics() {
-					if metric.GetName() != "e2e.requests" {
-						continue
-					}
-					found = true
-					assert.Equal(t, `Requests (Measured in "{request}").`, metric.GetDescription())
-					assert.Equal(t, "{request}", metric.GetUnit())
-					require.Len(t, metric.GetSum().GetDataPoints(), 1)
-					assert.Equal(t, int64(7), metric.GetSum().GetDataPoints()[0].GetAsInt())
-				}
-			}
-		}
-	}
+	metric, resourceAttrs, scopeNames := findExportedMetric(requests, "e2e.requests")
 
-	assert.True(t, found, "metric e2e.requests was not exported")
+	for _, scopeName := range scopeNames {
+		assert.Equal(t, "meter-e2e-service", scopeName)
+	}
+	require.NotNil(t, metric, "metric e2e.requests was not exported")
+	assert.Equal(t, `Requests (Measured in "{request}").`, metric.GetDescription())
+	assert.Equal(t, "{request}", metric.GetUnit())
+	require.Len(t, metric.GetSum().GetDataPoints(), 1)
+	assert.Equal(t, int64(7), metric.GetSum().GetDataPoints()[0].GetAsInt())
 	assert.Equal(t, "meter-e2e-service", resourceAttrs["service.name"])
 	assert.Equal(t, "grpc", resourceAttrs[config.EXPORTER_PROTOCOL])
 }

@@ -80,12 +80,12 @@ func splitHostPort(hostport string) (host string, port int) {
 			// Invalid hostport.
 			return
 		}
-		if i := strings.LastIndex(hostport[addrEnd:], ":"); i < 0 {
+		if strings.LastIndex(hostport[addrEnd:], ":") < 0 {
 			host = hostport[1:addrEnd]
 			return
 		}
 	} else {
-		if i := strings.LastIndex(hostport, ":"); i < 0 {
+		if strings.LastIndex(hostport, ":") < 0 {
 			host = hostport
 			return
 		}
