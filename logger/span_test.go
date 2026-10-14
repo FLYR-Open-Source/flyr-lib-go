@@ -23,7 +23,9 @@
 package logger
 
 import (
+	"context"
 	"encoding/json"
+	"errors"
 	"testing"
 	"time"
 
@@ -31,6 +33,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.opentelemetry.io/otel/codes"
 )
 
 func TestValueToJSONString(t *testing.T) {
@@ -155,4 +158,103 @@ func TestConvertToOtelNestedTags(t *testing.T) {
 	v, ok = attributesResult["my_items.amount"]
 	assert.True(t, ok)
 	assert.Equal(t, "10.5", v)
+}
+
+type testLogValuer struct{}
+
+func (testLogValuer) LogValue() slog.Value {
+	return slog.GroupValue(slog.String("inner", "value"))
+}
+
+func TestValueToJSONString_LogValuerAndMarshalError(t *testing.T) {
+	t.Run("LogValuer is resolved", func(t *testing.T) {
+		got, err := valueToJSONString(slog.AnyValue(testLogValuer{}))
+		require.NoError(t, err)
+		assert.JSONEq(t, `{"inner":"value"}`, got)
+	})
+
+	t.Run("Any value that cannot be marshalled returns an error", func(t *testing.T) {
+		got, err := valueToJSONString(slog.AnyValue(make(chan int)))
+		require.Error(t, err)
+		assert.Empty(t, got)
+	})
+}
+
+func TestConvertToOtelNestedTags_NonObjectJSON(t *testing.T) {
+	tests := []struct {
+		name  string
+		input string
+	}{
+		{name: "number", input: "42"},
+		{name: "string", input: `"text"`},
+		{name: "array", input: `[1,2]`},
+		{name: "malformed", input: `{not json`},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := make(map[string]string)
+			convertToOtelNestedTags("prefix", tt.input, result)
+			assert.Empty(t, result)
+		})
+	}
+}
+
+func TestInjectAttrsToSpan(t *testing.T) {
+	t.Run("Non-recording span is a no-op", func(t *testing.T) {
+		assert.NotPanics(t, func() {
+			injectAttrsToSpan(context.Background(), slog.Group("metadata", "id", 1))
+		})
+	})
+
+	tests := []struct {
+		name string
+		attr slog.Attr
+		want map[string]string
+	}{
+		{
+			name: "group is flattened with dotted keys",
+			attr: slog.Group("metadata", "id", 1, "nested", map[string]interface{}{"a": "b"}),
+			want: map[string]string{"metadata.id": "1", "metadata.nested.a": "b"},
+		},
+		{
+			name: "non-object value is ignored",
+			attr: slog.Int("count", 5),
+			want: map[string]string{},
+		},
+		{
+			name: "unmarshalable value is ignored",
+			attr: slog.Any("bad", make(chan int)),
+			want: map[string]string{},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx, span, _ := newRecordingSpan(t)
+
+			injectAttrsToSpan(ctx, tt.attr)
+
+			assert.Equal(t, tt.want, spanAttrs(span))
+		})
+	}
+}
+
+func TestSetErroredSpan(t *testing.T) {
+	t.Run("Non-recording span is a no-op", func(t *testing.T) {
+		assert.NotPanics(t, func() {
+			setErroredSpan(context.Background(), errors.New("ignored"))
+		})
+	})
+
+	t.Run("Recording span gets Error status and the error event", func(t *testing.T) {
+		ctx, span, _ := newRecordingSpan(t)
+
+		setErroredSpan(ctx, errors.New("bad thing"))
+
+		assert.Equal(t, codes.Error, span.Status().Code)
+		assert.Equal(t, "bad thing", span.Status().Description)
+		require.Len(t, span.Events(), 1)
+		assert.Equal(t, "exception", span.Events()[0].Name)
+	})
 }

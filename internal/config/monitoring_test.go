@@ -185,3 +185,36 @@ func TestMetricsInterval(t *testing.T) {
 		})
 	}
 }
+
+func TestMonitoringConfigPanicsOnInvalidEnvironment(t *testing.T) {
+	tests := []struct {
+		name      string
+		variables map[string]string
+	}{
+		{
+			name:      "with a non-numeric metrics interval",
+			variables: map[string]string{"OTEL_METRICS_INTERVAL_SECONDS": "not-a-number"},
+		},
+		{
+			name:      "with a non-boolean test exporter flag",
+			variables: map[string]string{"OTEL_EXPORTER_OTLP_TEST": "maybe"},
+		},
+		{
+			name:      "with a non-boolean http client traces flag",
+			variables: map[string]string{"OTEL_ENABLE_HTTP_CLIENT_TRACES": "maybe"},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// A panic inside sync.Once.Do still marks the Once as done, so the singleton
+			// must be reset both before and after to avoid leaking state into other tests.
+			ResetMonitoringConfig()
+			t.Cleanup(ResetMonitoringConfig)
+
+			assert.Panics(t, func() {
+				NewMonitoringConfig(withEnvironment(tt.variables))
+			})
+		})
+	}
+}

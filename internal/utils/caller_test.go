@@ -24,6 +24,9 @@ package utils
 
 import (
 	"encoding/json"
+	"path/filepath"
+	"runtime"
+	"strings"
 	"testing"
 
 	"log/slog"
@@ -33,6 +36,33 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/otel/attribute"
 )
+
+func TestGetCallerName(t *testing.T) {
+	t.Run("Skipping one frame returns the caller of GetCallerName", func(t *testing.T) {
+		_, _, line, _ := runtime.Caller(0)
+		caller := GetCallerName(1) // must stay on the line right after runtime.Caller(0)
+
+		assert.Equal(t, "caller_test.go", filepath.Base(caller.FilePath))
+		assert.Equal(t, line+1, caller.LineNumber)
+		assert.NotEmpty(t, caller.FunctionName)
+	})
+
+	t.Run("Skipping two frames returns the caller of the caller", func(t *testing.T) {
+		// the test function is invoked by testing.tRunner
+		caller := GetCallerName(2)
+
+		assert.True(t, strings.HasSuffix(filepath.ToSlash(caller.FilePath), "testing/testing.go"))
+		assert.Positive(t, caller.LineNumber)
+		assert.Equal(t, "testing", caller.Namespace)
+		assert.Equal(t, "tRunner", caller.FunctionName)
+	})
+
+	t.Run("Skipping more frames than the stack depth returns an empty caller", func(t *testing.T) {
+		caller := GetCallerName(10000)
+
+		assert.Equal(t, Caller{}, caller)
+	})
+}
 
 func TestSplitFunctionName(t *testing.T) {
 	tests := []struct {

@@ -14,6 +14,8 @@ make test            # gotestsum -- -short --cover over $(TEST_DIRS)
 make tidy            # go mod tidy in EVERY go.mod (root + each example)
 make add-license     # add MIT headers; CI fails without them on every .go file
 make check-license
+make coverage        # per-package coverage over $(COVER_PKGS); prints funcs below 100% + total, writes coverage.out / coverage.html
+make coverage-check  # make coverage, then fail if total < COVERAGE_MIN (default 90)
 make benchmark
 make pre-commit-hook # installs scripts/license-pre-commit.sh as a git hook
 
@@ -21,6 +23,7 @@ go test ./monitoring/tracer -run TestName -v   # single test
 ```
 
 - `make test` deliberately **excludes** `examples/`, `pkg/` and `scripts/` (`EXCLUDED_TOP_DIRS`), so `pkg/testhelpers` tests are not run by it. CI instead runs `gotestsum ... ./...` from the root, which does include `pkg/`. Use `go test ./...` to match CI.
+- `make coverage` scope: all root-module packages except `examples/**`; `pkg/testhelpers` is included. Per-package (no `-coverpkg`), same as CI's `coverage.out` for Sonar. Threshold: `make coverage-check COVERAGE_MIN=80` overrides the default 90.
 - `golangci-lint`, `gotestsum` and `addlicense` are not vendored; install them separately (`brew install golangci-lint`; `go install github.com/google/addlicense@latest`).
 - Every `.go` file needs the MIT header with `FLYR, Inc` (see any existing file; `make add-license` writes it). Package clauses also carry import comments, e.g. `package tracer // import "github.com/FLYR-Open-Source/flyr-lib-go/monitoring/tracer"` — keep that on new packages.
 
