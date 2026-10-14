@@ -191,6 +191,25 @@ func TestInitializeTracerProvider_SetsCompositePropagator(t *testing.T) {
 	assert.ElementsMatch(t, []string{"traceparent", "tracestate", "baggage"}, otel.GetTextMapPropagator().Fields())
 }
 
+// collectExportedSpans returns the spans, the resource attributes and the scope names (mapped to
+// their versions) found in the exported requests.
+func collectExportedSpans(requests []*collector.ExportTraceServiceRequest) (spans []*tracepb.Span, resourceAttrs, scopeNames map[string]string) {
+	resourceAttrs = map[string]string{}
+	scopeNames = map[string]string{}
+	for _, req := range requests {
+		for _, rs := range req.GetResourceSpans() {
+			for _, kv := range rs.GetResource().GetAttributes() {
+				resourceAttrs[kv.GetKey()] = kv.GetValue().GetStringValue()
+			}
+			for _, ss := range rs.GetScopeSpans() {
+				scopeNames[ss.GetScope().GetName()] = ss.GetScope().GetVersion()
+				spans = append(spans, ss.GetSpans()...)
+			}
+		}
+	}
+	return spans, resourceAttrs, scopeNames
+}
+
 func TestStartDefaultTracer(t *testing.T) {
 	t.Run("empty service name starts a noop tracer", func(t *testing.T) {
 		restoreGlobals(t)
@@ -238,20 +257,7 @@ func TestStartDefaultTracer(t *testing.T) {
 		// the batch processor only flushes on its schedule or on shutdown
 		require.NoError(t, ShutdownTracerProvider(ctx))
 
-		var spans []*tracepb.Span
-		resourceAttrs := map[string]string{}
-		scopeNames := map[string]string{}
-		for _, req := range fake.requests() {
-			for _, rs := range req.GetResourceSpans() {
-				for _, kv := range rs.GetResource().GetAttributes() {
-					resourceAttrs[kv.GetKey()] = kv.GetValue().GetStringValue()
-				}
-				for _, ss := range rs.GetScopeSpans() {
-					scopeNames[ss.GetScope().GetName()] = ss.GetScope().GetVersion()
-					spans = append(spans, ss.GetSpans()...)
-				}
-			}
-		}
+		spans, resourceAttrs, scopeNames := collectExportedSpans(fake.requests())
 
 		require.Len(t, spans, 1)
 		assert.Equal(t, "e2e-span", spans[0].GetName())

@@ -41,7 +41,7 @@ func (a AmqpHeadersCarrier) Get(key string) string {
 }
 
 // Set sets the value for the key
-func (a AmqpHeadersCarrier) Set(key string, value string) {
+func (a AmqpHeadersCarrier) Set(key, value string) {
 	a[key] = value
 }
 
