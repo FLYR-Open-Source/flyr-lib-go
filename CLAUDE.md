@@ -28,6 +28,8 @@ go test ./monitoring/tracer -run TestName -v   # single test
 
 Releases are automated by semantic-release (`.releaserc.js`) from **Conventional Commits** on `main` (also `release/N.x`, `next`, `alpha`, `beta`, `rc`). The commit type decides the version bump, so use `fix:`/`feat:`/`feat!:` accurately. Dependency bumps arrive from Renovate as `fix(deps): ...`.
 
+PR titles (and so squash-merge commit subjects) put the Jira ticket right after the type: `<type>(<scope>): <TICKET> <summary>`, e.g. `ci: CPE-3645 pin semantic-release plugins to fix Release Validation`. Bot PRs (Renovate/Dependabot) are exempt.
+
 ## Architecture
 
 Three layers; public packages depend on `internal/`, never the reverse.
