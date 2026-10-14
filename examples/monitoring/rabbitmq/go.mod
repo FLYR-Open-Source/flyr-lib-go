@@ -1,6 +1,6 @@
 module github.com/FLYR-Open-Source/flyr-lib-go/examples/monitoring/rabbitmq
 
-go 1.26.5
+go 1.26.8
 
 require (
 	github.com/FLYR-Open-Source/flyr-lib-go v1.6.0
