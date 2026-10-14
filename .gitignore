@@ -4,6 +4,7 @@
 # Coverage
 cover/*
 coverage.out
+coverage.html
 unit-test-results.json
 
 # Benchmark

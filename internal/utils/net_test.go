@@ -123,6 +123,12 @@ func TestSplitHostPort(t *testing.T) {
 			wantPort: -1,
 		},
 		{
+			name:     "Invalid format with too many colons",
+			hostport: "127.0.0.1:80:90",
+			wantHost: "",
+			wantPort: -1,
+		},
+		{
 			name:     "Invalid format with non-numeric port",
 			hostport: "127.0.0.1:abcd",
 			wantHost: "127.0.0.1",

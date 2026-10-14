@@ -124,9 +124,6 @@ jobs:
       run: go mod download
     - name: Run Unit Tests
       continue-on-error: true
-      env:
-        SPANNER_EMULATOR_HOST: localhost:9010
-        PUBSUB_EMULATOR_HOST: localhost:8681
       run: |
         go run gotest.tools/gotestsum@latest --junitfile report.xml --jsonfile test-results.json -- -coverprofile coverage.out ./...
     - name: Convert Unit Tests

@@ -46,3 +46,24 @@ func TestLoggerConfigWithEnvVars(t *testing.T) {
 	assert.Equalf(t, "test-service", cfg.Service(), "default Service() return value is not correct")
 	assert.Equalf(t, "error", cfg.LogLevel(), "default LogLevel() return value is not correct")
 }
+
+func TestLoggerConfigFromProcessEnvironment(t *testing.T) {
+	t.Setenv("LOG_LEVEL", "debug")
+	t.Setenv("OTEL_SERVICE_NAME", "env-service")
+
+	cfg := NewLoggerConfig()
+
+	assert.Equal(t, "debug", cfg.LogLevel())
+	assert.Equal(t, "env-service", cfg.Service())
+}
+
+func TestLoggerConfigPanicsOnInvalidEnvironment(t *testing.T) {
+	// the embedded Monitoring config parses OTEL_METRICS_INTERVAL_SECONDS as a float
+	en := map[string]string{
+		"OTEL_METRICS_INTERVAL_SECONDS": "not-a-number",
+	}
+
+	assert.Panics(t, func() {
+		NewLoggerConfig(withEnvironment(en))
+	})
+}

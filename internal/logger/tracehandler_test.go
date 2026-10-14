@@ -170,3 +170,41 @@ func TestNewTracingHandler(t *testing.T) {
 	assert.Equal(t, slog.LevelInfo, handler.(*TracingHandler).level)
 	assert.Equal(t, mockNext, handler.(*TracingHandler).next)
 }
+
+func TestTracingHandler_Handle_MissingNextHandler(t *testing.T) {
+	handler := &TracingHandler{level: slog.LevelInfo}
+
+	err := handler.Handle(context.Background(), slog.Record{Level: slog.LevelInfo})
+
+	require.Error(t, err)
+	assert.EqualError(t, err, "handler is missing")
+}
+
+func TestTracingHandler_Handler(t *testing.T) {
+	mockNext := &MockHandler{}
+	handler := &TracingHandler{next: mockNext, level: slog.LevelInfo}
+
+	assert.Same(t, mockNext, handler.Handler())
+}
+
+func TestTracingHandler_WithAttrsAndWithGroupPreserveLevelAndWrapNext(t *testing.T) {
+	mockNext := &MockHandler{}
+	handler := &TracingHandler{next: mockNext, level: slog.LevelWarn}
+
+	tests := []struct {
+		name    string
+		derived slog.Handler
+	}{
+		{name: "WithAttrs", derived: handler.WithAttrs([]slog.Attr{slog.String("k", "v")})},
+		{name: "WithGroup", derived: handler.WithGroup("group")},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			derived, ok := tt.derived.(*TracingHandler)
+			require.True(t, ok, "derived handler must still be a TracingHandler")
+			assert.Equal(t, slog.LevelWarn, derived.level)
+			assert.NotNil(t, derived.Handler())
+		})
+	}
+}
