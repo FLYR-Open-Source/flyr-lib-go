@@ -1,5 +1,3 @@
-# Centrally managed file, do not modify directly https://github.com/FlyrInc/terraform-tfe-cloud/tree/main/terraform-github/repository-files/files
-
 name: Close stale issues and pull requests
 permissions:
   contents: write # only for delete-branch option
