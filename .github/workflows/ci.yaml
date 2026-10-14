@@ -77,7 +77,7 @@ jobs:
       with:
         sarif_file: gosec-results.sarif
     - name: Upload Artifact
-      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+      uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
       id: upload-artifact
       with:
         name: sonar-reports-gosec
@@ -103,7 +103,7 @@ jobs:
       with:
         sarif_file: trivy-results-fs.sarif
     - name: Upload Artifact
-      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+      uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
       id: upload-artifact
       with:
         name: sonar-reports-trivy-fs
@@ -131,7 +131,7 @@ jobs:
       run: |
         go run github.com/ctrf-io/go-ctrf-json-reporter/cmd/go-ctrf-json-reporter@latest -output ctrf-report.json < test-results.json
     - name: Upload Test Results Artifact
-      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+      uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
       id: upload-test-results
       with:
         name: sonar-reports-test-results
@@ -139,7 +139,7 @@ jobs:
           test-results.json
           report.xml
     - name: Upload Coverage Artifact
-      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+      uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
       id: upload-coverage
       with:
         name: sonar-reports-coverage
