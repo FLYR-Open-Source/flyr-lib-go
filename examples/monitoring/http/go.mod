@@ -1,6 +1,6 @@
 module github.com/FLYR-Open-Source/flyr-lib-go/examples/monitoring/http
 
-go 1.27.1
+go 1.27.2
 
 require github.com/FLYR-Open-Source/flyr-lib-go v1.6.0
 
