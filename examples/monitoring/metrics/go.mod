@@ -5,7 +5,7 @@ go 1.27.1
 replace github.com/FLYR-Open-Source/flyr-lib-go => ../../..
 
 require (
-	github.com/FLYR-Open-Source/flyr-lib-go v1.6.0
+	github.com/FLYR-Open-Source/flyr-lib-go v1.10.0
 	go.opentelemetry.io/otel v1.47.0
 	go.opentelemetry.io/otel/metric v1.47.0
 )
