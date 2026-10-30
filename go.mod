@@ -3,7 +3,7 @@ module github.com/FLYR-Open-Source/flyr-lib-go
 go 1.27.1
 
 require (
-	cloud.google.com/go/pubsub/v2 v2.7.0
+	cloud.google.com/go/pubsub/v2 v2.8.0
 	github.com/caarlos0/env/v11 v11.4.1
 	github.com/gin-gonic/gin v1.12.0
 	github.com/go-chi/chi/v5 v5.5.0
@@ -24,7 +24,7 @@ require (
 	go.opentelemetry.io/otel/sdk/metric v1.47.0
 	go.opentelemetry.io/otel/trace v1.47.0
 	go.opentelemetry.io/proto/otlp v1.11.1
-	google.golang.org/api v0.306.0
+	google.golang.org/api v0.308.0
 	google.golang.org/grpc v1.84.0
 )
 
