@@ -1,18 +1,18 @@
 module github.com/FLYR-Open-Source/flyr-lib-go/examples/logging
 
-go 1.27.1
+go 1.27.3
 
 require github.com/FLYR-Open-Source/flyr-lib-go v1.10.0
 
 require (
-	github.com/caarlos0/env/v11 v11.4.1 // indirect
+	github.com/caarlos0/env/v11 v11.4.2 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/go-logr/logr v1.4.4 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/samber/lo v1.53.0 // indirect
-	github.com/samber/slog-common v0.21.0 // indirect
-	github.com/samber/slog-multi v1.8.0 // indirect
+	github.com/samber/slog-common v0.22.0 // indirect
+	github.com/samber/slog-multi v1.9.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
 	go.opentelemetry.io/otel v1.47.0 // indirect
 	go.opentelemetry.io/otel/log v1.47.0 // indirect
