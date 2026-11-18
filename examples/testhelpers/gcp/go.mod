@@ -3,7 +3,7 @@ module github.com/FLYR-Open-Source/flyr-lib-go/examples/testhelpers/gcp
 go 1.27.4
 
 require (
-	cloud.google.com/go/pubsub/v2 v2.8.1
+	cloud.google.com/go/pubsub/v2 v2.9.0
 	github.com/FLYR-Open-Source/flyr-lib-go v1.10.0
 )
 
